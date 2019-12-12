@@ -23,11 +23,11 @@ ui <- fluidPage(
     
     # Application title
     titlePanel(title = tags$img(src = "Bren-logo-only.jpg", width = 80,  "  Siting Tool for Mariculture in Brazil"),
-               windowTitle = "Maricultura app"),
+               windowTitle = "Mariculture Tool"),
     
     # Navbar
-    navbarPage("Maricultura App",
-               
+    navbarPage("" ,
+               # Do not need title for Navigation Bar
                # First tab
                tabPanel(div(icon("info-circle"),"About"),
                         p( "Visit our",
@@ -37,9 +37,28 @@ ui <- fluidPage(
                
                # Second tab
                tabPanel(div(icon("map-pin"),"Map"),
-                        sliderInput("slider2", label = h3("Temperature Range"), min = 0, 
-                                    max = 30, value = c(27, 29))
-               )
+                        
+                        sliderInput("slider1", label = h3("Maximum Sea Surface Temperature"), min = 0, 
+                                    max = 40, value = 20),
+                        
+                        sliderInput("slider1", label = h3("Minimum Sea Surface Temperature"), min = 0, 
+                                    max = 40, value = 20),
+                        
+                        sliderInput("slider1", label = h3("Minimum Dissolved Oxygen"), min = 0, 
+                                    max = 40, value = 20),
+                        
+                        sliderInput("slider1", label = h3("Maximum Depth"), min = 0, 
+                                    max = 40, value = 20),
+                        
+                        sliderInput("slider1", label = h3("Minimum Depth"), min = 0, 
+                                    max = 40, value = 20),
+                        
+                        sliderInput("slider1", label = h3("Maximum Current Velocity"), min = 0, 
+                                    max = 40, value = 20),
+                        
+                        sliderInput("slider1", label = h3("Maximum Distance to Shore"), min = 0, 
+                                    max = 40, value = 20))
+                    
     ),
     # Create footer
     br(),
