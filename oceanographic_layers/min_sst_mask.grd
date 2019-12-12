@@ -1,0 +1,26 @@
+[general]
+creator=R package 'raster'
+created=2019-11-25 13:00:54
+[georeference]
+nrows=357
+ncols=342
+xmin=4937644.60644706
+ymin=6030061.5446369
+xmax=8111404.60644706
+ymax=10778161.5446369
+projection=+proj=poly +lat_0=0 +lon_0=-54 +x_0=5000000 +y_0=10000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs
+[data]
+datatype=FLT4S
+byteorder=little
+nbands=1
+bandorder=BIL
+categorical=FALSE
+minvalue=12.7668114644611
+maxvalue=29.6385513354884
+nodatavalue=-3.4e+38
+[legend]
+legendtype=
+values=
+color=
+[description]
+layername=BO_sstmin
