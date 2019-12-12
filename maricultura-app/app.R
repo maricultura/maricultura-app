@@ -37,29 +37,26 @@ ui <- fluidPage(
                
                # Second tab
                tabPanel(div(icon("map-pin"),"Map"),
-                        
-                        sliderInput("slider1", label = h3("Maximum Sea Surface Temperature"), min = 0, 
+                        sidebarLayout(
+                            sidebarPanel(
+                                sliderInput("slider1", label = h4("Maximum Sea Surface Temperature"), min = 0, 
                                     max = 40, value = 20),
-                        
-                        sliderInput("slider1", label = h3("Minimum Sea Surface Temperature"), min = 0, 
+                                sliderInput("slider1", label = h4("Minimum Sea Surface Temperature"), min = 0, 
                                     max = 40, value = 20),
-                        
-                        sliderInput("slider1", label = h3("Minimum Dissolved Oxygen"), min = 0, 
+                                sliderInput("slider1", label = h4("Minimum Dissolved Oxygen"), min = 0, 
                                     max = 40, value = 20),
-                        
-                        sliderInput("slider1", label = h3("Maximum Depth"), min = 0, 
+                                sliderInput("slider1", label = h4("Maximum Depth"), min = 0, 
                                     max = 40, value = 20),
-                        
-                        sliderInput("slider1", label = h3("Minimum Depth"), min = 0, 
+                                sliderInput("slider1", label = h4("Minimum Depth"), min = 0, 
                                     max = 40, value = 20),
-                        
-                        sliderInput("slider1", label = h3("Maximum Current Velocity"), min = 0, 
+                                sliderInput("slider1", label = h4("Maximum Current Velocity"), min = 0, 
                                     max = 40, value = 20),
-                        
-                        sliderInput("slider1", label = h3("Maximum Distance to Shore"), min = 0, 
-                                    max = 40, value = 20))
-                    
-    ),
+                                sliderInput("slider1", label = h4("Maximum Distance to Shore"), min = 0, 
+                                    max = 40, value = 20)),
+                            mainPanel()
+                            
+                            ))),
+    
     # Create footer
     br(),
     div( style = "background-color: #c5dbeb; padding: 15px; text-align: center;",
