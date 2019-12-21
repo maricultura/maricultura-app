@@ -40,22 +40,18 @@ ui <- fluidPage(
                tabPanel(div(icon("map-pin"),"Map"),
                         sidebarLayout(
                             sidebarPanel(
-                                sliderInput("slider1", label = h4("Maximum Sea Surface Temperature"), min = 0, 
-                                    max = 40, value = 20),
-                                sliderInput("slider1", label = h4("Minimum Sea Surface Temperature"), min = 0, 
-                                    max = 40, value = 20),
-                                sliderInput("slider1", label = h4("Minimum Dissolved Oxygen"), min = 0, 
-                                    max = 40, value = 20),
-                                sliderInput("slider1", label = h4("Maximum Depth"), min = 0, 
-                                    max = 40, value = 20),
-                                sliderInput("slider1", label = h4("Minimum Depth"), min = 0, 
-                                    max = 40, value = 20),
-                                sliderInput("slider1", label = h4("Maximum Current Velocity"), min = 0, 
-                                    max = 40, value = 20),
-                                sliderInput("slider1", label = h4("Maximum Distance to Shore"), min = 0, 
-                                    max = 40, value = 20)),
+                                sliderInput("sst_slider", label = h4("Sea Surface Temperature"), min = 0, 
+                                    max = 40, value = c(22,32)),
+                                sliderInput("min_DO_slider", label = h4("Minimum Dissolved Oxygen"), min = 0, 
+                                    max = 400, value = 200.5),
+                                sliderInput("depth_slider", label = h4("Depth"), min = -200, 
+                                    max = 0, value = c(-100, -25)),
+                                sliderInput("max_cv_slider", label = h4("Maximum Current Velocity"), min = 0, 
+                                    max = 3, value = 1),
+                                sliderInput("dist_shore_slider", label = h4("Maximum Distance to Shore"), min = 0, 
+                                    max = 100000, value = 46300)),
                             mainPanel(
-                                leafletOutput("suitable_map")
+                                leafletOutput("suitableMap")
                             )
                             
                             ))),
@@ -76,7 +72,8 @@ ui <- fluidPage(
 # Define server logic 
 server <- function(input, output) {
 
-    output$mymap <- renderLeaflet({
+    output$suitableMap <- renderLeaflet({
+        suitable_leaflet
     })
 }
 
