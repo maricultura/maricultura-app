@@ -166,7 +166,9 @@ server <- function(input, output) {
     DO_min_binary <- reactive(reclassify(DO_min_mask, rcl = rcl_matrix_DO()))
     
     ### Suitable areas (overlay of layers)
-    suitable <-reactive(overlay(sst_binary_min(), sst_binary_max(), depth_binary(), current_binary(), dist_shore_binary(), fun = function(a, b, c, d, e){a*b*c*d*e}))
+    suitable <- eventReactive( input$run_button, {
+        overlay(sst_binary_min(), sst_binary_max(), depth_binary(), current_binary(), dist_shore_binary(), fun = function(a, b, c, d, e){a*b*c*d*e})
+    })
     
     ### Render leaflet map
     output$suitableMap <- renderLeaflet({
@@ -175,13 +177,13 @@ server <- function(input, output) {
         pal <- colorNumeric(c("#41B6C4", "#fc7303"), values(suitable()), na.color = "transparent")
         
         # Leaflet map
+        
         leaflet() %>% 
             addTiles() %>%
             addRasterImage(suitable(), colors = pal)
     })
     
     ### Download map
-    
     output$download_button <- downloadHandler(
         
         filename = function() {
