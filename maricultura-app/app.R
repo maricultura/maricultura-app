@@ -52,9 +52,11 @@ ui <- fluidPage(
                                     max = 3, value = 1, step = 0.1),
                                 sliderInput("dist_shore_slider", label = h4("Maximum Distance to Shore"), min = 0, 
                                     max = 200, value = 25, step = 0.5),
-                                actionButton("run_button", label = "Run")),
+                                actionButton("run_button", label = "Run"),
+                                downloadButton("download_button", label = "Download")
+                            ),
                             mainPanel(
-                                leafletOutput("suitableMap")
+                                leafletOutput("suitableMap", height = 700)
                             )
                             
                             ))),
@@ -162,21 +164,33 @@ server <- function(input, output) {
     
     # Reclassify DO min
     DO_min_binary <- reactive(reclassify(DO_min_mask, rcl = rcl_matrix_DO()))
-
+    
+    ### Suitable areas (overlay of layers)
+    suitable <-reactive(overlay(sst_binary_min(), sst_binary_max(), depth_binary(), current_binary(), dist_shore_binary(), fun = function(a, b, c, d, e){a*b*c*d*e}))
+    
     ### Render leaflet map
     output$suitableMap <- renderLeaflet({
         
-        ### Suitable areas (overlay of layers)
-        suitable <- overlay(sst_binary_min(), sst_binary_max(), depth_binary(), current_binary(), dist_shore_binary(), fun = function(a, b, c, d, e){a*b*c*d*e})
-        
         # Color palette
-        pal <- colorNumeric(c("#41B6C4", "#fc7303"), values(suitable), na.color = "transparent")
+        pal <- colorNumeric(c("#41B6C4", "#fc7303"), values(suitable()), na.color = "transparent")
         
         # Leaflet map
-        suitable_leaflet <- leaflet() %>% 
+        leaflet() %>% 
             addTiles() %>%
-            addRasterImage(suitable, colors = pal)
+            addRasterImage(suitable(), colors = pal)
     })
+    
+    ### Download map
+    
+    output$download_button <- downloadHandler(
+        
+        filename = function() {
+             "suitability_map.tif"
+        },
+        content = function(file) {
+            writeRaster( suitable(), file)
+        }
+    )
 }
 
 # Run the application 
