@@ -29,7 +29,8 @@ ui <- fluidPage(
                windowTitle = "Mariculture Tool"),
     
     # Navbar
-    navbarPage("" ,
+    navbarPage("" , 
+               selected = div(icon("map-pin"),"Map"),
                # Do not need title for Navigation Bar
                # First tab
                tabPanel(div(icon("info-circle"),"About"),
