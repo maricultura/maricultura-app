@@ -43,16 +43,27 @@ ui <- fluidPage(
                tabPanel(div(icon("map-pin"),"Map"),
                         sidebarLayout(
                             sidebarPanel(
-                                sliderInput("sst_slider", label = h4("Sea Surface Temperature"), min = 0, 
-                                    max = 40, value = c(22,32)),
-                                sliderInput("min_DO_slider", label = h4("Minimum Dissolved Oxygen"), min = 0, 
-                                    max = 400, value = 200.5, step = 0.5),
-                                sliderInput("depth_slider", label = h4("Depth"), min = -200, 
-                                    max = 0, value = c(-100, -25)),
-                                sliderInput("max_cv_slider", label = h4("Maximum Current Velocity"), min = 0, 
-                                    max = 3, value = 1, step = 0.1),
-                                sliderInput("dist_shore_slider", label = h4("Maximum Distance to Shore"), min = 0, 
-                                    max = 200, value = 25, step = 0.5),
+                                tabsetPanel(type = "tabs",
+                                            tabPanel( "Sliders",
+                                                      sliderInput("sst_slider", label = h4("Sea Surface Temperature"), min = 0, 
+                                                                  max = 40, value = c(22,32)),
+                                                      sliderInput("min_DO_slider", label = h4("Minimum Dissolved Oxygen"), min = 0, 
+                                                                  max = 400, value = 200.5, step = 0.5),
+                                                      sliderInput("depth_slider", label = h4("Depth"), min = -200, 
+                                                                  max = 0, value = c(-100, -25)),
+                                                      sliderInput("max_cv_slider", label = h4("Maximum Current Velocity"), min = 0, 
+                                                                  max = 3, value = 1, step = 0.1),
+                                                      sliderInput("dist_shore_slider", label = h4("Maximum Distance to Shore"), min = 0, 
+                                                                  max = 200, value = 25, step = 0.5)),
+                                            tabPanel( "Fixed",
+                                                      checkboxGroupInput("checkGroup", label = h3("Fixed Variables"), 
+                                                                         choices = list("MPAs" = 1,
+                                                                                        "Reefs" = 2,
+                                                                                        "Artificial Reefs" = 3,
+                                                                                        "Oil Pipelines" = 4,
+                                                                                        "Oil Production" = 5),
+                                                                         selected = 1),
+                                            )),
                                 actionButton("run_button", label = "Run"),
                                 downloadButton("download_button", label = "Download")
                             ),
@@ -60,7 +71,10 @@ ui <- fluidPage(
                                 leafletOutput("suitableMap", height = 700)
                             )
                             
-                            ))),
+                            )),
+               # Third tab
+               tabPanel(div(icon("book-open"),"User Guide"))
+               ),
     
     # Create footer
     br(),
