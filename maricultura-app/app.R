@@ -45,13 +45,13 @@ ui <- fluidPage(
                                 sliderInput("sst_slider", label = h4("Sea Surface Temperature"), min = 0, 
                                     max = 40, value = c(22,32)),
                                 sliderInput("min_DO_slider", label = h4("Minimum Dissolved Oxygen"), min = 0, 
-                                    max = 400, value = 200.5),
+                                    max = 400, value = 200.5, step = 0.5),
                                 sliderInput("depth_slider", label = h4("Depth"), min = -200, 
                                     max = 0, value = c(-100, -25)),
                                 sliderInput("max_cv_slider", label = h4("Maximum Current Velocity"), min = 0, 
-                                    max = 3, value = 1),
+                                    max = 3, value = 1, step = 0.1),
                                 sliderInput("dist_shore_slider", label = h4("Maximum Distance to Shore"), min = 0, 
-                                    max = 100000, value = 46300), #25 nautical miles converted to meters
+                                    max = 200, value = 25, step = 0.5),
                                 actionButton("run_button", label = "Run")),
                             mainPanel(
                                 leafletOutput("suitableMap")
@@ -83,7 +83,7 @@ server <- function(input, output) {
         max_depth <- input$depth_slider[1]
         min_sst_value <- input$sst_slider[1]
         max_sst_value <- input$sst_slider[2]
-        max_dist_shore <- input$dist_shore_slider 
+        max_dist_shore <- input$dist_shore_slider*1852 # To convert from nautical miles to meters
         max_cv_value <- input$max_cv_slider
         min_DO_value <- input$min_DO_slider
         
