@@ -44,7 +44,7 @@ ui <- fluidPage(
                         sidebarLayout(
                             sidebarPanel(
                                 tabsetPanel(type = "tabs",
-                                            tabPanel( "Sliders",
+                                            tabPanel( "Variable",
                                                       sliderInput("sst_slider", label = h4("Sea Surface Temperature"), min = 0, 
                                                                   max = 40, value = c(22,32)),
                                                       sliderInput("min_DO_slider", label = h4("Minimum Dissolved Oxygen"), min = 0, 
@@ -62,7 +62,7 @@ ui <- fluidPage(
                                                                                         "Artificial Reefs" = 3,
                                                                                         "Oil Pipelines" = 4,
                                                                                         "Oil Production" = 5),
-                                                                         selected = 1),
+                                                                         selected = c(1, 2, 3, 4, 5)),
                                             )),
                                 actionButton("run_button", label = "Run"),
                                 downloadButton("download_button", label = "Download")
@@ -180,9 +180,30 @@ server <- function(input, output) {
     # Reclassify DO min
     DO_min_binary <- reactive(reclassify(DO_min_mask, rcl = rcl_matrix_DO()))
     
+    ########## Fixed Variables ############
+    ### MPAs
+    # Read in file
+    mpas_binary <- reactive(raster(ifelse(1 %in% input$checkGroup,"data/mpas_binary.tif","data/raster_ones.tif" )))
+    
+    ### Reefs
+    # Read in file
+    reefs_binary <- reactive(raster(ifelse(2 %in% input$checkGroup,"data/reefs_binary.tif", "data/raster_ones.tif")))
+    
+    ### Artificial Reefs
+    # Read in file
+    reefs_artificial_binary <- reactive(raster(ifelse(3 %in% input$checkGroup,"data/reefs_artificial_binary.tif", "data/raster_ones.tif")))
+    
+    ### Oil pipelines
+    # Read in file
+    og_pipeline_binary <- reactive(raster(ifelse(4 %in% input$checkGroup,"data/og_pipeline_binary.tif", "data/raster_ones.tif")))
+    
+    ### Oil production
+    # Read in file
+    og_production_binary <- reactive(raster(ifelse(5 %in% input$checkGroup,"data/og_production_binary.tif", "data/raster_ones.tif")))
+    
     ### Suitable areas (overlay of layers)
     suitable <- eventReactive( input$run_button, {
-        overlay(sst_binary_min(), sst_binary_max(), depth_binary(), current_binary(), dist_shore_binary(), fun = function(a, b, c, d, e){a*b*c*d*e})
+        overlay(sst_binary_min(), sst_binary_max(), depth_binary(), current_binary(), dist_shore_binary(), mpas_binary(), reefs_binary(), reefs_artificial_binary(), og_pipeline_binary(), og_production_binary(), fun = function(a, b, c, d, e, f, g, h, i, j){a*b*c*d*e*f*g*h*i*j})
     })
     
     ### Render leaflet map
