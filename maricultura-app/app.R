@@ -56,7 +56,7 @@ ui <- fluidPage(
                                                       sliderInput("dist_shore_slider", label = h4("Maximum Distance to Shore"), min = 0, 
                                                                   max = 200, value = 25, step = 0.5)),
                                             tabPanel( "Fixed",
-                                                      checkboxGroupInput("checkGroup", label = h3("Fixed Variables"), 
+                                                      checkboxGroupInput("checkGroup", label = h3("Fixed Barriers"), 
                                                                          choices = list("MPAs" = 1,
                                                                                         "Reefs" = 2,
                                                                                         "Artificial Reefs" = 3,
