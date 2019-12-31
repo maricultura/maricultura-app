@@ -54,7 +54,7 @@ ui <- fluidPage(
                                                                   #max = 400, value = 200.5, step = 0.5),
                                                       #sliderInput("max_cv_slider", label = h4("Maximum Current Velocity (m/s)"), min = 0,                                                                     max = 3, value = 1, step = 0.1),
                                                       #sliderInput("dist_shore_slider", label = h4("Maximum Distance to Shore (NM)"), min                                                                     =0, max = 200, value = 25, step = 0.5)),
-                                                      numericInput("min_DO_slider", label = h5("Minimum Dissolved Oxygen ()"), min = 0,   
+                                                      numericInput("min_DO_slider", label = HTML("<h5>Minimum Dissolved Oxygen (mol/m<sup>3</sup>)</h5>"), min = 0,   
                                                                    max =400,
                                                                   step = 0.5, value = 200),
                                                       numericInput("max_cv_slider", label = h5("Maximum Current Velocity (m/s)"), min = 0,
