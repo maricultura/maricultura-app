@@ -14,6 +14,7 @@ library(dplyr)
 library(leaflet)
 library(sf)
 library(raster)
+library(htmlwidgets)
 
 # Define UI for application
 ui <- fluidPage(
@@ -56,7 +57,7 @@ ui <- fluidPage(
                                                       sliderInput("dist_shore_slider", label = h4("Maximum Distance to Shore"), min = 0, 
                                                                   max = 200, value = 25, step = 0.5)),
                                             tabPanel( "Fixed",
-                                                      checkboxGroupInput("checkGroup", label = h3("Fixed Barriers"), 
+                                                          checkboxGroupInput("checkGroup", label = h3("Fixed Variables"), 
                                                                          choices = list("MPAs" = 1,
                                                                                         "Reefs" = 2,
                                                                                         "Artificial Reefs" = 3,
@@ -216,8 +217,31 @@ server <- function(input, output) {
         
         leaflet() %>% 
             addTiles() %>%
-            addRasterImage(suitable(), colors = pal)
+            addRasterImage(suitable(), colors = pal) %>% 
+            onRender(
+                "function(el,x){
+                    this.on('mousemove', function(e) {
+                        var lat = e.latlng.lat;
+                        var lng = e.latlng.lng;
+                        var coord = [lat, lng];
+                        Shiny.onInputChange('hover_coordinates', coord)
+                    });
+                    this.on('mouseout', function(e) {
+                        Shiny.onInputChange('hover_coordinates', null)
+                    })
+                }"
+            )
     })
+    
+    output$out <- renderText({
+        if(is.null(input$hover_coordinates)) {
+            "Mouse outside of map"
+        } else {
+            paste0("Lat: ", input$hover_coordinates[1], 
+                   "\nLng: ", input$hover_coordinates[2])
+        }
+    })
+
     
     ### Download map
     output$download_button <- downloadHandler(
