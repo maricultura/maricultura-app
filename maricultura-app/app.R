@@ -72,18 +72,18 @@ ui <- fluidPage(
                                                                                         "Artificial Reefs" = 3,
                                                                                         "Oil Pipelines" = 4,
                                                                                         "Oil Production" = 5),
-                                                                         selected = c(1, 2, 3, 4, 5)),
+                                                                         selected = c(1, 2, 3, 4, 5))
                                             )),
                                 actionButton("run_button", label = "Run"),
                                 downloadButton("download_button", label = "Download")
                             ),
                             mainPanel(
-                                leafletOutput("suitableMap", height = 700)
+                                leafletOutput("suitableMap", height = "100vh")
                             )
                             
                             )),
                # Third Tab
-               tabPanel(div(icon("book-open"),"User Guide" ))),
+               tabPanel(div(icon("book-open"),"User Guide" )),
             
                 # Fourth Tab
                 tabPanel(div(icon("table"),"Metadata"))
