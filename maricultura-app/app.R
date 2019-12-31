@@ -46,18 +46,24 @@ ui <- fluidPage(
                             sidebarPanel(
                                 tabsetPanel(type = "tabs",
                                             tabPanel( "Variable",
-                                                      sliderInput("sst_slider", label = h4("Sea Surface Temperature"), min = 0, 
+                                                      sliderInput("sst_slider", label = h5("Sea Surface Temperature (°C)"), min = 0, 
                                                                   max = 40, value = c(22,32)),
-                                                      sliderInput("min_DO_slider", label = h4("Minimum Dissolved Oxygen"), min = 0, 
-                                                                  max = 400, value = 200.5, step = 0.5),
-                                                      sliderInput("depth_slider", label = h4("Depth"), min = -200, 
+                                                      sliderInput("depth_slider", label = h5("Depth (m)"), min = -200, 
                                                                   max = 0, value = c(-100, -25)),
-                                                      sliderInput("max_cv_slider", label = h4("Maximum Current Velocity"), min = 0, 
-                                                                  max = 3, value = 1, step = 0.1),
-                                                      sliderInput("dist_shore_slider", label = h4("Maximum Distance to Shore"), min = 0, 
-                                                                  max = 200, value = 25, step = 0.5)),
+                                                      #sliderInput("min_DO_slider", label = h4("Minimum Dissolved Oxygen ()"), min = 0, 
+                                                                  #max = 400, value = 200.5, step = 0.5),
+                                                      #sliderInput("max_cv_slider", label = h4("Maximum Current Velocity (m/s)"), min = 0,                                                                     max = 3, value = 1, step = 0.1),
+                                                      #sliderInput("dist_shore_slider", label = h4("Maximum Distance to Shore (NM)"), min                                                                     =0, max = 200, value = 25, step = 0.5)),
+                                                      numericInput("min_DO_slider", label = h5("Minimum Dissolved Oxygen ()"), min = 0, max =400,
+                                                                  step = 0.5, value = 200),
+                                                      numericInput("max_cv_slider", label = h5("Maximum Current Velocity (m/s)"), min = 0, max = 3,
+                                                                  step = 0.1, value = 1),
+                                                      numericInput("dist_shore_slider", label = h5("Maximum Distance to Shore (NM)"), min = 0, max = 200,
+                                                                   step = 0.5, value = 25)),
+            
+               
                                             tabPanel( "Fixed",
-                                                          checkboxGroupInput("checkGroup", label = h3("Fixed Variables"), 
+                                                          checkboxGroupInput("checkGroup", label = h3("Select Barrier(s)"), 
                                                                          choices = list("MPAs" = 1,
                                                                                         "Reefs" = 2,
                                                                                         "Artificial Reefs" = 3,
@@ -216,35 +222,13 @@ server <- function(input, output) {
         # Leaflet map
         
         leaflet() %>% 
+            withProgress(message = 'Loading Map', value = 0, {n <- 10}) %>% 
             addTiles() %>%
-            addRasterImage(suitable(), colors = pal) %>% 
-            onRender(
-                "function(el,x){
-                    this.on('mousemove', function(e) {
-                        var lat = e.latlng.lat;
-                        var lng = e.latlng.lng;
-                        var coord = [lat, lng];
-                        Shiny.onInputChange('hover_coordinates', coord)
-                    });
-                    this.on('mouseout', function(e) {
-                        Shiny.onInputChange('hover_coordinates', null)
-                    })
-                }"
-            )
-    })
-    
-    output$out <- renderText({
-        if(is.null(input$hover_coordinates)) {
-            "Mouse outside of map"
-        } else {
-            paste0("Lat: ", input$hover_coordinates[1], 
-                   "\nLng: ", input$hover_coordinates[2])
-        }
-    })
-
-    
-    ### Download map
-    output$download_button <- downloadHandler(
+            addRasterImage(suitable(), colors = pal)
+            
+    })  
+         ### Download map
+        output$download_button <- downloadHandler(
         
         filename = function() {
              "suitability_map.tif"
@@ -252,8 +236,32 @@ server <- function(input, output) {
         content = function(file) {
             writeRaster( suitable(), file)
         }
-    )
-}
-
+        )
+    }
+    
 # Run the application 
 shinyApp(ui = ui, server = server)
+
+
+#output$out <- renderText({
+
+#  if(is.null(input$hover_coordinates)) {
+#        "Mouse outside of map"
+#  } else {
+#   paste0("Lat: ", input$hover_coordinates[1], 
+#            "\nLng: ", input$hover_coordinates[2])
+# }
+# })
+
+
+### Download map
+# onRender(
+#"function(el,x){
+#   this.on('mousemove', function(e) {
+#     var lat = e.latlng.lat;
+#      var lng = e.latlng.lng;
+#     var coord = [lat, lng];
+#    Shiny.onInputChange('hover_coordinates', coord)
+#   });
+#   this.on('mouseout', function(e) {
+
