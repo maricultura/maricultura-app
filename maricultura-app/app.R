@@ -222,16 +222,17 @@ server <- function(input, output) {
     output$suitableMap <- renderLeaflet({
         
         # Color palette
-        pal <- colorNumeric(c("#41B6C4", "#fc7303"), values(suitable()), na.color = "transparent")
+        pal <- colorNumeric(c("#FFFFFF", "#8B0000"), values(suitable()), na.color = "transparent")
         
         # Leaflet map
         
         leaflet() %>% 
             withProgress(message = 'Loading Map', value = 0, {n <- 10}) %>% 
             addTiles() %>%
-            addRasterImage(suitable(), colors = pal)
-            
-    })  
+            addRasterImage(suitable(), colors = pal, opacity = .4) 
+         })  
+    
+    ###
          ### Download map
         output$download_button <- downloadHandler(
         
@@ -240,12 +241,29 @@ server <- function(input, output) {
         },
         content = function(file) {
             writeRaster( suitable(), file)
-        }
-        )
-    }
-    
+        
+            observeEvent(input$map_click, {
+                
+                cat(file=stderr(), "\n")
+                cat(file=stderr(), paste("observed map_click"), "\n")    
+                
+                click <- input$map_click
+                my$long <- click$lng
+                my$lat <- click$lat
+                
+                # mark map
+                leafletProxy("map", deferUntilFlush=FALSE) %>%
+                    addMarkers(my$long, my$lat, "layer1", options=pathOptions(clickable=FALSE)) 
+                
+            })           
+            })
+ }
+ 
+
+
 # Run the application 
 shinyApp(ui = ui, server = server)
+
 
 
 #output$out <- renderText({
