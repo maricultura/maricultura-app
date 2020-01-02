@@ -20,7 +20,7 @@ library(waiter)
 # Define UI for application
 ui <- fluidPage(
     
-    # add waiter dependencies
+    # Add waiter dependencies
     use_waiter(),
     
     # Head element (contains metadata for app)
@@ -228,26 +228,25 @@ server <- function(input, output) {
     })
    
     
-    # Create loading spinner
+    # Create waiter spinner
     waiting_screen <- tagList(
         spin_flower(),
         h4("Loading map...")
     ) 
     
+    # Show waiter after clicking run button
     observeEvent(input$run_button, {
         waiter_show(
-            html = waiting_screen
+            html = waiting_screen,
+            color = "#222222"
         )
     })
-    
     
     ### Render leaflet map
     output$suitableMap <- renderLeaflet({
         
-        # Color palette
-        white_col <- rgb(1, 1, 1, alpha = 0.4 ) # white color with modified opacity
-        
-        pal <- colorNumeric(c(white_col, "#8B0000"), values(suitable()), na.color = "transparent")
+        # Color palettes
+        pal <- colorNumeric(c("#FFFFFF40", "#8B0000FF"), values(suitable()), na.color = "transparent", alpha = TRUE)
         
         on.exit(waiter_hide())
         
