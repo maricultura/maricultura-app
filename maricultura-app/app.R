@@ -54,17 +54,21 @@ ui <- fluidPage(
                                                                   #max = 400, value = 200.5, step = 0.5),
                                                       #sliderInput("max_cv_slider", label = h4("Maximum Current Velocity (m/s)"), min = 0,                                                                     max = 3, value = 1, step = 0.1),
                                                       #sliderInput("dist_shore_slider", label = h4("Maximum Distance to Shore (NM)"), min                                                                     =0, max = 200, value = 25, step = 0.5)),
-                                                      numericInput("min_DO_slider", label = HTML("<h5>Minimum Dissolved Oxygen (mol/m<sup>3</sup>)</h5>"), min = 0,   
-                                                                   max =400,
+                                                      numericInput("min_DO_slider",
+                                                                   label = HTML("<h5>Minimum Dissolved Oxygen (mol/m<sup>3</sup>)</h5>"),
+                                                                   min = 0,   
+                                                                   max = 400,
                                                                   step = 0.5, value = 200),
-                                                      numericInput("max_cv_slider", label = h5("Maximum Current Velocity (m/s)"), min = 0,
+                                                      numericInput("max_cv_slider", label = h5("Maximum Current Velocity (m/s)"),
+                                                                   min = 0,
                                                                    max = 3,
-                                                                  step = 0.1, value = 1),
-                                                      numericInput("dist_shore_slider", label = h5("Maximum Distance to Shore (NM)"), min 
-                                                                   = 0, max = 200,
-                                                                   step = 0.5, value = 25)),
-            
-               
+                                                                  step = 0.1,
+                                                                  value = 1),
+                                                      numericInput("dist_shore_slider", label = h5("Maximum Distance to Shore (NM)"),
+                                                                   min = 0,
+                                                                   max = 200,
+                                                                   step = 0.5,
+                                                                   value = 25)),
                                             tabPanel( "Fixed",
                                                           checkboxGroupInput("checkGroup", label = h3("Select Barrier(s)"), 
                                                                          choices = list("MPAs" = 1,
@@ -222,14 +226,20 @@ server <- function(input, output) {
     output$suitableMap <- renderLeaflet({
         
         # Color palette
-        pal <- colorNumeric(c("#FFFFFF", "#8B0000"), values(suitable()), na.color = "transparent")
+        white_col <- rgb(1, 1, 1, alpha = 0.4 ) # white color with modified opacity
+        
+        pal <- colorNumeric(c(white_col, "#8B0000"), values(suitable()), na.color = "transparent")
         
         # Leaflet map
-        
         leaflet() %>% 
             withProgress(message = 'Loading Map', value = 0, {n <- 10}) %>% 
             addTiles() %>%
-            addRasterImage(suitable(), colors = pal, opacity = .4) 
+            addRasterImage(suitable(), colors = pal) %>% 
+            addScaleBar(position = "bottomright") %>%  # adds scale bar
+            setView(lng = -39.8789667, lat = -14.0182737, zoom = 4) %>% # sets initial view of map
+            addEasyButton(easyButton(
+                icon="fa-globe", title="Reset View",
+                onClick=JS("function(btn, map){ map.setView([-14.0182737, -39.8789667]); }"))) # button to reset to initial view
          })  
     
     ###
