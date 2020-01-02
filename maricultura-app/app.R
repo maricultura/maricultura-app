@@ -251,16 +251,22 @@ server <- function(input, output) {
         on.exit(waiter_hide())
         
         # Leaflet map
-        leaflet() %>%
+        leaflet(options = leafletOptions( zoomSnap = 0.2)) %>%
             addTiles() %>%
             addRasterImage(suitable(), colors = pal) %>% 
             addScaleBar(position = "bottomright") %>%  # adds scale bar
-            setView(lng = -39.8789667, lat = -14.0182737, zoom = 4) %>% # sets initial view of map
+            fitBounds(lng1 = -54.6903404, # sets initial view of map to fit coordinates
+                      lng2 = -25.835314,
+                      lat1 = 6.3071255,
+                      lat2 = -35.8573806) %>% 
             addEasyButton(easyButton(
                 icon="fa-globe", title="Reset View", # button to reset to initial view
-                onClick=JS("function(btn, map){
+                 onClick=JS("function(btn, map){
                            map.setView([-14.0182737, -39.8789667]);
-                           map.setZoom(4);}"))) 
+                           map.setZoom(4.6);}"))) %>% 
+            addLegend(colors = c("#8B0000FF", "#FFFFFF40"), # adds legend
+                      labels = c("Suitable", "Non-suitable"),
+                      title = "Legend")
          })  
     
     ###
