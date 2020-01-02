@@ -15,13 +15,18 @@ library(leaflet)
 library(sf)
 library(raster)
 library(htmlwidgets)
+library(waiter)
 
 # Define UI for application
 ui <- fluidPage(
-
+    
+    # add waiter dependencies
+    use_waiter(),
+    
     # Head element (contains metadata for app)
     tags$head(
         tags$style(HTML("@import url('https://fonts.googleapis.com/css?family=Source+Code+Pro&display=swap')"))),
+    
     # Theme for the app
     theme = shinytheme("cosmo"),
     
@@ -221,6 +226,20 @@ server <- function(input, output) {
     suitable <- eventReactive( input$run_button, {
         overlay(sst_binary_min(), sst_binary_max(), depth_binary(), current_binary(), dist_shore_binary(), mpas_binary(), reefs_binary(), reefs_artificial_binary(), og_pipeline_binary(), og_production_binary(), fun = function(a, b, c, d, e, f, g, h, i, j){a*b*c*d*e*f*g*h*i*j})
     })
+   
+    
+    # Create loading spinner
+    waiting_screen <- tagList(
+        spin_flower(),
+        h4("Loading map...")
+    ) 
+    
+    observeEvent(input$run_button, {
+        waiter_show(
+            html = waiting_screen
+        )
+    })
+    
     
     ### Render leaflet map
     output$suitableMap <- renderLeaflet({
@@ -230,16 +249,19 @@ server <- function(input, output) {
         
         pal <- colorNumeric(c(white_col, "#8B0000"), values(suitable()), na.color = "transparent")
         
+        on.exit(waiter_hide())
+        
         # Leaflet map
-        leaflet() %>% 
-            withProgress(message = 'Loading Map', value = 0, {n <- 10}) %>% 
+        leaflet() %>%
             addTiles() %>%
             addRasterImage(suitable(), colors = pal) %>% 
             addScaleBar(position = "bottomright") %>%  # adds scale bar
             setView(lng = -39.8789667, lat = -14.0182737, zoom = 4) %>% # sets initial view of map
             addEasyButton(easyButton(
-                icon="fa-globe", title="Reset View",
-                onClick=JS("function(btn, map){ map.setView([-14.0182737, -39.8789667]); }"))) # button to reset to initial view
+                icon="fa-globe", title="Reset View", # button to reset to initial view
+                onClick=JS("function(btn, map){
+                           map.setView([-14.0182737, -39.8789667]);
+                           map.setZoom(4);}"))) 
          })  
     
     ###
