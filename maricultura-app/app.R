@@ -53,8 +53,8 @@ ui <- fluidPage(
                                             tabPanel( "Variable",
                                                       sliderInput("sst_slider", label = h5("Sea Surface Temperature (°C)"), min = 0, 
                                                                   max = 40, value = c(22,32)),
-                                                      sliderInput("depth_slider", label = h5("Depth (m)"), min = -200, 
-                                                                  max = 0, value = c(-100, -25)),
+                                                      sliderInput("depth_slider", label = h5("Depth (m)"), min = 0, 
+                                                                  max = 200, value = c(25, 100)),
                                                       #sliderInput("min_DO_slider", label = h4("Minimum Dissolved Oxygen ()"), min = 0, 
                                                                   #max = 400, value = 200.5, step = 0.5),
                                                       #sliderInput("max_cv_slider", label = h4("Maximum Current Velocity (m/s)"), min = 0,                                                                     max = 3, value = 1, step = 0.1),
@@ -114,6 +114,7 @@ ui <- fluidPage(
 # Define server logic 
 server <- function(input, output) {
     
+    ### Modal Dialogue
     # Create modal dialogue
     dataModal <- function(failed = FALSE) {
         modalDialog(
@@ -139,8 +140,8 @@ server <- function(input, output) {
     
     ### Depth
     # Defining variables
-    min_depth <- reactive(input$depth_slider[2])
-    max_depth <- reactive(input$depth_slider[1])
+    min_depth <- reactive(-input$depth_slider[1])
+    max_depth <- reactive(-input$depth_slider[2])
     
     # Read in file
     depth_mask <- raster("data/depth_mask.tif")
