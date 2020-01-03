@@ -114,6 +114,7 @@ ui <- fluidPage(
 # Define server logic 
 server <- function(input, output) {
     
+    # Create modal dialogue
     dataModal <- function(failed = FALSE) {
         modalDialog(
             title = tags$h1(
@@ -250,7 +251,7 @@ server <- function(input, output) {
         overlay(sst_binary_min(), sst_binary_max(), depth_binary(), current_binary(), dist_shore_binary(), mpas_binary(), reefs_binary(), reefs_artificial_binary(), og_pipeline_binary(), og_production_binary(), fun = function(a, b, c, d, e, f, g, h, i, j){a*b*c*d*e*f*g*h*i*j})
     })
    
-    
+    ### Waiter
     # Create waiter spinner
     waiting_screen <- tagList(
         spin_flower(),
@@ -264,6 +265,20 @@ server <- function(input, output) {
             color = "#222222"
         )
     })
+    
+    ### Area Message
+    # Show message after clicking run button
+    observeEvent(input$run_button, {
+        
+        # Area calculation
+        area <- round(freq(suitable(), value = 1)*184.64, digits = 0)
+        
+        # Notification
+        showNotification("Total suitable area:",
+                         HTML(paste(area, " km", tags$sup(2), sep = "")),
+                         type = "message", duration = NULL)
+    })
+    
     
     ### Render leaflet map
     output$suitableMap <- renderLeaflet({
