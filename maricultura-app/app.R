@@ -90,7 +90,8 @@ ui <- fluidPage(
                                 leafletOutput("suitableMap", height = "100vh")
                             )
                             
-                            )),
+                            )
+                        ),
                # Third Tab
                tabPanel(div(icon("book-open"),"User Guide" )),
             
@@ -112,6 +113,28 @@ ui <- fluidPage(
 
 # Define server logic 
 server <- function(input, output) {
+    
+    dataModal <- function(failed = FALSE) {
+        modalDialog(
+            title = tags$h1(
+                style = "text-align: center;",
+                "Welcome to the Siting Tool for Mariculture in Brazil !"
+            ),
+            tags$div(
+                style = "text-align: center;",
+                tags$p("Use this tool to find suitable sites for marine aquaculture in Brazil"),
+                tags$p("Select input layers and modify input values"),
+                tags$p("Click the run button to overlay all the layers and generate a map of suitable sites"),
+                tags$p("When you're ready, click the download button to save your map!")
+            ),
+            footer = tagList(
+                modalButton("Start")
+            )
+        )
+    }
+    
+    # Show modal
+        showModal(dataModal())
     
     ### Depth
     # Defining variables
