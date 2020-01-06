@@ -41,7 +41,7 @@ ui <- fluidPage(
                # Do not need title for Navigation Bar
                # First tab
                tabPanel(div(icon("info-circle"),"About"),
-                        img(src="GfK_logo_online.jpg",height=72,width=72),
+                        img(src ="fish-1149465_1920.jpg"),
                         p( "MARICULTURA is a team of 5 bright graduate students studying at the Bren School of Environmental Science & Management at the University of California Santa Barbara.  A partnership with the World Wildlife Fund has enabled the team to shape marine aquaculture planning off the coast of Brazil. 
                            
                            
