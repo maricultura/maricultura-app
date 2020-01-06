@@ -130,9 +130,9 @@ server <- function(input, output) {
             tags$div(
                 style = "text-align: center;",
                 tags$p("This tool identifies available sites for marine aquaculture development in Brazil"),
-                tags$p("1. Find sites by selecting and modifying environmental conditions and barriers"),
-                tags$p("2. Click the 'Run' button to generate a map of suitable sites"),
-                tags$p("3. Download your map!")
+                tags$p(tags$b("1."), "Find sites by selecting and modifying environmental conditions and barriers"),
+                tags$p(tags$b("2."), "Click the 'Run' button to generate a map of suitable sites"),
+                tags$p(tags$b("3."), "Download your map!")
             ),
             footer = tagList(
                 modalButton("Start")
