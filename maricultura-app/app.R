@@ -41,13 +41,13 @@ ui <- fluidPage(
                # Do not need title for Navigation Bar
                # First tab
                tabPanel(div(icon("info-circle"),"About"),
-                        img(src ="fish-1149465_1920.jpg", height = 200, width = 500),
                         p( "MARICULTURA is a team of 5 bright graduate students studying at the Bren School of Environmental Science & Management at the University of California Santa Barbara.  A partnership with the World Wildlife Fund has enabled the team to shape marine aquaculture planning off the coast of Brazil. 
                            
                            
                            Visit our",
                            a( href = "https://maricultura.weebly.com", "website"),
-                           "for more information.")
+                           "for more information."),
+                        img(src ="schooloffish.jpg", height = 300, width = 800)
                         ),
                
                # Second tab
