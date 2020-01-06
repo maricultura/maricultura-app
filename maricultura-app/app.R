@@ -16,6 +16,7 @@ library(sf)
 library(raster)
 library(htmlwidgets)
 library(waiter)
+library(mapview)
 
 # Define UI for application
 ui <- fluidPage(
@@ -305,7 +306,8 @@ server <- function(input, output) {
                            map.setZoom(4.6);}"))) %>% 
             addLegend(colors = c("#8B0000FF", "#FFFFFF40"), # adds legend
                       labels = c("Suitable", "Non-suitable"),
-                      title = "Legend")
+                      title = "Legend") %>% 
+            addMouseCoordinates()
          })  
     
     ###
@@ -318,23 +320,25 @@ server <- function(input, output) {
         content = function(file) {
             writeRaster( suitable(), file)
         
-            observeEvent(input$map_click, {
-                
-                cat(file=stderr(), "\n")
-                cat(file=stderr(), paste("observed map_click"), "\n")    
-                
-                click <- input$map_click
-                my$long <- click$lng
-                my$lat <- click$lat
+    
                 
                 # mark map
                 leafletProxy("map", deferUntilFlush=FALSE) %>%
                     addMarkers(my$long, my$lat, "layer1", options=pathOptions(clickable=FALSE)) 
                 
-            })           
+                observeEvent(input$suitableMap_click, {
+                    click <- input$suitableMap_click
+                    clat <- click$lat
+                    clng <- click$lng
+                    
+                    leafletProxy('suitableMap') %>%
+                        addCircles(lng=clng, lat=clat, group='circles',
+                                   weight=1, radius=1000, color='black', fillColor='green',
+                                   fillOpacity=0.2, opacity=1)})
+           
             })
- }
- 
+}
+
 
 
 # Run the application 
@@ -364,3 +368,11 @@ shinyApp(ui = ui, server = server)
 #   });
 #   this.on('mouseout', function(e) {
 
+#observeEvent(input$map_click, {
+    
+   # cat(file=stderr(), "\n")
+   # cat(file=stderr(), paste("observed map_click"), "\n")    
+    
+   # click <- input$map_click
+   # my$long <- click$lng
+ #   my$lat <- click$lat
