@@ -121,14 +121,14 @@ server <- function(input, output) {
         modalDialog(
             title = tags$h1(
                 style = "text-align: center;",
-                "Welcome to the Siting Tool for Mariculture in Brazil !"
+                "Welcome to Brazil's First Mariculture Siting Tool !"
             ),
             tags$div(
                 style = "text-align: center;",
-                tags$p("Use this tool to find suitable sites for marine aquaculture in Brazil"),
-                tags$p("Select input layers and modify input values"),
-                tags$p("Click the run button to overlay all the layers and generate a map of suitable sites"),
-                tags$p("When you're ready, click the download button to save your map!")
+                tags$p("This tool identifies available sites for marine aquaculture development in Brazil"),
+                tags$p("1. Find sites by selecting and modifying environmental conditions and barriers"),
+                tags$p("2. Click the 'Run' button to generate a map of suitable sites"),
+                tags$p("3. Download your map!")
             ),
             footer = tagList(
                 modalButton("Start")
@@ -320,21 +320,6 @@ server <- function(input, output) {
         content = function(file) {
             writeRaster( suitable(), file)
         
-    
-                
-                # mark map
-                leafletProxy("map", deferUntilFlush=FALSE) %>%
-                    addMarkers(my$long, my$lat, "layer1", options=pathOptions(clickable=FALSE)) 
-                
-                observeEvent(input$suitableMap_click, {
-                    click <- input$suitableMap_click
-                    clat <- click$lat
-                    clng <- click$lng
-                    
-                    leafletProxy('suitableMap') %>%
-                        addCircles(lng=clng, lat=clat, group='circles',
-                                   weight=1, radius=1000, color='black', fillColor='green',
-                                   fillOpacity=0.2, opacity=1)})
            
             })
 }
