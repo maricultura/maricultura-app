@@ -74,6 +74,11 @@ ui <- fluidPage(
                                                                    max = 3,
                                                                   step = 0.1,
                                                                   value = 1),
+                                                      numericInput("max_swh_slider", label = h5("Maximum Significant Wave Height"),
+                                                                   min = 0,
+                                                                   max = 3,
+                                                                   step = 0.1,
+                                                                   value = 1),
                                                       numericInput("dist_shore_slider", label = h5("Maximum Distance to Shore (NM)"),
                                                                    min = 0,
                                                                    max = 200,
@@ -85,8 +90,9 @@ ui <- fluidPage(
                                                                                         "Reefs" = 2,
                                                                                         "Artificial Reefs" = 3,
                                                                                         "Oil Pipelines" = 4,
-                                                                                        "Oil Production" = 5),
-                                                                         selected = c(1, 2, 3, 4, 5))
+                                                                                        "Oil Production" = 5,
+                                                                                        "Shipping lanes" = 6),
+                                                                         selected = c(1, 2, 3, 4, 5, 6))
                                             )),
                                 actionButton("run_button", label = "Run"),
                                 downloadButton("download_button", label = "Download")
@@ -97,6 +103,7 @@ ui <- fluidPage(
                             
                             )
                         ),
+               
                # Third Tab
                tabPanel(div(icon("book-open"),"User Guide" )),
             
@@ -299,6 +306,10 @@ server <- function(input, output) {
             addTiles() %>%
             addRasterImage(suitable(), colors = pal) %>% 
             addScaleBar(position = "bottomright") %>%  # adds scale bar
+           # fitBounds(lng1 = 4937645, # sets initial view of map to fit coordinates
+              # lng2 = 8111405,
+              # lat1 = 6030062,
+              # lat2 = 10778162) %>% 
             fitBounds(lng1 = -54.6903404, # sets initial view of map to fit coordinates
                       lng2 = -25.835314,
                       lat1 = 6.3071255,
