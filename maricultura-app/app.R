@@ -17,6 +17,7 @@ library(raster)
 library(htmlwidgets)
 library(waiter)
 library(mapview)
+library(shinydashboard)
 
 # Define UI for application
 ui <- fluidPage(
@@ -41,7 +42,11 @@ ui <- fluidPage(
                # Do not need title for Navigation Bar
                # First tab
                tabPanel(div(icon("info-circle"),"About"),
-                        p( "MARICULTURA is a team of 5 bright graduate students studying at the Bren School of Environmental Science & Management at the University of California Santa Barbara.  A partnership with the World Wildlife Fund has enabled the team to shape marine aquaculture planning off the coast of Brazil. 
+                        h1("Meet the Creators",
+                           class = "font-weight-light text-white",
+                           class = "bg-primary text-center py-5 mb-4"),
+                        p(
+                        "MARICULTURA is a team of 5 bright graduate students studying at the Bren School of Environmental Science & Management at the University of California Santa Barbara.  A partnership with the World Wildlife Fund has enabled the team to shape marine aquaculture planning off the coast of Brazil. 
                            
                            
                            Visit our",
