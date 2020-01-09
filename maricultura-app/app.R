@@ -42,19 +42,37 @@ ui <- fluidPage(
                # Do not need title for Navigation Bar
                # First tab
                tabPanel(div(icon("info-circle"),"About"),
+                        h1("The Project",
+                           class = "font-weight-light text-white",
+                           class = "bg-primary text-center py-5 mb-4"),
+                        p(
+                            "This tool was created for use by the World Wildlife Fund to assist with marine aquaculture planning within the Exclusive Economic Zone (EEZ) of Brazil. The creators are a group of master's students at the Bren School....."
+                        ),
                         h1("Meet the Creators",
                            class = "font-weight-light text-white",
                            class = "bg-primary text-center py-5 mb-4"),
                         p(
-                            img(src)
-                        "MARICULTURA is a team of 5 bright graduate students studying at the Bren School of Environmental Science & Management at the University of California Santa Barbara.  A partnership with the World Wildlife Fund has enabled the team to shape marine aquaculture planning off the coast of Brazil. 
+                            wellPanel( style = "padding = 15",
+                            img(src = "bartlett-kirby_orig.jpg", height = 300, width = 225), 
+                            img(src = "bartlett-kirby_orig.jpg", height = 300, width   = 225),
+                            img(src = "bartlett-kirby_orig.jpg", height = 300, width = 225), 
+                            img(src = "bartlett-kirby_orig.jpg", height = 300, width   = 225),
+                            img(src = "bartlett-kirby_orig.jpg", height = 300, width = 225)
+                            
+                            ),
+                       
+                       
+                       
+                       
+                        "MARICULTURA is a team of 5 bright graduate students studying at the Bren School of Environmental Science & Management at the University of California Santa Barbara.  A partnership with the World Wildlife Fund has enabled the team to shape marine aquaculture planning off the coast of Brazil...... 
                            
                            
                            Visit our",
                            a( href = "https://maricultura.weebly.com", "website"),
                            "for more information."),
-                        img(src ="schooloffish.jpg", height = 300, width = 800)
+                        div(class = "container")
                         ),
+
                
                # Second tab
                tabPanel(div(icon("map-pin"),"Map"),
