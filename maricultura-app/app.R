@@ -46,6 +46,7 @@ ui <- fluidPage(
                            class = "font-weight-light text-white",
                            class = "bg-primary text-center py-5 mb-4"),
                         p(
+                            img(src)
                         "MARICULTURA is a team of 5 bright graduate students studying at the Bren School of Environmental Science & Management at the University of California Santa Barbara.  A partnership with the World Wildlife Fund has enabled the team to shape marine aquaculture planning off the coast of Brazil. 
                            
                            
