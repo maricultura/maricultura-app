@@ -283,9 +283,14 @@ server <- function(input, output) {
     # Read in file
     og_production_binary <- reactive(raster(ifelse(5 %in% input$checkGroup,"data/og_production_binary.tif", "data/raster_ones.tif")))
     
+    
+    #### Shipping Lanes 
+    # Read in File
+    shipping_lanes_binary <- reactive(raster(ifelse(6 %in% input$checkGroup, "data/shipping_mask.tif", "data/raster_ones.tif")))
+    
     ### Suitable areas (overlay of layers)
     suitable <- eventReactive( input$run_button, {
-        overlay(sst_binary_min(), sst_binary_max(), depth_binary(), current_binary(), dist_shore_binary(), mpas_binary(), reefs_binary(), reefs_artificial_binary(), og_pipeline_binary(), og_production_binary(), fun = function(a, b, c, d, e, f, g, h, i, j){a*b*c*d*e*f*g*h*i*j})
+        overlay(sst_binary_min(), sst_binary_max(), depth_binary(), current_binary(), dist_shore_binary(), mpas_binary(), reefs_binary(), reefs_artificial_binary(), og_pipeline_binary(), og_production_binary(), shipping_lanes_binary(), fun = function(a, b, c, d, e, f, g, h, i, j, k){a*b*c*d*e*f*g*h*i*j*k})
     })
    
     ### Waiter
