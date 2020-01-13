@@ -132,7 +132,8 @@ ui <- fluidPage(
                tabPanel(div(icon("book-open"),"User Guide" )),
             
                 # Fourth Tab
-                tabPanel(div(icon("table"),"Metadata"))
+                tabPanel(div(icon("table"),"Metadata"),
+                         tableOutput("metadataTable"))
                 ),
     # Create footer
     br(),
@@ -366,6 +367,15 @@ server <- function(input, output) {
         
            
             })
+        
+        ### Metadata table
+        output$metadataTable <- renderTable({
+            
+            # Read csv file
+            metadata <- read_csv("data/metadata.csv")
+            metadata
+            
+        }, width = "100vw")
 }
 
 
