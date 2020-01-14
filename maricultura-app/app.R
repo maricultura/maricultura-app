@@ -98,11 +98,11 @@ ui <- fluidPage(
                                                                    max = 3,
                                                                   step = 0.1,
                                                                   value = 1),
-                                                      numericInput("max_swh_slider", label = h5("Maximum Significant Wave Height"),
+                                                      numericInput("max_swh_slider", label = h5("Maximum Significant Wave Height (m)"),
                                                                    min = 0,
-                                                                   max = 3,
+                                                                   max = 15,
                                                                    step = 0.1,
-                                                                   value = 1),
+                                                                   value = 9),
                                                       numericInput("dist_shore_slider", label = h5("Maximum Distance to Shore (NM)"),
                                                                    min = 0,
                                                                    max = 200,
@@ -127,11 +127,23 @@ ui <- fluidPage(
                             
                             )
                         ),
-               
                # Third Tab
+               tabPanel(div(icon("book-open"),"Growth/Econ"),
+               sidebarLayout(
+                   sidebarPanel(
+                       tabPanel( "Species",
+                                 selectInput("selectSpecies", label = h3("Species"), 
+                                             choices = list("Atlantic salmon" = 1, "gilthead seabream" = 2, "cobia" = 3), 
+                                             selected = 1)
+                                                    )
+                       ),
+                   mainPanel()
+                   )),
+               
+               # Fourth Tab
                tabPanel(div(icon("book-open"),"User Guide" )),
             
-                # Fourth Tab
+                # Fifth Tab
                 tabPanel(div(icon("table"),"Metadata"),
                          tableOutput("metadataTable"))
                 ),
@@ -376,6 +388,34 @@ server <- function(input, output) {
             metadata
             
         }, width = "100vw")
+        
+        
+        ### Growth Model
+        
+       # Defining values for coefficients/variables based on inputs
+        
+        if (input$species = salmon){
+           a1 = 0.0264
+           a2 = -0.066
+           b1 = -0.0396
+           b2 = 1.254
+           T0 = 14
+        }
+        else if (input$species = gilthead){
+            a1 = 0.026
+            a2 = -0.066
+            b1 = -0.0396
+            b2 = 1.254
+            T0 = 25
+        }
+        else (input$species = cobia){
+            a1 = 0.026
+            a2 = -0.0042
+            b1 = -0.0308
+            b2 = 0.1388
+            T0 = 29
+        } 
+        
 }
 
 
