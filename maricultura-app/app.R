@@ -133,7 +133,7 @@ ui <- fluidPage(
                    sidebarPanel(
                        tabPanel( "Species",
                                  selectInput("selectSpecies", label = h3("Species"), 
-                                             choices = list("Atlantic salmon" = 1, "gilthead seabream" = 2, "cobia" = 3), 
+                                             choices = list("atlantic salmon" = 1, "gilthead seabream" = 2, "cobia" = 3), 
                                              selected = 1)
                                                     )
                        ),
@@ -364,7 +364,7 @@ server <- function(input, output) {
             addLegend(colors = c("#8B0000FF", "#FFFFFF40"), # adds legend
                       labels = c("Suitable", "Non-suitable"),
                       title = "Legend") %>% 
-            addMouseCoordinates()
+            leafem::addMouseCoordinates
          })  
     
     ###
@@ -394,29 +394,31 @@ server <- function(input, output) {
         
        # Defining values for coefficients/variables based on inputs
         
-        if (input$species = salmon){
+       if (input$selectSpecies == salmon){
            a1 = 0.0264
            a2 = -0.066
-           b1 = -0.0396
-           b2 = 1.254
-           T0 = 14
-        }
-        else if (input$species = gilthead){
+          b1 = -0.0396
+          b2 = 1.254
+          T0 = 14
+       }
+        else if (input$selectSpecies == gilthead){
             a1 = 0.026
             a2 = -0.066
             b1 = -0.0396
             b2 = 1.254
             T0 = 25
         }
-        else (input$species = cobia){
+        else (input$selectSpecies == cobia){
             a1 = 0.026
             a2 = -0.0042
             b1 = -0.0308
             b2 = 0.1388
             T0 = 29
-        } 
+        }
         
 }
+        
+
 
 
 
