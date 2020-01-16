@@ -394,14 +394,14 @@ server <- function(input, output) {
         
        # Defining values for coefficients/variables based on inputs
         
-       if (input$selectSpecies == salmon){
+       if(input$selectSpecies == salmon){
            a1 = 0.0264
            a2 = -0.066
           b1 = -0.0396
           b2 = 1.254
           T0 = 14
        }
-        else if (input$selectSpecies == gilthead){
+        else if(input$selectSpecies == gilthead){
             a1 = 0.026
             a2 = -0.066
             b1 = -0.0396
