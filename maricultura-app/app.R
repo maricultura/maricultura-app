@@ -136,7 +136,19 @@ ui <- fluidPage(
                                  selectInput("selectSpecies", label = h3("Species"), 
                                              choices = list("atlantic salmon" = 1, "gilthead seabream" = 2, "cobia" = 3), 
                                              selected = 1)
-                                                    ))),
+                                                    ),
+                       tabPanel("Economic Factors",
+                                numericInput("sizetoharvest", label = h3("Size at Harvest (kg)"),
+                                             min = 0,
+                                             max = 5,
+                                             step = 0.5,
+                                             value = 3),
+                                numericInput("numberofcages", label = h3("Number of Cages (6400m^3 each)"),
+                                             min = 1,
+                                             max = 32,
+                                             step = 1,
+                                             value = 16)
+                                             ))),
                    mainPanel()
                    )),
                
