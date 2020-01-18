@@ -1,11 +1,4 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
+# Load required libraries
 
 library(shiny)
 library(shinythemes)
@@ -18,6 +11,8 @@ library(htmlwidgets)
 library(waiter)
 library(mapview)
 library(shinydashboard)
+
+
 
 # Define UI for application
 ui <- fluidPage(
@@ -133,10 +128,32 @@ ui <- fluidPage(
                    sidebarPanel(
                      tabsetPanel(type = "tabs",
                        tabPanel( "Species",
-                                 selectInput("selectSpecies", label = h3("Species"), 
-                                             choices = list("atlantic salmon" = 1, "gilthead seabream" = 2, "cobia" = 3), 
-                                             selected = 1)
-                                                    ),
+                                 tags$div(HTML('<div id="selectSpecies" class="form-group shiny-input-radiogroup shiny-input-container">
+  <label class="control-label" for="selectSpecies">
+    <h3>Species</h3>
+  </label>
+  <div class="shiny-options-group">
+    <div class="radio">
+      <label>
+        <input type="radio" name="radio" value="1" checked="checked"/>
+        <span>Atlantic salmon<img src="atlantic_salmon.png" alt=“image of salmon“ height="100px"/></span>
+      </label>
+    </div>
+    <div class="radio">
+      <label>
+        <input type="radio" name="radio" value="2"/>
+        <span>gilthead seabream<br><br><img src="seabream.png" alt=“image of salmon“ height="70px"/></span>
+      </label>
+    </div>
+    <div class="radio">
+      <label>
+        <input type="radio" name="radio" value="3"/>
+        <span>cobia<br><img src="cobia.png" alt=“image of salmon“  height="100px"/></span>
+      </label>
+    </div>
+  </div>
+</div>'))
+                                ),
                        tabPanel("Economic Factors",
                                 numericInput("sizetoharvest", label = h3("Size at Harvest (kg)"),
                                              min = 0,
