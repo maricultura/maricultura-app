@@ -85,10 +85,13 @@ ui <- fluidPage(
                                                       #sliderInput("max_cv_slider", label = h4("Maximum Current Velocity (m/s)"), min = 0,                                                                     max = 3, value = 1, step = 0.1),
                                                       #sliderInput("dist_shore_slider", label = h4("Maximum Distance to Shore (NM)"), min                                                                     =0, max = 200, value = 25, step = 0.5)),
                                                       numericInput("min_DO_slider",
+                                                                   
                                                                    label = HTML("<h5>Minimum Dissolved Oxygen (mol/m<sup>3</sup>)</h5>"),
                                                                    min = 0,   
                                                                    max = 400,
-                                                                  step = 0.5, value = 200),
+                                                                   
+                                                                   step = 0.5, value = 200),
+                                                      
                                                       numericInput("max_cv_slider", label = h5("Maximum Current Velocity (m/s)"),
                                                                    min = 0,
                                                                    max = 3,
@@ -438,8 +441,6 @@ server <- function(input, output) {
         reclassify(suitable_sst_0(), cbind(0, NA))
     )
     
-    # Source growth function from scripts folder
-    # source("scripts/growth_function.R")
 
 # Set reactive values
     
@@ -496,10 +497,6 @@ server <- function(input, output) {
         growth_above_optimal() + growth_below_optimal()
     )
     
-    # Apply growth function 
-    # growth_raster <- reactive(
-    #     growth_function(species_var(), suitable_sst())
-    # )
     
     # Render growth plot
     output$growthMap <- renderLeaflet({
@@ -545,51 +542,8 @@ server <- function(input, output) {
 
         
 
-        
-
-
+      
 
 
 # Run the application 
 shinyApp(ui = ui, server = server)
-
-
-
-#output$out <- renderText({
-
-#  if(is.null(input$hover_coordinates)) {
-#        "Mouse outside of map"
-#  } else {
-#   paste0("Lat: ", input$hover_coordinates[1], 
-#            "\nLng: ", input$hover_coordinates[2])
-# }
-# })
-
-
-### Download map
-# onRender(
-#"function(el,x){
-#   this.on('mousemove', function(e) {
-#     var lat = e.latlng.lat;
-#      var lng = e.latlng.lng;
-#     var coord = [lat, lng];
-#    Shiny.onInputChange('hover_coordinates', coord)
-#   });
-#   this.on('mouseout', function(e) {
-
-#observeEvent(input$map_click, {
-    
-   # cat(file=stderr(), "\n")
-   # cat(file=stderr(), paste("observed map_click"), "\n")    
-    
-   # click <- input$map_click
-   # my$long <- click$lng
- #   my$lat <- click$lat
-
-#growth_model <- reactive({
-# if(input$selectSpecies == "atlantic salmon") 
-#   a1 = 0.0264
-# a2 = -0.066
-# b1 = -0.0396
-# b2 = 1.254
-# T0 = 14})
