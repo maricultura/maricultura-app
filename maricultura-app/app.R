@@ -135,7 +135,7 @@ ui <- fluidPage(
   <div class="shiny-options-group">
     <div class="radio">
       <label>
-        <input type="radio" name="radio" value="1" checked="checked"/>
+        <input type="radio" name="radio" value="1"/>
         <span>Atlantic salmon<img src="atlantic_salmon.png" alt=“image of salmon“ height="100px"/></span>
       </label>
     </div>
@@ -147,7 +147,7 @@ ui <- fluidPage(
     </div>
     <div class="radio">
       <label>
-        <input type="radio" name="radio" value="3"/>
+        <input type="radio" name="radio" value="3" checked="checked"/>
         <span>cobia<br><img src="cobia.png" alt=“image of salmon“  height="100px"/></span>
       </label>
     </div>
@@ -166,7 +166,9 @@ ui <- fluidPage(
                                              step = 1,
                                              value = 16)
                                              ))),
-                   mainPanel()
+                   mainPanel(
+                       leafletOutput("growthMap", height = "100vh")
+                   )
                    )),
                
                # Fourth Tab
@@ -420,30 +422,107 @@ server <- function(input, output) {
         
         
         ### Growth Model
-        
-       # Defining values for coefficients/variables based on inputs
-        
+    # Read saved raster
+    mean_sst_mask <- raster("data/mean_sst_mask.tif")
     
-        #  if(input$selectSpecies == "salmon"){
-          #  a1 = 0.0264
-           #  a2 = -0.066
-           #  b1 = -0.0396
-          #        b2 = 1.254
-          #        T0 = 14
-          #     }
-        #    else if(input$selectSpecies == "gilthead"){
-          #          a1 = 0.026
-            #         a2 = -0.066
-            #          b1 = -0.0396
-            #          b2 = 1.254
-            #          T0 = 25
-            #       }
-        #      else (input$selectSpecies == "cobia"){
-          #           a1 = 0.026
-            #          a2 = -0.0042
-            #        b1 = -0.0308
-            #       b2 = 0.1388
-      #      T0 = 29
+    # Overlay suitable raster and mean SST and reclassify
+    suitable_sst_0 <- reactive(
+        overlay(mean_sst_mask, suitable(), fun = function(x, y) {x * y})
+    )
+    
+    # Convert zero values in raster into NAs, otherwise all background would be less than T0
+    suitable_sst <- reactive(
+        reclassify(suitable_sst_0(), cbind(0, NA))
+    )
+    
+    # Source growth function from scripts folder
+    # source("scripts/growth_function.R")
+   
+
+    # Set variables from vector (starts at element 2 because element 1 is species name)
+    a1 <-  reactive(
+        if (input$selectSpecies == "1") {
+            0.0264
+        } else if (input$selectSpecies == "1") {
+            0.0260
+        } else {
+            0.0714
+        }
+        )
+    a2 <-  reactive(
+        if (input$selectSpecies == "1") {
+            -0.0660
+        } else if (input$selectSpecies == "2") {
+            -0.0042
+        } else {
+            -0.1667
+        }
+        )
+    b1 <-  reactive(
+        if (input$selectSpecies == "1") {
+            -0.0396
+        } else if (input$selectSpecies == "2") {
+            -0.0308
+        } else {
+            -1.5714
+        }
+        )
+    b2 <-  reactive(
+        if (input$selectSpecies == "1") {
+            1.2540
+        } else if (input$selectSpecies == "2") {
+            0.1388	
+        } else {
+            5.3333
+        }
+        )
+    T0 <-  reactive(
+        if (input$selectSpecies == "1") {
+            14
+        } else if (input$selectSpecies == "2") {
+            25
+        } else {
+            29
+        }
+        )
+    
+    # Separete cells into cells above and below optimal SST
+    cells_below_optimal <- reactive(
+        suitable_sst() < T0()
+        )
+    
+    cells_above_optimal <-  reactive(
+        suitable_sst() > T0()
+    )
+    
+    # Apply growth equations
+    growth_below_optimal <- reactive(
+        a1()*cells_below_optimal()*suitable_sst() - b1()*cells_below_optimal()
+    )
+    growth_above_optimal <- reactive(
+        a2()*cells_above_optimal()*suitable_sst() + b2()*cells_above_optimal()
+    )
+    
+    # Add both rasters
+    growth_raster <- reactive(
+        growth_above_optimal() + growth_below_optimal()
+    )
+    
+    # Apply growth function 
+    # growth_raster <- reactive(
+    #     growth_function(species_var(), suitable_sst())
+    # )
+    
+    # Render growth plot
+    output$growthMap <- renderLeaflet({
+        
+        # Leaflet map
+        leaflet(options = leafletOptions( zoomSnap = 0.2)) %>%
+            addTiles() %>%
+            addRasterImage( growth_raster())
+        }
+    )
+
 }
 
 
