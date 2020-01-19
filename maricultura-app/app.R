@@ -165,7 +165,9 @@ ui <- fluidPage(
                                              max = 32,
                                              step = 1,
                                              value = 16)
-                                             ))),
+                                             )),
+                     actionButton("run_button_growth", label = "Run"),
+                     downloadButton("download_button_growth", label = "Download")),
                    mainPanel(
                        leafletOutput("growthMap", height = "100vh")
                    )
@@ -399,7 +401,7 @@ server <- function(input, output) {
          })  
     
     ###
-         ### Download map
+         ### Download suitability map
         output$download_button <- downloadHandler(
         
         filename = function() {
@@ -437,74 +439,59 @@ server <- function(input, output) {
     
     # Source growth function from scripts folder
     # source("scripts/growth_function.R")
-   
 
-    # Set variables from vector (starts at element 2 because element 1 is species name)
-    a1 <-  reactive(
-        if (input$selectSpecies == "1") {
-            0.0264
-        } else if (input$selectSpecies == "1") {
-            0.0260
-        } else {
-            0.0714
-        }
-        )
-    a2 <-  reactive(
-        if (input$selectSpecies == "1") {
-            -0.0660
-        } else if (input$selectSpecies == "2") {
-            -0.0042
-        } else {
-            -0.1667
-        }
-        )
-    b1 <-  reactive(
-        if (input$selectSpecies == "1") {
-            -0.0396
-        } else if (input$selectSpecies == "2") {
-            -0.0308
-        } else {
-            -1.5714
-        }
-        )
-    b2 <-  reactive(
-        if (input$selectSpecies == "1") {
-            1.2540
-        } else if (input$selectSpecies == "2") {
-            0.1388	
-        } else {
-            5.3333
-        }
-        )
-    T0 <-  reactive(
-        if (input$selectSpecies == "1") {
-            14
-        } else if (input$selectSpecies == "2") {
-            25
-        } else {
-            29
-        }
-        )
+# Set reactive values
+    
+    # initializing reactive values with values for cobia
+    values <-  reactiveValues( a1 = 0.0714,
+                                a2 = -0.1667,
+                                b1 = -1.5714,
+                                b2 = 5.3333,
+                                T0 = 29)
+    
+    
+    eventReactive(input$selectSpecies, 
+        if (input$selectSpecies == 1){
+        values$a1 <-  0.0264
+        values$a2 <-  -0.066
+        values$b1 <-  -0.0396
+        values$b2 <-  1.254
+        values$T0 <-  14
+    } else if (input$selectSpecies == 2){
+        values$a1 <-  0.026
+        values$a2 <-  -0.0042
+        values$b1 <-  -0.0308
+        values$b2 <-  0.1388
+        values$T0 <-  25
+    } else {
+        values$a1 <- 0.0714
+        values$a2 <- -0.1667
+        values$b1 <- -1.5714
+        values$b2 <- 5.3333
+        values$T0 <-  29                     
+    }
+    )
+
     
     # Separete cells into cells above and below optimal SST
     cells_below_optimal <- reactive(
-        suitable_sst() < T0()
+        suitable_sst() < values$T0
         )
     
     cells_above_optimal <-  reactive(
-        suitable_sst() > T0()
+        suitable_sst() > values$T0
     )
     
     # Apply growth equations
     growth_below_optimal <- reactive(
-        a1()*cells_below_optimal()*suitable_sst() - b1()*cells_below_optimal()
+        values$a1*cells_below_optimal()*suitable_sst() - values$b1*cells_below_optimal()
     )
     growth_above_optimal <- reactive(
-        a2()*cells_above_optimal()*suitable_sst() + b2()*cells_above_optimal()
+        values$a2*cells_above_optimal()*suitable_sst() + values$b2*cells_above_optimal()
     )
     
     # Add both rasters
-    growth_raster <- reactive(
+    growth_raster <- eventReactive( input$run_button_growth,
         growth_above_optimal() + growth_below_optimal()
     )
     
@@ -515,13 +502,42 @@ server <- function(input, output) {
     
     # Render growth plot
     output$growthMap <- renderLeaflet({
-        
+        # Palette
+        pal_growth <- colorNumeric(c("#DAF7A6", "#C70039", "#581845"), values(growth_raster()),
+                                   na.color = "transparent")
+            
         # Leaflet map
         leaflet(options = leafletOptions( zoomSnap = 0.2)) %>%
             addTiles() %>%
-            addRasterImage( growth_raster())
+            addRasterImage(growth_raster(), colors = pal_growth) %>%
+            fitBounds(lng1 = -54.6903404, # sets initial view of map to fit coordinates
+                      lng2 = -25.835314,
+                      lat1 = 6.3071255,
+                      lat2 = -35.8573806) %>% 
+            addEasyButton(easyButton(
+                icon="fa-globe", title="Reset View", # button to reset to initial view
+                onClick=JS("function(btn, map){
+                           map.setView([-14.0182737, -39.8789667]);
+                           map.setZoom(4.6);}"))) %>% 
+            addLegend("topright",
+                      pal = pal_growth,
+                      values = values(growth_raster()),
+                      title = "Somatic growth (kg/month)")
+        
         }
     )
+    
+    ### Download suitability map
+    output$download_button_growth <- downloadHandler(
+        
+        filename = function() {
+            "growth_map.tif"
+        },
+        content = function(file) {
+            writeRaster(growth_raster(), file)
+            
+            
+        })
 
 }
 
