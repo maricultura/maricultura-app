@@ -11,6 +11,7 @@ library(htmlwidgets)
 library(waiter)
 library(mapview)
 library(shinydashboard)
+library(rgdal)
 
 
 
