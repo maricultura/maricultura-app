@@ -35,7 +35,7 @@ ui <- fluidPage(
     
     # Navbar
     navbarPage("" , 
-               selected = div(icon("map-pin"),"Map"),
+               selected = div(icon("map-pin"),"Suitability"),
                # Do not need title for Navigation Bar
                # First tab
                tabPanel(div(icon("info-circle"),"About"),
@@ -492,7 +492,8 @@ server <- function(input, output) {
             addLegend("topright",
                       pal = pal_growth,
                       values = values(growth_raster()),
-                      title = "Somatic growth (kg/month)")
+                      title = "Somatic growth (kg/month)") %>% 
+            addMouseCoordinates()
         
         }
     )
