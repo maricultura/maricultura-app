@@ -12,6 +12,7 @@ library(waiter)
 library(mapview)
 library(shinydashboard)
 library(rgdal)
+library(shinyBS)
 
 # Source scripts
 source("scripts/html.R")
@@ -75,18 +76,32 @@ ui <- fluidPage(
                             sidebarPanel(
                                 tabsetPanel(type = "tabs",
                                             tabPanel( "Variable",
-                                                      sliderInput("sst_slider", label = h5("Sea Surface Temperature (°C)"), min = 0, 
-                                                                  max = 40, value = c(22,32)),
-                                                      sliderInput("depth_slider", label = h5("Depth (m)"), min = 0, 
-                                                                  max = 200, value = c(25, 100)),
+                                                      sliderInput("sst_slider",
+                                                                  label = h5("Sea Surface Temperature (°C)"),
+                                                                  min = 0, 
+                                                                  max = 40,
+                                                                  value = c(22,32)),
+                                                      bsTooltip(id = "sst_slider",
+                                                                title = "Temperature range for fish survival",
+                                                                placement = "right",
+                                                                trigger = "hover",
+                                                                options = NULL),
+                                                      sliderInput("depth_slider",
+                                                                  label = h5("Depth (m)"),
+                                                                  min = 0, 
+                                                                  max = 200,
+                                                                  value = c(25, 100)),
+                                                      bsTooltip(id = "depth_slider",
+                                                                title = "Cage manufacturer depth specifications",
+                                                                placement = "right",
+                                                                trigger = "hover",
+                                                                options = NULL),
                                                       numericInput("min_DO_slider",
-                                                                   
                                                                    label = HTML("<h5>Minimum Dissolved Oxygen (mol/m<sup>3</sup>)</h5>"),
                                                                    min = 0,   
                                                                    max = 400,
-                                                                   
-                                                                   step = 0.5, value = 200),
-                                                      
+                                                                   step = 0.5,
+                                                                   value = 200),
                                                       numericInput("max_cv_slider", label = h5("Maximum Current Velocity (m/s)"),
                                                                    min = 0,
                                                                    max = 3,
