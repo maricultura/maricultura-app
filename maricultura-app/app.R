@@ -13,7 +13,8 @@ library(mapview)
 library(shinydashboard)
 library(rgdal)
 
-
+# Source scripts
+source("scripts/html.R")
 
 # Define UI for application
 ui <- fluidPage(
@@ -41,9 +42,7 @@ ui <- fluidPage(
                         h1("The Project",
                            class = "font-weight-light text-white",
                            class = "bg-primary text-center py-5 mb-4"),
-                        p(
-                            "This tool was created for use by the World Wildlife Fund to assist with marine aquaculture planning within the Exclusive Economic Zone (EEZ) of Brazil. The creators are a group of master's students at the Bren School....."
-                        ),
+                       test,
                         h1("Meet the Creators",
                            class = "font-weight-light text-white",
                            class = "bg-primary text-center py-5 mb-4"),
@@ -71,7 +70,7 @@ ui <- fluidPage(
 
                
                # Second tab
-               tabPanel(div(icon("map-pin"),"Map"),
+               tabPanel(div(icon("map-pin"),"Suitability"),
                         sidebarLayout(
                             sidebarPanel(
                                 tabsetPanel(type = "tabs",
@@ -80,10 +79,6 @@ ui <- fluidPage(
                                                                   max = 40, value = c(22,32)),
                                                       sliderInput("depth_slider", label = h5("Depth (m)"), min = 0, 
                                                                   max = 200, value = c(25, 100)),
-                                                      #sliderInput("min_DO_slider", label = h4("Minimum Dissolved Oxygen ()"), min = 0, 
-                                                                  #max = 400, value = 200.5, step = 0.5),
-                                                      #sliderInput("max_cv_slider", label = h4("Maximum Current Velocity (m/s)"), min = 0,                                                                     max = 3, value = 1, step = 0.1),
-                                                      #sliderInput("dist_shore_slider", label = h4("Maximum Distance to Shore (NM)"), min                                                                     =0, max = 200, value = 25, step = 0.5)),
                                                       numericInput("min_DO_slider",
                                                                    label = HTML("<h5>Minimum Dissolved Oxygen (mol/m<sup>3</sup>)</h5>"),
                                                                    min = 0,   
@@ -124,36 +119,12 @@ ui <- fluidPage(
                             )
                         ),
                # Third Tab
-               tabPanel(div(icon("book-open"),"Growth/Econ"),
+               tabPanel(div(icon("chart-line"),"Growth/Econ"),
                sidebarLayout(
                    sidebarPanel(
                      tabsetPanel(type = "tabs",
                        tabPanel( "Species",
-                                 tags$div(HTML('<div id="selectSpecies" class="form-group shiny-input-radiogroup shiny-input-container">
-  <label class="control-label" for="selectSpecies">
-    <h3>Species</h3>
-  </label>
-  <div class="shiny-options-group">
-    <div class="radio">
-      <label>
-        <input type="radio" name="radio" value="1"/>
-        <span>Atlantic salmon<img src="atlantic_salmon.png" alt=“image of salmon“ height="100px"/></span>
-      </label>
-    </div>
-    <div class="radio">
-      <label>
-        <input type="radio" name="radio" value="2"/>
-        <span>gilthead seabream<br><br><img src="seabream.png" alt=“image of salmon“ height="70px"/></span>
-      </label>
-    </div>
-    <div class="radio">
-      <label>
-        <input type="radio" name="radio" value="3" checked="checked"/>
-        <span>cobia<br><img src="cobia.png" alt=“image of salmon“  height="100px"/></span>
-      </label>
-    </div>
-  </div>
-</div>'))
+                                 fish_radiobuttons # Radio buttons sourced from scripts/html.R
                                 ),
                        tabPanel("Economic Factors",
                                 numericInput("sizetoharvest", label = h3("Size at Harvest (kg)"),
@@ -175,6 +146,7 @@ ui <- fluidPage(
                    )),
                
                # Fourth Tab
+               
                tabPanel(div(icon("book-open"),"User Guide" )),
             
                 # Fifth Tab
