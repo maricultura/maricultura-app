@@ -456,9 +456,15 @@ server <- function(input, output) {
 # Set reactive values
     
     
-   # We need to define values somewhere as a DF that 
+   # Data frame with coefficients for different species
+    species <- c("Atlantic salmon", "Gilthead seabream", "cobia")
+    a1 <- c(0.0264, 0.026, 0.0714)
+    a2 <- c(-0.066, -0.0042, -0.1667)
+    b1 <- c(-0.0396, -0.0308, -1.5714)
+    b2 <- c(1.254, 0.1388, 5.3333)
+    T0 <- c(14, 25, 29)
     
-   
+    species_df <- data.frame(species, a1, a2, b1, b2, T0)
 
     
     # Separete cells into cells above and below optimal SST
