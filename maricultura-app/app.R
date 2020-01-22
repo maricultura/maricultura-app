@@ -441,6 +441,7 @@ server <- function(input, output) {
     # Read saved raster
     mean_sst_mask <- raster("data/mean_sst_mask.tif")
     
+    
     # Overlay suitable raster and mean SST and reclassify
     suitable_sst_0 <- reactive(
         overlay(mean_sst_mask, suitable(), fun = function(x, y) {x * y})
@@ -454,35 +455,10 @@ server <- function(input, output) {
 
 # Set reactive values
     
-    # initializing reactive values with values for cobia
-    values <-  reactiveValues( a1 = 0.0714,
-                                a2 = -0.1667,
-                                b1 = -1.5714,
-                                b2 = 5.3333,
-                                T0 = 29)
     
+   # We need to define values somewhere as a DF that 
     
-    eventReactive(input$selectSpecies, 
-        if (input$selectSpecies == 1){
-        values$a1 <-  0.0264
-        values$a2 <-  -0.066
-        values$b1 <-  -0.0396
-        values$b2 <-  1.254
-        values$T0 <-  14
-    } else if (input$selectSpecies == 2){
-        values$a1 <-  0.026
-        values$a2 <-  -0.0042
-        values$b1 <-  -0.0308
-        values$b2 <-  0.1388
-        values$T0 <-  25
-    } else {
-        values$a1 <- 0.0714
-        values$a2 <- -0.1667
-        values$b1 <- -1.5714
-        values$b2 <- 5.3333
-        values$T0 <-  29                     
-    }
-    )
+   
 
     
     # Separete cells into cells above and below optimal SST
