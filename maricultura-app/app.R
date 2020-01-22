@@ -378,14 +378,17 @@ server <- function(input, output) {
     output$suitableMap <- renderLeaflet({
         
         # Color palettes
-        pal <- colorNumeric(c("#FFFFFF40", "#8B0000FF"), values(suitable()), na.color = "transparent", alpha = TRUE)
+        pal <- colorNumeric(c("#FFFFFF40", "blue"), values(suitable()), na.color = "transparent", alpha = TRUE)
         
         on.exit(waiter_hide())
         
         # Leaflet map
         leaflet(options = leafletOptions( zoomSnap = 0.2)) %>%
-            addTiles() %>%
-            addRasterImage(suitable(), colors = pal) %>% 
+            addTiles(group = "Open Street Map") %>%
+          addProviderTiles("Esri.WorldGrayCanvas", group = "Esri Gray Canvas (default)") %>%
+            addRasterImage(suitable(),
+                           colors = pal,
+                           group = "Suitable Areas") %>% 
             addScaleBar(position = "bottomright") %>%  # adds scale bar
            # fitBounds(lng1 = 4937645, # sets initial view of map to fit coordinates
               # lng2 = 8111405,
@@ -400,10 +403,15 @@ server <- function(input, output) {
                  onClick=JS("function(btn, map){
                            map.setView([-14.0182737, -39.8789667]);
                            map.setZoom(4.6);}"))) %>% 
-            addLegend(colors = c("#8B0000FF", "#FFFFFF40"), # adds legend
-                      labels = c("Suitable", "Non-suitable"),
+          addLayersControl(
+            baseGroups = c("Esri Gray Canvas (default)", "Open Street Map"),
+            overlayGroups = "Suitable Areas",
+            options = layersControlOptions(collapsed = TRUE),
+            position = "topleft") %>% 
+            addLegend(colors = c("blue", "#FFFFFF40"), # adds legend
+                      labels = c("Suitable Areas", "Exclusive Economic Zone"),
                       title = "Legend") %>% 
-            addMouseCoordinates()
+            addMouseCoordinates() 
          })  
     
     ###
