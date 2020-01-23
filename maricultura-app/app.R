@@ -13,6 +13,7 @@ library(mapview)
 library(shinydashboard)
 library(rgdal)
 library(shinyBS)
+library(plotly)
 
 # Source scripts
 source("scripts/html.R")
@@ -177,12 +178,17 @@ ui <- fluidPage(
                        leafletOutput("growthMap", height = "100vh")
                    )
                    )),
-               
                # Fourth Tab
+               tabPanel(div(icon("calculator"),"Area Calculator"),
+                        fluidRow(
+                          column(12,
+                                 plotlyOutput("barPlot"))
+                        )),
                
+               # Fifth Tab
                tabPanel(div(icon("book-open"),"User Guide" )),
             
-                # Fifth Tab
+                # Sixth Tab
                 tabPanel(div(icon("table"),"Metadata"),
                          tableOutput("metadataTable"))
                 ),
@@ -360,19 +366,30 @@ server <- function(input, output) {
         )
     })
     
-    ### Area Message
-    # Show message after clicking run button
-    observeEvent(input$run_button, {
-        
-        # Area calculation
-        area <- round(freq(suitable(), value = 1)*184.64, digits = 0)
-        
-        # Notification
-        showNotification("Total suitable area:",
-                         HTML(paste(area, " km", tags$sup(2), sep = "")),
-                         type = "message", duration = NULL)
-    })
+    ### Area Calculator ###
+    area <- reactive(
+      round(freq(suitable(), value = 1)*184.64, digits = 0)
+    )
     
+    values <- reactiveValues()
+    
+    values$x <- vector()
+    values$y <- vector()
+    
+    observeEvent(input$run_button, {
+    values$x <- append(values$x, paste0("Run", input$run_button), input$run_button-1)
+    values$y <- append(values$y, area(), input$run_button-1)
+    }
+    )
+    
+    output$barPlot <- renderPlotly(
+      output$barPlot <- renderPlotly(
+        p <- plot_ly(
+          x = values$x,
+          y = values$y,
+          type = "bar")
+      )
+    )
     
     ### Render leaflet map
     output$suitableMap <- renderLeaflet({
