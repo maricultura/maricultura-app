@@ -183,8 +183,11 @@ ui <- fluidPage(
                                                     step = 1,
                                                     value = 16
                                                     ))),
-                                actionButton("run_button_economics", label = "Run")),
-                                mainPanel()
+                                actionButton("run_button_economics", label = "Run"),
+                              downloadButton("download_button_economics", label = "Download")),
+                                mainPanel(
+                                  leafletOutput("economics_map", height = "100vh")
+                                )
                )),
                # Fifth Tab
                tabPanel(div(icon("calculator"),"Area Calculator"),
