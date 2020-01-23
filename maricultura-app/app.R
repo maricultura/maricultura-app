@@ -181,10 +181,10 @@ ui <- fluidPage(
                                                     min = 1,
                                                     max = 32,
                                                     step = 1,
-                                                    value = 16)
-                                        ))),
-                          
-                        mainPanel()
+                                                    value = 16
+                                                    ))),
+                                actionButton("run_button_economics", label = "Run")),
+                                mainPanel()
                )),
                # Fifth Tab
                tabPanel(div(icon("calculator"),"Area Calculator"),
