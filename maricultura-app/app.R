@@ -138,7 +138,7 @@ ui <- fluidPage(
                             )
                         ),
                # Third Tab
-               tabPanel(div(icon("chart-line"),"Growth Optimization"),
+               tabPanel(div(icon("chart-line"),"Growth"),
                sidebarLayout(
                    sidebarPanel(
                      tabsetPanel(type = "tabs",
@@ -152,7 +152,7 @@ ui <- fluidPage(
                    )
                    )),
                #Fourth Tab
-               tabPanel(div(icon("hand-holding-usd"), "Economic Optimization"),
+               tabPanel(div(icon("hand-holding-usd"), "Economics"),
                         sidebarLayout(
                             sidebarPanel(
                               tabsetPanel(type = "tabs",
@@ -197,9 +197,12 @@ ui <- fluidPage(
                         )),
                
                # Sixth Tab
+               tabPanel(div(icon("history"), "Run History")),
+                
+               # Seventh Tab
                tabPanel(div(icon("book-open"),"User Guide" )),
-            
-                # Seventh Tab
+                
+               # Eight Tab
                 tabPanel(div(icon("table"),"Metadata"),
                          tableOutput("metadataTable"))
                 ),
