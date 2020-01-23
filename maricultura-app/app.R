@@ -72,7 +72,7 @@ ui <- fluidPage(
 
                
                # Second tab
-               tabPanel(div(icon("map-pin"),"Suitability"),
+               tabPanel(div(icon("map-pin"),"Site Suitability"),
                         sidebarLayout(
                             sidebarPanel(
                                 tabsetPanel(type = "tabs",
@@ -138,57 +138,65 @@ ui <- fluidPage(
                             )
                         ),
                # Third Tab
-               tabPanel(div(icon("chart-line"),"Growth/Econ"),
+               tabPanel(div(icon("chart-line"),"Growth Optimization"),
                sidebarLayout(
                    sidebarPanel(
                      tabsetPanel(type = "tabs",
                        tabPanel( "Species",
                                  fish_radiobuttons # Radio buttons sourced from scripts/html.R
-                                ),
-                       tabPanel("Economic Factors",
-                                numericInput("sizetoharvest", label = h3("Size at Harvest (kg)"),
-                                             min = 0,
-                                             max = 5,
-                                             step = 0.5,
-                                             value = 3),
-                                numericInput("stockingdensity", label = h3("Stocking Density (fish/m^3"),
-                                             min = 1,
-                                             max = 50,
-                                             step = 1,
-                                             value = 10), 
-                                numericInput("fingerlingprice", label = h3("Fingerling Price ($USD/fish"),
-                                             min = .10,
-                                             max = 10.00,
-                                             step = .10,
-                                             value = 1.50),
-                                numericInput("feedprice", label = h3("Feed Price ($USD/kg)"),
-                                             min = 1.00,
-                                             max = 10000.00,
-                                             step = 1.00,
-                                             value = 500.00),
-                                numericInput("numberofcages", label = h3("Number of Cages (6400m^3 each)"),
-                                             min = 1,
-                                             max = 32,
-                                             step = 1,
-                                             value = 16)
-                                             )),
+                                )),
                      actionButton("run_button_growth", label = "Run"),
                      downloadButton("download_button_growth", label = "Download")),
                    mainPanel(
                        leafletOutput("growthMap", height = "100vh")
                    )
                    )),
-               # Fourth Tab
+               #Fourth Tab
+               tabPanel(div(icon("hand-holding-usd"), "Economic Optimization"),
+                        sidebarLayout(
+                            sidebarPanel(
+                              tabsetPanel(type = "tabs",
+                                tabPanel("Economic Factors",
+                                        numericInput("sizetoharvest", label = h3("Size at Harvest (kg)"),
+                                                    min = 0,
+                                                    max = 5,
+                                                    step = 0.5,
+                                                    value = 3),
+                                       numericInput("stockingdensity", label = h3("Stocking Density (fish/m^3"),
+                                                    min = 1,
+                                                    max = 50,
+                                                    step = 1,
+                                                    value = 10), 
+                                       numericInput("fingerlingprice", label = h3("Fingerling Price ($USD/fish)"),
+                                                    min = .10,
+                                                    max = 10.00,
+                                                    step = .10,
+                                                    value = 1.50),
+                                       numericInput("feedprice", label = h3("Feed Price ($USD/kg)"),
+                                                    min = 1.00,
+                                                    max = 10000.00,
+                                                    step = 1.00,
+                                                    value = 500.00),
+                                       numericInput("numberofcages", label = h3("Number of Cages (6400m^3 each)"),
+                                                    min = 1,
+                                                    max = 32,
+                                                    step = 1,
+                                                    value = 16)
+                                        ))),
+                          
+                        mainPanel()
+               )),
+               # Fifth Tab
                tabPanel(div(icon("calculator"),"Area Calculator"),
                         fluidRow(
                           column(12,
                                  plotlyOutput("barPlot"))
                         )),
                
-               # Fifth Tab
+               # Sixth Tab
                tabPanel(div(icon("book-open"),"User Guide" )),
             
-                # Sixth Tab
+                # Seventh Tab
                 tabPanel(div(icon("table"),"Metadata"),
                          tableOutput("metadataTable"))
                 ),
