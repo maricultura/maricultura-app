@@ -14,9 +14,14 @@ library(shinydashboard)
 library(rgdal)
 library(shinyBS)
 library(plotly)
+library(shinyEventLogger)
 
 # Source scripts
 source("scripts/html.R")
+
+
+# Set logging for history
+set_logging()
 
 # Define UI for application
 ui <- fluidPage(
@@ -157,32 +162,41 @@ ui <- fluidPage(
                             sidebarPanel(
                               tabsetPanel(type = "tabs",
                                 tabPanel("Economic Factors",
-                                        numericInput("sizetoharvest", label = h3("Size at Harvest (kg)"),
-                                                    min = 0,
-                                                    max = 5,
-                                                    step = 0.5,
-                                                    value = 3),
+                                        selectInput("sizetoharvest", label = h3("Size at Harvest (kg)"),
+                                                    choices = list("1" = 1, "2" = 2, "3" = 3, "4" = 4, "5" = 5),
+                                                    selected = 1
+                                                    ),
                                        numericInput("stockingdensity", label = h3("Stocking Density (fish/m^3"),
                                                     min = 1,
                                                     max = 50,
                                                     step = 1,
                                                     value = 10), 
-                                       numericInput("fingerlingprice", label = h3("Fingerling Price ($USD/fish)"),
+                                       bsTooltip(id = "stockingdensity",
+                                                 title = "Desired density of adult fish at time of harvest (max 50)",
+                                                 placement = "right",
+                                                 trigger = "hover",
+                                                 options = NULL),
+                                       sliderInput("fingerlingprice", label = h3("Fingerling Price ($USD/fish)"),
                                                     min = .10,
                                                     max = 10.00,
                                                     step = .10,
                                                     value = 1.50),
-                                       numericInput("feedprice", label = h3("Feed Price ($USD/kg)"),
-                                                    min = 1.00,
-                                                    max = 10000.00,
-                                                    step = 1.00,
+                                       sliderInput("feedprice", label = h3("Feed Price ($USD/kg)"),
+                                                    min = 100.00,
+                                                    max = 5000.00,
+                                                    step = 100.00,
                                                     value = 500.00),
                                        numericInput("numberofcages", label = h3("Number of Cages (6400m^3 each)"),
                                                     min = 1,
                                                     max = 32,
                                                     step = 1,
-                                                    value = 16
-                                                    ))),
+                                                    value = 16),
+                                       bsTooltip(id = "numberofcages",
+                                                 title = "Desired farm size (max 32 SeaStation cages)",
+                                                 placement = "right",
+                                                 trigger = "hover",
+                                                 options = NULL),
+                                       )),
                                 actionButton("run_button_economics", label = "Run"),
                               downloadButton("download_button_economics", label = "Download")),
                                 mainPanel(
@@ -197,7 +211,8 @@ ui <- fluidPage(
                         )),
                
                # Sixth Tab
-               tabPanel(div(icon("history"), "Run History")),
+               tabPanel(div(icon("history"), "Run History"),
+                        log_init()),
                 
                # Seventh Tab
                tabPanel(div(icon("book-open"),"User Guide" )),
@@ -223,6 +238,7 @@ ui <- fluidPage(
 # Define server logic 
 ##########################################################################################
 server <- function(input, output) {
+  set_logging_session()
     
     ### Modal Dialogue
     # Create modal dialogue
@@ -524,18 +540,6 @@ server <- function(input, output) {
     )
     
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 # Set reactive values
     
     
@@ -617,14 +621,13 @@ server <- function(input, output) {
         },
         content = function(file) {
             writeRaster(growth_raster(), file)
-          
-          
-    # Economic Analysis
-          
-            
+      
             
         })
+    
+    log_event()
 
+  
 }
 
 
