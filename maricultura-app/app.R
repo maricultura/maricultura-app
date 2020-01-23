@@ -205,7 +205,9 @@ ui <- fluidPage(
     )
 )
 
+##########################################################################################
 # Define server logic 
+##########################################################################################
 server <- function(input, output) {
     
     ### Modal Dialogue
@@ -367,27 +369,65 @@ server <- function(input, output) {
     })
     
     ### Area Calculator ###
+    
+    # Calculate value for total area
     area <- reactive(
       round(freq(suitable(), value = 1)*184.64, digits = 0)
     )
     
-    values <- reactiveValues()
+    text_depth <- reactive(paste0("Depth: ", input$depth_slider[1], " - ", input$depth_slider[2], " m"))
+    text_sst <-  reactive(paste0(" \nSST: ", input$sst_slider[1], " - ", input$sst_slider[2], " °C"))
+    text_do <- reactive(paste0(" \nDissolved Oxygen: ", input$min_DO_slider, HTML("mol/m<sup>3</sup>")))
+    text_max_cv <- reactive(paste0(" \nMax Current Velocity :", input$max_cv_slider, " m/s"))
+    text_max_swh <- reactive(paste0(" \nMax. Sig. Wave Height: ", "m"))
+    text_dist_shore <- reactive(paste0(" \nDistance to Shore: ", input$dist_shore_slider, " NM"))
+    text_mpas <- reactive(paste0(" \nMPAS: ", input$checkGroup[1] == 1))
+    text_reefs <- reactive(paste0(" \nReefs: ", input$checkGroup[2] == 2))
+    text_a_reefs <- reactive(paste0(" \nArtificial Reefs: ", input$checkGroup[3] == 3))
+    text_oil_pipe <- reactive(paste0(" \nOil Pipelines: ", input$checkGroup[4] == 4))
+    text_oil_prod <- reactive(paste0(" \nOil Production: ", input$checkGroup[5] == 5))
+    text_shipping <- reactive(paste0(" \nShipping Lanes: ", input$checkGroup[6] == 6))
     
+    # Create text for inputs
+    inputs_suitability <- reactive(
+      paste0(text_depth(),
+             text_sst(),
+             text_do(),
+             text_max_cv(),
+             text_max_swh(),
+             text_dist_shore(),
+             text_mpas(),
+             text_reefs(),
+             text_a_reefs(),
+             text_oil_pipe(),
+             text_oil_prod(),
+             text_shipping())
+    )
+    
+    # Create empty reactive values
+    values <- reactiveValues()
     values$x <- vector()
     values$y <- vector()
+    values$text<- vector()
     
+    # Add new run # and area value to x and y vectors every time the run button is clicked
     observeEvent(input$run_button, {
-    values$x <- append(values$x, paste0("Run", input$run_button), input$run_button-1)
+    values$x <- append(values$x, paste0("Run ", input$run_button), input$run_button-1)
     values$y <- append(values$y, area(), input$run_button-1)
+    values$text <- append(values$text, inputs_suitability(), input$run_button-1)
     }
     )
     
+    # Render plotly bar chart
     output$barPlot <- renderPlotly(
       output$barPlot <- renderPlotly(
         p <- plot_ly(
           x = values$x,
           y = values$y,
-          type = "bar")
+          text = values$text,
+          type = "bar")%>%
+          layout(title = "Total Suitable Area by Run Number",
+                 yaxis = list(title = HTML("Area (km<sup>2</sup>)")))
       )
     )
     
@@ -515,8 +555,11 @@ server <- function(input, output) {
             
         # Leaflet map
         leaflet(options = leafletOptions( zoomSnap = 0.2)) %>%
-            addTiles() %>%
-            addRasterImage(growth_raster(), colors = pal_growth) %>%
+          addTiles(group = "Open Street Map") %>%
+          addProviderTiles("Esri.WorldGrayCanvas", group = "Esri Gray Canvas (default)") %>%
+            addRasterImage(growth_raster(),
+                           colors = pal_growth,
+                           group = "Growth Model") %>%
             fitBounds(lng1 = -54.6903404, # sets initial view of map to fit coordinates
                       lng2 = -25.835314,
                       lat1 = 6.3071255,
@@ -525,7 +568,12 @@ server <- function(input, output) {
                 icon="fa-globe", title="Reset View", # button to reset to initial view
                 onClick=JS("function(btn, map){
                            map.setView([-14.0182737, -39.8789667]);
-                           map.setZoom(4.6);}"))) %>% 
+                           map.setZoom(4.6);}"))) %>%
+          addLayersControl(
+            baseGroups = c("Esri Gray Canvas (default)", "Open Street Map"),
+            overlayGroups = "Suitable Areas",
+            options = layersControlOptions(collapsed = TRUE),
+            position = "topleft") %>% 
             addLegend("topright",
                       pal = pal_growth,
                       values = values(growth_raster()),
