@@ -521,6 +521,18 @@ server <- function(input, output) {
     )
     
 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 # Set reactive values
     
     
@@ -602,6 +614,10 @@ server <- function(input, output) {
         },
         content = function(file) {
             writeRaster(growth_raster(), file)
+          
+          
+    # Economic Analysis
+          
             
             
         })
