@@ -42,7 +42,7 @@ ui <- fluidPage(
     
     # Navbar
     navbarPage("" , 
-               selected = div(icon("map-pin"),"Suitability"),
+               selected = div(icon("map-pin"),"Site Suitability"),
                # Do not need title for Navigation Bar
                # First tab
                tabPanel(div(icon("info-circle"),"About"),
