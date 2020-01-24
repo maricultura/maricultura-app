@@ -474,6 +474,7 @@ server <- function(input, output) {
             addTiles(group = "Open Street Map") %>%
           addProviderTiles("Esri.WorldGrayCanvas", group = "Esri Gray Canvas (default)") %>%
             addRasterImage(suitable(),
+                           method = "ngb",
                            colors = pal,
                            group = "Suitable Areas") %>% 
             addScaleBar(position = "bottomright") %>%  # adds scale bar
