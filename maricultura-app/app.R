@@ -42,7 +42,7 @@ ui <- fluidPage(
     
     # Navbar
     navbarPage("" , 
-               selected = div(icon("map-pin"),"Suitability"),
+               selected = div(icon("map-pin"),"Site Suitability"),
                # Do not need title for Navigation Bar
                # First tab
                tabPanel(div(icon("info-circle"),"About"),
@@ -211,8 +211,7 @@ ui <- fluidPage(
                         )),
                
                # Sixth Tab
-               tabPanel(div(icon("history"), "Run History"),
-                        log_init()),
+               tabPanel(div(icon("history"), "Run History")),
                 
                # Seventh Tab
                tabPanel(div(icon("book-open"),"User Guide" )),
@@ -273,12 +272,57 @@ server <- function(input, output) {
     depth_mask <- raster("data/depth_mask.tif")
     
     # Reclassification matrix for depth layer
-    rcl_mat_depth <- reactive(c(-Inf, max_depth(), 0,
-                       max_depth(), min_depth(), 1,
-                       min_depth(), Inf, 0))
+    rcl_mat_depth <- reactive(c(-Inf, max_depth(), 1,
+                                max_depth(), min_depth(), 2,
+                                min_depth(), Inf, 1))
     
     # Reclassify the depth layer
-    depth_binary <- reactive(reclassify(depth_mask,rcl= rcl_mat_depth()))
+    depth_binary_1 <- reactive(reclassify(depth_mask,rcl= rcl_mat_depth()))
+    
+    # Adding missing portion of EEZ using an raster cropped to the correct shape of the EEZ
+    
+    # Making NA background zeros
+  
+    # Read in 1's raster
+    eez_all_1 <- raster("data/eez_all_1.tif")
+    
+    # Overlay two layers
+    depth_binary_2 <- reactive(overlay(depth_binary_1(), eez_all_1, fun = function(a, b) {a + b}))
+    
+    # Reclassification matrix for depth layer
+    rcl_mat_depth_2 <- c(-Inf, 2.1, 0,
+                         2.9, 3.1, 1)
+    
+    # Reclassify the depth layer
+    depth_binary <- reactive(reclassify(depth_binary_2(),rcl= rcl_mat_depth_2))
+    
+    ### Min SST
+    # Defining variable
+    min_sst_value <- reactive(input$sst_slider[1])
+    
+    # Read in file
+    min_sst_mask <- raster("data/min_sst_mask.tif")
+    
+    # Reclassification matrix for min SST
+    rcl_matrix_min <- reactive(c( -Inf, min_sst_value(), 0,
+                                  min_sst_value(), Inf, 1))
+    
+    # Reclassify min SST
+    sst_binary_min <- reactive(reclassify(min_sst_mask, rcl = rcl_matrix_min()))
+    
+    ### Min SST
+    # Defining variable
+    min_sst_value <- reactive(input$sst_slider[1])
+    
+    # Read in file
+    min_sst_mask <- raster("data/min_sst_mask.tif")
+    
+    # Reclassification matrix for min SST
+    rcl_matrix_min <- reactive(c( -Inf, min_sst_value(), 0,
+                                  min_sst_value(), Inf, 1))
+    
+    # Reclassify min SST
+    sst_binary_min <- reactive(reclassify(min_sst_mask, rcl = rcl_matrix_min()))
     
     ### Min SST
     # Defining variable
@@ -626,7 +670,7 @@ server <- function(input, output) {
             
         })
     
-    log_event()
+    
 
   
 }
