@@ -42,7 +42,8 @@ ui <- fluidPage(
                windowTitle = "Mariculture Tool"),
     
     # Navbar
-    navbarPage("" , 
+    navbarPage("" ,
+               id = "navbar",
                selected = div(icon("map-pin"),"Site Suitability"),
                # Do not need title for Navigation Bar
                # First tab
@@ -144,7 +145,7 @@ ui <- fluidPage(
                             )
                         ),
                # Third Tab
-               tabPanel(div(icon("chart-line"),"Growth"),
+               tabPanel( HTML('<div><i class="fa fa-chart-line"></i>Growth</div>'),
                sidebarLayout(
                    sidebarPanel(
                      tabsetPanel(type = "tabs",
@@ -158,7 +159,7 @@ ui <- fluidPage(
                    )
                    )),
                #Fourth Tab
-               tabPanel(div(icon("hand-holding-usd"), "Economics"),
+               tabPanel(HTML('<div><i class="fa fa-hand-holding-usd"></i>Economics</div>'),
                         sidebarLayout(
                             sidebarPanel(
                               tabsetPanel(type = "tabs",
@@ -205,7 +206,7 @@ ui <- fluidPage(
                                 )
                )),
                # Fifth Tab
-               tabPanel(div(icon("calculator"),"Area Calculator"),
+               tabPanel(HTML('<div><i class="fa fa-calculator"></i>Area Calculator</div>'),
                         fluidRow(
                           column(12,
                                  plotlyOutput("barPlot"))
@@ -251,8 +252,26 @@ ui <- fluidPage(
 # Define server logic 
 ##########################################################################################
 server <- function(input, output) {
+  
   set_logging_session()
+  
+  ### Show/Hide tabs ###
+  # Hide growth, economic, and area tabs when server starts
+    hideTab(inputId = "navbar", target = HTML('<div><i class="fa fa-chart-line"></i>Growth</div>'))
+    hideTab(inputId = "navbar", target = HTML('<div><i class="fa fa-hand-holding-usd"></i>Economics</div>'))
+    hideTab(inputId = "navbar", target = HTML('<div><i class="fa fa-calculator"></i>Area Calculator</div>'))
     
+    # Show tabs after clicking the run button/ growth run button
+    observeEvent(input$run_button, {
+      showTab(inputId = "navbar", target = HTML('<div><i class="fa fa-chart-line"></i>Growth</div>'))
+    })
+    observeEvent(input$run_button_growth, {
+      showTab(inputId = "navbar", target = HTML('<div><i class="fa fa-hand-holding-usd"></i>Economics</div>'))
+    })
+    observeEvent(input$run_button, {
+      showTab(inputId = "navbar", target = HTML('<div><i class="fa fa-calculator"></i>Area Calculator</div>'))
+    })
+  
     ### Modal Dialogue
     # Create modal dialogue
     dataModal <- function(failed = FALSE) {
