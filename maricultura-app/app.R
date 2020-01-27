@@ -14,8 +14,7 @@ library(shinydashboard)
 library(rgdal)
 library(shinyBS)
 library(plotly)
-library(shinyEventLogger) # Are we using this package?
-library(leaflet.extras)
+library(shinyEventLogger)
 
 # Source scripts
 source("scripts/html.R")
@@ -42,8 +41,7 @@ ui <- fluidPage(
                windowTitle = "Mariculture Tool"),
     
     # Navbar
-    navbarPage("" ,
-               id = "navbar",
+    navbarPage("" , 
                selected = div(icon("map-pin"),"Site Suitability"),
                # Do not need title for Navigation Bar
                # First tab
@@ -145,7 +143,7 @@ ui <- fluidPage(
                             )
                         ),
                # Third Tab
-               tabPanel( HTML('<div><i class="fa fa-chart-line"></i>Growth</div>'),
+               tabPanel(div(icon("chart-line"),"Growth"),
                sidebarLayout(
                    sidebarPanel(
                      tabsetPanel(type = "tabs",
@@ -159,7 +157,7 @@ ui <- fluidPage(
                    )
                    )),
                #Fourth Tab
-               tabPanel(HTML('<div><i class="fa fa-hand-holding-usd"></i>Economics</div>'),
+               tabPanel(div(icon("hand-holding-usd"), "Economics"),
                         sidebarLayout(
                             sidebarPanel(
                               tabsetPanel(type = "tabs",
@@ -206,19 +204,10 @@ ui <- fluidPage(
                                 )
                )),
                # Fifth Tab
-               tabPanel(HTML('<div><i class="fa fa-calculator"></i>Area Calculator</div>'),
+               tabPanel(div(icon("calculator"),"Area Calculator"),
                         fluidRow(
                           column(12,
                                  plotlyOutput("barPlot"))
-                        ),
-                        fluidRow(
-                          column(12,
-                                 tags$h3("Percentage of EEZ excluded"),
-                                 tabsetPanel(type = "tabs",
-                                             id = "area_tabs",
-                                             selected = "Run 1"
-                                   
-                                 ))
                         )),
                
                # Sixth Tab
@@ -252,26 +241,8 @@ ui <- fluidPage(
 # Define server logic 
 ##########################################################################################
 server <- function(input, output) {
-  
   set_logging_session()
-  
-  ### Show/Hide tabs ###
-  # Hide growth, economic, and area tabs when server starts
-    hideTab(inputId = "navbar", target = HTML('<div><i class="fa fa-chart-line"></i>Growth</div>'))
-    hideTab(inputId = "navbar", target = HTML('<div><i class="fa fa-hand-holding-usd"></i>Economics</div>'))
-    hideTab(inputId = "navbar", target = HTML('<div><i class="fa fa-calculator"></i>Area Calculator</div>'))
     
-    # Show tabs after clicking the run button/ growth run button
-    observeEvent(input$run_button, {
-      showTab(inputId = "navbar", target = HTML('<div><i class="fa fa-chart-line"></i>Growth</div>'))
-    })
-    observeEvent(input$run_button_growth, {
-      showTab(inputId = "navbar", target = HTML('<div><i class="fa fa-hand-holding-usd"></i>Economics</div>'))
-    })
-    observeEvent(input$run_button, {
-      showTab(inputId = "navbar", target = HTML('<div><i class="fa fa-calculator"></i>Area Calculator</div>'))
-    })
-  
     ### Modal Dialogue
     # Create modal dialogue
     dataModal <- function(failed = FALSE) {
@@ -352,7 +323,7 @@ server <- function(input, output) {
     rcl_mat_current <- reactive(c(-Inf, max_cv_value(), 1,
                          max_cv_value(), Inf, 0))
     
-    # Reclassify the max current velocity layer
+    # Reclassify the depth layer
     current_binary <- reactive(reclassify(max_cv_mask ,rcl= rcl_mat_current()))
     
     ### Distance to shore
@@ -432,25 +403,23 @@ server <- function(input, output) {
     
     ### Area Calculator ###
     
-    ### First Bar Graph ###
-    
     # Calculate value for total area
     area <- reactive(
       round(freq(suitable(), value = 1)*184.64, digits = 0)
     )
     
-    text_depth <- reactive(paste0(HTML("<b>Depth: </b>"), input$depth_slider[1], " - ", input$depth_slider[2], " m"))
-    text_sst <-  reactive(paste0(HTML("<b>\nSST: </b>"), input$sst_slider[1], " - ", input$sst_slider[2], " °C"))
-    text_do <- reactive(paste0(HTML("<b>\nDissolved Oxygen:  </b>"), input$min_DO_slider, HTML("mol/m<sup>3</sup>")))
-    text_max_cv <- reactive(paste0(HTML("<b>\nMax Current Velocity:  </b>"), input$max_cv_slider, " m/s"))
-    text_max_swh <- reactive(paste0(HTML("<b>\nMax. Sig. Wave Height:  </b>"), "m"))
-    text_dist_shore <- reactive(paste0(HTML("<b>\nDistance to Shore:  </b>"), input$dist_shore_slider, " NM"))
-    text_mpas <- reactive(paste0(HTML("<b>\nMPAS:  </b>"), input$checkGroup[1] == 1))
-    text_reefs <- reactive(paste0(HTML("<b>\nReefs:  </b>"), input$checkGroup[2] == 2))
-    text_a_reefs <- reactive(paste0(HTML("<b>\nArtificial Reefs:  </b>"), input$checkGroup[3] == 3))
-    text_oil_pipe <- reactive(paste0(HTML("<b>\nOil Pipelines:  </b>"), input$checkGroup[4] == 4))
-    text_oil_prod <- reactive(paste0(HTML("<b>\nOil Production:  </b>"), input$checkGroup[5] == 5))
-    text_shipping <- reactive(paste0(HTML("<b>\nShipping Lanes:  </b>"), input$checkGroup[6] == 6))
+    text_depth <- reactive(paste0("Depth: ", input$depth_slider[1], " - ", input$depth_slider[2], " m"))
+    text_sst <-  reactive(paste0(" \nSST: ", input$sst_slider[1], " - ", input$sst_slider[2], " °C"))
+    text_do <- reactive(paste0(" \nDissolved Oxygen: ", input$min_DO_slider, HTML("mol/m<sup>3</sup>")))
+    text_max_cv <- reactive(paste0(" \nMax Current Velocity :", input$max_cv_slider, " m/s"))
+    text_max_swh <- reactive(paste0(" \nMax. Sig. Wave Height: ", "m"))
+    text_dist_shore <- reactive(paste0(" \nDistance to Shore: ", input$dist_shore_slider, " NM"))
+    text_mpas <- reactive(paste0(" \nMPAS: ", input$checkGroup[1] == 1))
+    text_reefs <- reactive(paste0(" \nReefs: ", input$checkGroup[2] == 2))
+    text_a_reefs <- reactive(paste0(" \nArtificial Reefs: ", input$checkGroup[3] == 3))
+    text_oil_pipe <- reactive(paste0(" \nOil Pipelines: ", input$checkGroup[4] == 4))
+    text_oil_prod <- reactive(paste0(" \nOil Production: ", input$checkGroup[5] == 5))
+    text_shipping <- reactive(paste0(" \nShipping Lanes: ", input$checkGroup[6] == 6))
     
     # Create text for inputs
     inputs_suitability <- reactive(
@@ -468,11 +437,6 @@ server <- function(input, output) {
              text_shipping())
     )
     
-    # Keep track of run number
-    run_number <- reactive(
-      paste0("Run ", input$run_button)
-    )
-    
     # Create empty reactive values
     values <- reactiveValues()
     values$x <- vector()
@@ -481,7 +445,7 @@ server <- function(input, output) {
     
     # Add new run # and area value to x and y vectors every time the run button is clicked
     observeEvent(input$run_button, {
-    values$x <- append(values$x, run_number() , input$run_button-1)
+    values$x <- append(values$x, paste0("Run ", input$run_button), input$run_button-1)
     values$y <- append(values$y, area(), input$run_button-1)
     values$text <- append(values$text, inputs_suitability(), input$run_button-1)
     }
@@ -498,81 +462,6 @@ server <- function(input, output) {
           layout(title = "Total Suitable Area by Run Number",
                  yaxis = list(title = HTML("Area (km<sup>2</sup>)")))
       )
-    )
-    
-    ### Second Bar Graph ###
-    
-    # Create bar graph after clicking run button
-    observeEvent(input$run_button, {
-      if ( input$run_button == 1) {
-      prependTab(
-        inputId = "area_tabs",
-        tabPanel( "Run 1", 
-                 plotOutput("excludedPlot"))
-      )
-      } else {
-        insertTab(inputId = "area_tabs",
-                  tabPanel(run_number(),
-                           plotOutput("excludedPlot")),
-                  target = paste0("Run ", input$run_button-1)
-                  )
-      }
-    })
-    
-    # Create vector with input names
-    input_names <- c("Min SST",
-                     "Max SST",
-                     "Depth",
-                     "Current Velocity",
-                     "Distance to Shore",
-                     "Dissolved Oxygen",
-                     "MPAs",
-                     "Reefs",
-                     "Artificial Reefs",
-                     "Oil Pipelines",
-                     "Oil Production",
-                     "Shipping Lanes")
-    
-    
-    # Create vector with number of 0 cells in each binary raster
-    freq_0 <- reactive(c(
-      freq(sst_binary_min(), value = 0),
-      freq(sst_binary_max(), value = 0),
-      freq(depth_binary(), value = 0),
-      freq(current_binary(), value = 0),
-      freq(dist_shore_binary(), value = 0),
-      freq(DO_min_binary(), value = 0),
-      freq(mpas_binary(), value = 0),
-      freq(reefs_binary(), value = 0),
-      freq(reefs_artificial_binary(), value = 0),
-      freq(og_pipeline_binary(), value = 0),
-      freq(og_production_binary(), value = 0),
-      freq(shipping_lanes_binary(), value = 0)
-    ))
-    
-    # Create df with layer names, frequency of 0 cells, and percentage of excluded area
-    area_df <- reactive(
-      data.frame(input_names, freq_0()) %>% 
-      mutate(percent_excluded = round(freq_0()*100/30959, digits = 2)) %>% 
-      arrange(percent_excluded) %>% 
-      mutate( input_names = factor(input_names, levels = input_names))
-    )
-    
-    # Render excluded areas plot
-    output$excludedPlot <- renderPlot(isolate(
-      ggplot(area_df(), aes(x = input_names, y = percent_excluded)) +
-        geom_col(fill = "darkturquoise") +
-        coord_flip() +
-        ylab("Percentage of EEZ Excluded") +
-        xlab("") +
-        scale_y_continuous( expand = c(0,0)) +
-        theme_classic(14) +
-        geom_text(
-          aes(label = paste0(percent_excluded,"%"), y = percent_excluded + 15), 
-          color = "black", 
-          size = 5,
-          hjust = 1)
-        )
     )
     
     ### Render leaflet map
@@ -605,7 +494,6 @@ server <- function(input, output) {
                  onClick=JS("function(btn, map){
                            map.setView([-14.0182737, -39.8789667]);
                            map.setZoom(4.6);}"))) %>% 
-          addFullscreenControl() %>% 
           addLayersControl(
             baseGroups = c("Esri Gray Canvas (default)", "Open Street Map"),
             overlayGroups = "Suitable Areas",
