@@ -212,7 +212,10 @@ ui <- fluidPage(
                
                # Sixth Tab
                tabPanel(div(icon("history"), "Run History"),
-                        log_init()),
+                        fluidRow(
+                          column(12,
+                                 dataTableOutput("suitabilityTable"))
+                        )),
                 
                # Seventh Tab
                tabPanel(div(icon("book-open"),"User Guide" )),
@@ -626,7 +629,14 @@ server <- function(input, output) {
             
         })
     
-    log_event()
+    header <- c("Input", "Value", "Unit")
+    sst_table <- reactive(c("SST", paste0(input$sst_slider[1], "-" , input$sst_slider[2]), "°C"))
+    suitability_df <- data.frame(header)
+                                 
+    output$suitabilityTable <- renderDataTable(
+      suitability_df 
+    
+    )
 
   
 }
