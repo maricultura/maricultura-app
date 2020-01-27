@@ -209,6 +209,15 @@ ui <- fluidPage(
                         fluidRow(
                           column(12,
                                  plotlyOutput("barPlot"))
+                        ),
+                        fluidRow(
+                          column(12,
+                                 tags$h3("Percentage of EEZ excluded"),
+                                 tabsetPanel(type = "tabs",
+                                             id = "area_tabs",
+                                             selected = "Run 1"
+                                   
+                                 ))
                         )),
                
                # Sixth Tab
@@ -324,7 +333,7 @@ server <- function(input, output) {
     rcl_mat_current <- reactive(c(-Inf, max_cv_value(), 1,
                          max_cv_value(), Inf, 0))
     
-    # Reclassify the depth layer
+    # Reclassify the max current velocity layer
     current_binary <- reactive(reclassify(max_cv_mask ,rcl= rcl_mat_current()))
     
     ### Distance to shore
@@ -404,6 +413,8 @@ server <- function(input, output) {
     
     ### Area Calculator ###
     
+    ### First Bar Graph ###
+    
     # Calculate value for total area
     area <- reactive(
       round(freq(suitable(), value = 1)*184.64, digits = 0)
@@ -438,6 +449,11 @@ server <- function(input, output) {
              text_shipping())
     )
     
+    # Keep track of run number
+    run_number <- reactive(
+      paste0("Run ", input$run_button)
+    )
+    
     # Create empty reactive values
     values <- reactiveValues()
     values$x <- vector()
@@ -446,7 +462,7 @@ server <- function(input, output) {
     
     # Add new run # and area value to x and y vectors every time the run button is clicked
     observeEvent(input$run_button, {
-    values$x <- append(values$x, paste0("Run ", input$run_button), input$run_button-1)
+    values$x <- append(values$x, run_number() , input$run_button-1)
     values$y <- append(values$y, area(), input$run_button-1)
     values$text <- append(values$text, inputs_suitability(), input$run_button-1)
     }
@@ -463,6 +479,81 @@ server <- function(input, output) {
           layout(title = "Total Suitable Area by Run Number",
                  yaxis = list(title = HTML("Area (km<sup>2</sup>)")))
       )
+    )
+    
+    ### Second Bar Graph ###
+    
+    # Create bar graph after clicking run button
+    observeEvent(input$run_button, {
+      if ( input$run_button == 1) {
+      prependTab(
+        inputId = "area_tabs",
+        tabPanel( "Run 1", 
+                 plotOutput("excludedPlot"))
+      )
+      } else {
+        insertTab(inputId = "area_tabs",
+                  tabPanel(run_number(),
+                           plotOutput("excludedPlot")),
+                  target = paste0("Run ", input$run_button-1)
+                  )
+      }
+    })
+    
+    # Create vector with input names
+    input_names <- c("Min SST",
+                     "Max SST",
+                     "Depth",
+                     "Current Velocity",
+                     "Distance to Shore",
+                     "Dissolved Oxygen",
+                     "MPAs",
+                     "Reefs",
+                     "Artificial Reefs",
+                     "Oil Pipelines",
+                     "Oil Production",
+                     "Shipping Lanes")
+    
+    
+    # Create vector with number of 0 cells in each binary raster
+    freq_0 <- reactive(c(
+      freq(sst_binary_min(), value = 0),
+      freq(sst_binary_max(), value = 0),
+      freq(depth_binary(), value = 0),
+      freq(current_binary(), value = 0),
+      freq(dist_shore_binary(), value = 0),
+      freq(DO_min_binary(), value = 0),
+      freq(mpas_binary(), value = 0),
+      freq(reefs_binary(), value = 0),
+      freq(reefs_artificial_binary(), value = 0),
+      freq(og_pipeline_binary(), value = 0),
+      freq(og_production_binary(), value = 0),
+      freq(shipping_lanes_binary(), value = 0)
+    ))
+    
+    # Create df with layer names, frequency of 0 cells, and percentage of excluded area
+    area_df <- reactive(
+      data.frame(input_names, freq_0()) %>% 
+      mutate(percent_excluded = round(freq_0()*100/30959, digits = 2)) %>% 
+      arrange(percent_excluded) %>% 
+      mutate( input_names = factor(input_names, levels = input_names))
+    )
+    
+    # Render excluded areas plot
+    output$excludedPlot <- renderPlot(isolate(
+      ggplot(area_df(), aes(x = input_names, y = percent_excluded)) +
+        geom_col(fill = "darkturquoise") +
+        coord_flip() +
+        ylab("Percentage of EEZ Excluded") +
+        xlab("") +
+        scale_y_continuous( expand = c(0,0)) +
+        theme_classic(14) +
+        geom_text(
+          aes(label = paste0(percent_excluded,"%"), y = percent_excluded + 15), 
+          color = "black", 
+          size = 5,
+          hjust = 1)
+        )
     )
     
     ### Render leaflet map
