@@ -17,6 +17,17 @@ library(shinyBS)
 # Source scripts
 source("scripts/html.R")
 
+
+# Data frame with coefficients for different species
+species <- c("Atlantic salmon", "Gilthead seabream", "cobia")
+a1 <- c(0.0264, 0.026, 0.0714)
+a2 <- c(-0.066, -0.0042, -0.1667)
+b1 <- c(-0.0396, -0.0308, -1.5714)
+b2 <- c(1.254, 0.1388, 5.3333)
+T0 <- c(14, 25, 29)
+
+species_df <- data.frame(species, a1, a2, b1, b2, T0)
+
 # Define UI for application
 ui <- fluidPage(
     
@@ -453,35 +464,28 @@ server <- function(input, output) {
     )
     
 
-# Set reactive values
     
-    
-   # Data frame with coefficients for different species
-    species <- c("Atlantic salmon", "Gilthead seabream", "cobia")
-    a1 <- c(0.0264, 0.026, 0.0714)
-    a2 <- c(-0.066, -0.0042, -0.1667)
-    b1 <- c(-0.0396, -0.0308, -1.5714)
-    b2 <- c(1.254, 0.1388, 5.3333)
-    T0 <- c(14, 25, 29)
-    
-    species_df <- data.frame(species, a1, a2, b1, b2, T0)
-
-    
+    # Set reactive values
+    fish_selection <-  reactive({
+      species_df %>% 
+        filter(species == input$selectSpecies)
+    })  
+      
     # Separete cells into cells above and below optimal SST
     cells_below_optimal <- reactive(
-        suitable_sst() < values$T0
+        suitable_sst() < fish_selection()$T0
         )
     
     cells_above_optimal <-  reactive(
-        suitable_sst() > values$T0
+        suitable_sst() >= fish_selection()$T0
     )
     
     # Apply growth equations
     growth_below_optimal <- reactive(
-        values$a1*cells_below_optimal()*suitable_sst() - values$b1*cells_below_optimal()
+        (fish_selection()$a1*cells_below_optimal()*suitable_sst()) - (fish_selection()$b1*cells_below_optimal())
     )
     growth_above_optimal <- reactive(
-        values$a2*cells_above_optimal()*suitable_sst() + values$b2*cells_above_optimal()
+        (fish_selection()$a2*cells_above_optimal()*suitable_sst()) + (fish_selection()$b2*cells_above_optimal())
     )
     
     # Add both rasters
