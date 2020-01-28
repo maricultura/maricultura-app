@@ -1,0 +1,43 @@
+---
+title: "economic_model"
+author: "Sandra Fogg"
+date: "1/27/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Read in Rasters
+```{r}
+# Read in the Empty Raster
+empty_rast_econ <- raster("maricultura-app/data/empty_raster.tif")
+
+# Read in EEZ Raster
+empty_eez_econ <- raster("maricultura-app/data/eez_all_1.tif")
+
+# Read in Distance to Shore Raster
+dist_shore_econ <- raster("maricultura-app/data/dist_shore.tif")
+```
+
+Setting Number of Farms per Cell
+```{r}
+num_farms <- 1 # number of farms per 9.2x9.2 km cell, most conservative estimate of 16 cages per/farm (per cell)
+```
+
+Calculate Fuel Costs
+```{r}
+# Determine Fuel Costs and Usage
+fuel_consumption <- 26.96 #L/hour
+vessel_speed <- 15 #average speed in km/hr
+diesel_price <- 0.92 #USD/L
+distance_to_port <- 25 #depend on cell
+num_of_boats <- 2
+trips_per_day <- 2
+trip_hours <- 6 #maximum roundtrip
+
+# Determine Trips per Year
+trips_per_year ()
+
+```
