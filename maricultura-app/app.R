@@ -23,7 +23,8 @@ source("scripts/html.R")
 #Species Dataframe 
 
 # Data frame with coefficients for different species
-species <- c("Atlantic salmon", "Gilthead seabream", "cobia")
+species <- c("Atlantic salmon", "Gilthead seabream", "Rachycentron
+canadum")
 a1 <- c(0.0264, 0.026, 0.0714)
 a2 <- c(-0.066, -0.0042, -0.1667)
 b1 <- c(-0.0396, -0.0308, -1.5714)
@@ -161,7 +162,9 @@ ui <- fluidPage(
                          sidebarPanel(
                            tabsetPanel(type = "tabs",
                                        tabPanel( "Species",
-                                                 fish_radiobuttons # Radio buttons sourced from scripts/html.R
+                                                 radioButtons(inputId = "selectSpecies",
+                                                              label = "Pick a species",
+                                                              choices = unique(species_df$species)) # Radio buttons sourced from scripts/html.R
                                        )),
                            actionButton("run_button_growth", label = "Run"),
                            downloadButton("download_button_growth", label = "Download")),
