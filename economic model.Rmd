@@ -51,4 +51,35 @@ fuel_rast_econ <- reclassify(eez_econ, rcl = diesel_price)
 annual_fuel_cost_econ <- ((dist_shore_econ*num_of_boats)/vessel_speed*fuel_consumption*fuel_rast_econ*annual_one_per_boat)
 
 plot(annual_fuel_cost_econ)
+
+# Export Fuel Cost Raster by Distance to Shore
+
 ```
+
+Calculate Wage Costs
+```{r}
+# Determine Wage Costs and Labor
+cage_size <- 6500 #m^3
+farm_size <- 16 #cages
+farm_volume <- 102400 #m^3
+monthly_hours <- 160 #hours/fulltime employee
+annual_hours <- (monthly_hours*12)
+num_of_employees <- 40 ##/farm
+hourly_wage <- 4.50 #USD/hour average
+work_days_per_month <- 30
+
+# Determine Annual Wage Cost for Workers per Farm
+wages_annual <- (annual_hours*hourly_wage)
+
+# Determine Annual Trip Hours
+transit_hours <- ((dist_shore_econ*num_of_boats)/vessel_speed*annual_one_per_boat)
+
+# Determine Annual Total Cost per Farm
+
+annual_labor_cost_rast <- wages_annual*num_of_employees*(annual_hours+transit_hours)
+plot(annual_labor_cost_econ)
+
+# Create a Labor Only Raster
+
+```
+
