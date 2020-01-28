@@ -15,7 +15,7 @@ Read in Rasters
 empty_rast_econ <- raster("maricultura-app/data/empty_raster.tif")
 
 # Read in EEZ Raster
-empty_eez_econ <- raster("maricultura-app/data/eez_all_1.tif")
+eez_econ <- raster("maricultura-app/data/eez_all_1.tif")
 
 # Read in Distance to Shore Raster
 dist_shore_econ <- raster("maricultura-app/data/dist_shore.tif")
@@ -38,6 +38,17 @@ trips_per_day <- 2
 trip_hours <- 6 #maximum roundtrip
 
 # Determine Trips per Year
-trips_per_year ()
+one_way_trips_per_year <- (num_of_boats*trips_per_day*365)# single trips for both boats combined is 1460
+annual_one_per_boat <- (one_way_trips_per_year/num_of_boats) # 730 annual trips for one boat
+roundtrips_per_year <- (one_way_trips_per_year/2) # roundtrips for both boats combined is 730
+annual_roundtrips_per_boat <- (roundtrips_per_year/num_of_boats) #365
 
+
+# Create a Raster for Fuel Price
+fuel_rast_econ <- reclassify(eez_econ, rcl = diesel_price)
+
+# Create Raster for All Fuel Costs
+annual_fuel_cost_econ <- ((dist_shore_econ*num_of_boats)/vessel_speed*fuel_consumption*fuel_rast_econ*annual_one_per_boat)
+
+plot(annual_fuel_cost_econ)
 ```
