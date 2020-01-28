@@ -8,19 +8,20 @@ fish_radiobuttons <- HTML('<div id="selectSpecies" class="form-group shiny-input
   <div class="shiny-options-group">
     <div class="radio">
       <label>
-        <input type="radio" name="radio" value="1"/>
+        <input type="radio" name="radio" value="Salmo salar"/>
         <span>Atlantic salmon (<i>Salmo salar</i>),<br><img src="atlantic_salmon.png" alt=“image of salmon“ height="100px"/></span>
       </label>
     </div>
     <div class="radio">
       <label>
-        <input type="radio" name="radio" value="2"/>
+        <input type="radio" name="radio" value="Sparus aurata"/>
         <span>gilthead seabream (<i>Sparus aurata</i>)<br><br><img src="seabream.png" alt=“image of salmon“ height="70px"/></span>
       </label>
     </div>
     <div class="radio">
       <label>
-        <input type="radio" name="radio" value="3" checked="checked"/>
+        <input type="radio" name="radio" value="Rachycentron
+canadum" checked="checked"/>
         <span>cobia (<i>Rachycentron canadum</i>)<br><img src="cobia.png" alt=“image of salmon“  height="100px"/></span>
       </label>
     </div>
