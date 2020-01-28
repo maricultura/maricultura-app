@@ -164,7 +164,12 @@ ui <- fluidPage(
                                        tabPanel( "Species",
                                                  radioButtons(inputId = "selectSpecies",
                                                               label = "Pick a species",
-                                                              choices = unique(species_df$species)) # Radio buttons sourced from scripts/html.R
+                                                              choiceNames = list(
+                                                                HTML('<span>Atlantic salmon (<i>Salmo salar</i>)<br><img src="atlantic_salmon.png" alt=“image of salmon“ height="100px"/></span>'),
+                                                                HTML('<span>gilthead seabream (<i>Sparus aurata</i>)<br><br><img src="seabream.png" alt=“image of salmon“ height="70px"/></span>'),
+                                                                HTML('<span>cobia (<i>Rachycentron canadum</i>)<br><img src="cobia.png" alt=“image of salmon“  height="100px"/></span>')
+                                                                ),
+                                                              choiceValues = unique(species_df$species)) # Radio buttons sourced from scripts/html.R
                                        )),
                            actionButton("run_button_growth", label = "Run"),
                            downloadButton("download_button_growth", label = "Download")),
