@@ -9,7 +9,7 @@ fish_radiobuttons <- HTML('<div id="selectSpecies" class="form-group shiny-input
     <div class="radio">
       <label>
         <input type="radio" name="radio" value="Salmo salar"/>
-        <span>Atlantic salmon (<i>Salmo salar</i>),<br><img src="atlantic_salmon.png" alt=“image of salmon“ height="100px"/></span>
+        <span>Atlantic salmon (<i>Salmo salar</i>)<br><img src="atlantic_salmon.png" alt=“image of salmon“ height="100px"/></span>
       </label>
     </div>
     <div class="radio">
