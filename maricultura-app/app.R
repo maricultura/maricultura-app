@@ -323,13 +323,29 @@ server <- function(input, output) {
   # Read in file
   depth_mask <- raster("data/depth_mask.tif")
   
-  # Reclassification matrix for depth layer
-  rcl_mat_depth <- reactive(c(-Inf, max_depth(), 0,
-                              max_depth(), min_depth(), 1,
-                              min_depth(), Inf, 0))
+  # Reclassification matrix for depth layer that makes unsuitable cells 1, suitable 2, and NAs 0
+  rcl_mat_depth <- reactive(c(-Inf, max_depth(), 1,
+                     max_depth(), min_depth(), 2,
+                     min_depth(), 0, 1,
+                     0, Inf, 0))
   
   # Reclassify the depth layer
-  depth_binary <- reactive(reclassify(depth_mask,rcl= rcl_mat_depth()))
+  depth_binary_1 <- reactive(reclassify(depth_mask,rcl= rcl_mat_depth()))
+  
+  # Adding missing portion of EEZ using an raster cropped to the correct shape of the EEZ
+  
+  # Read in 1's raster cropped to EEZ
+  eez_all_1 <- raster("data/eez_all_1.tif")
+  
+  # Overlay two layers
+  depth_binary_2 <- reactive(overlay(depth_binary_1(), eez_all_1, fun = function(a, b) {a + b}))
+  
+  # Reclassification matrix to make depth layer binary
+  rcl_mat_depth_2 <- c(-Inf, 2.1, 0,
+                       2.9, 3.1, 1)
+  
+  # Reclassify the depth layer
+  depth_binary <- reactive(reclassify(depth_binary_2(),rcl= rcl_mat_depth_2))
   
   ### Min SST
   # Defining variable
