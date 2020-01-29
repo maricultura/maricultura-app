@@ -693,7 +693,7 @@ server <- function(input, output) {
   
   # Apply growth equations
   growth_below_optimal <- reactive(
-    fish_selection()$a1*cells_below_optimal()*suitable_sst() - fish_selection()$b1*cells_below_optimal()
+    fish_selection()$a1*cells_below_optimal()*suitable_sst() + fish_selection()$b1*cells_below_optimal()
   )
   growth_above_optimal <- reactive(
     fish_selection()$a2*cells_above_optimal()*suitable_sst() + fish_selection()$b2*cells_above_optimal()
