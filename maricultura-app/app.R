@@ -16,6 +16,7 @@ library(shinyBS)
 library(plotly)
 library(shinyEventLogger) # Are we using this package?
 library(leaflet.extras)
+library(shinyjs)
 
 # Source scripts
 source("scripts/html.R")
@@ -41,6 +42,12 @@ ui <- fluidPage(
   
   # Add waiter dependencies
   use_waiter(),
+  
+  # Use previous and next buttons to navigate through the user guide
+  useShinyjs(),
+  
+  # Set the number of pages for the user guide
+  NUM_PAGES <- 5, 
   
   # Head element (contains metadata for app)
   tags$head(
@@ -248,7 +255,20 @@ ui <- fluidPage(
                       )),
              
              # Seventh Tab
-             tabPanel(div(icon("book-open"),"User Guide" )),
+             tabPanel(div(icon("book-open"),"User Guide"),
+                      hidden(
+                        lapply(seq(NUM_PAGES), function(ui) {
+                          div(
+                            class = "page",
+                            id = paste0("step", ui),
+                            "Step", ui
+                          )
+                        })
+                      ),
+                      br(),
+                      actionButton("prevBtn", "< Previous"),
+                      actionButton("nextBtn", "Next >")
+             ),
              
              # Eight Tab
              tabPanel(div(icon("table"),"Metadata"),
@@ -777,6 +797,22 @@ server <- function(input, output) {
     suitability_df 
     
   )
+  
+  rv <- reactiveValues(page = 1)
+  
+  observe({
+    toggleState(id = "prevBtn", condition = rv$page > 1)
+    toggleState(id = "nextBtn", condition = rv$page < NUM_PAGES)
+    hide(selector = ".page")
+    show(paste0("step", rv$page))
+  })
+  
+  navPage <- function(direction) {
+    rv$page <- rv$page + direction
+  }
+  
+  observeEvent(input$prevBtn, navPage(-1))
+  observeEvent(input$nextBtn, navPage(1))
   
   
 }
