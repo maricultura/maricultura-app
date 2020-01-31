@@ -31,14 +31,15 @@ Calculate Fuel Costs
 # Determine Fuel Costs and Usage
 fuel_consumption <- 26.96 #L/hour
 vessel_speed <- 15 #average speed in km/hr
-diesel_price <- 0.92 #USD/L
+diesel_price <- 0.92 #USD/L using 2020 exchange rate 1 usd = 4 reais
 distance_to_port <- 25 #depend on cell
 num_of_boats <- 2
 trips_per_day <- 2
 trip_hours <- 6 #maximum roundtrip
+trips_free_annual <- 480 #oneway trips
 
 # Determine Trips per Year
-one_way_trips_per_year <- (num_of_boats*trips_per_day*365)# single trips for both boats combined is 1460
+one_way_trips_per_year <- (num_of_boats*trips_free_annual)# single trips for both boats combined is 1460
 annual_one_per_boat <- (one_way_trips_per_year/num_of_boats) # 730 annual trips for one boat
 roundtrips_per_year <- (one_way_trips_per_year/2) # roundtrips for both boats combined is 730
 annual_roundtrips_per_boat <- (roundtrips_per_year/num_of_boats) #365
@@ -48,7 +49,7 @@ annual_roundtrips_per_boat <- (roundtrips_per_year/num_of_boats) #365
 fuel_rast_econ <- reclassify(eez_econ, rcl = diesel_price)
 
 # Create Raster for All Fuel Costs
-annual_fuel_cost_econ <- ((dist_shore_econ*num_of_boats)/vessel_speed*fuel_consumption*fuel_rast_econ*annual_one_per_boat)
+annual_fuel_cost_econ <- ((dist_shore_econ*num_of_boats)/vessel_speed*fuel_consumption*fuel_rast_econ*annual_one_per_boat*num_of_boats)
 
 plot(annual_fuel_cost_econ)
 
@@ -64,15 +65,18 @@ farm_size <- 16 #cages
 farm_volume <- 102400 #m^3
 monthly_hours <- 160 #hours/fulltime employee
 annual_hours <- (monthly_hours*12)
+annual_hours
+
 num_of_employees <- 40 ##/farm
 hourly_wage <- 4.50 #USD/hour average
-work_days_per_month <- 30
+work_days_per_month <- 20
 
 # Determine Annual Wage Cost for Workers per Farm
 wages_annual <- (annual_hours*hourly_wage)
 
 # Determine Annual Trip Hours
-transit_hours <- ((dist_shore_econ*num_of_boats)/vessel_speed*annual_one_per_boat)
+transit_hours <- ((dist_shore_econ*num_of_boats)/vessel_speed*annual_one_per_boat*num_of_boats)
+freq(transit_hours)
 
 # Determine Annual Total Cost per Farm
 
