@@ -634,7 +634,7 @@ server <- function(input, output) {
   output$suitableMap <- renderLeaflet({
     
     # Color palettes
-    pal <- colorNumeric(c("#FFFFFF40", "blue"), values(suitable()), na.color = "transparent", alpha = TRUE)
+    pal <- colorNumeric(c("#FFFFFF40", "#1D63A3"), values(suitable()), na.color = "transparent", alpha = TRUE)
     
     on.exit(waiter_hide())
     
@@ -666,7 +666,7 @@ server <- function(input, output) {
         overlayGroups = "Suitable Areas",
         options = layersControlOptions(collapsed = TRUE),
         position = "topleft") %>% 
-      addLegend(colors = c("blue", "#FFFFFF40"), # adds legend
+      addLegend(colors = c("#1D63A3", "#FFFFFF40"), # adds legend
                 labels = c("Suitable Areas", "Exclusive Economic Zone"),
                 title = "Legend") %>% 
       addMouseCoordinates() 
