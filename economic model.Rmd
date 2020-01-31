@@ -59,7 +59,7 @@ plot(annual_fuel_cost_econ)
 Calculate Wage Costs
 ```{r}
 # Determine Wage Costs and Labor
-cage_size <- 6500 #m^3
+cage_size <- 6400 #m^3
 farm_size <- 16 #cages
 farm_volume <- 102400 #m^3
 monthly_hours <- 160 #hours/fulltime employee
@@ -82,4 +82,99 @@ plot(annual_labor_cost_econ)
 # Create a Labor Only Raster
 
 ```
+
+Calculate Variable Costs
+```{r}
+# Define the discount rate
+risk_rho <- 1.17647
+risk_discount <- (1-(1/risk_rho))
+
+
+# Annuity Function
+annuity <- function(c, r = risk_discount, t = 10) {
+  a <- c/ ((1-(1+r)^-t)/r)
+  return(a)
+}
+
+```
+Calculate Capital Costs
+```{r}
+# Farm Design
+cage_cost <- 312000
+weight_at_harvest <- 3 #user inputs (value is 3kg)
+final_stocking_density <- 10 #user inputs (value is 10fish/m^3)
+initial_stocking_density <- 3 #user inputs 3fish/m^3)
+feed_conversion_ratio <- 3 #user inputs
+survival_rate <- .85 #note that this is species-specific 
+fingerling_price <- 1.50 #USD ****
+feed_price <- 2.10 #USD/kg ****
+optimal_feed <- 2350080 #kg er farm/grow out cycle total amount of feed 
+time <- 12 #months, rotation period 
+farm_installation <- 139700
+cage_installation <- (farm_installation/farm_size)
+  
+# One time costs
+farm_lease <- 8668.74 #one-time lease
+signaling_system <- 28021.40 #one-time system installation
+project_development <- 53403.69 #project development
+miscellaneous <- 123685.54 # one time
+boats <- 420376.85 #for 3 boats, one time, 1 * 16m, 2* 7m
+
+
+# ANNUAL FIXED COSTS
+electric_power <- 3661.32
+mooring_maintenance <- 53191.29
+diving_maintenance <- 8427.13
+office_rent <- 36626.43
+environmental_monitoring <- 45781.04
+
+
+
+annual_fixed_costs <- (electric_power + mooring_maintenance + diving_maintenance + office_rent + environmental_monitoring) #yearly costs
+one_time_fixed_costs_depreciated <- (signaling_system + miscellaneous + boats) # find out how to apply annuity 
+one_time_fixed_costs_ndepreciated <- (farm_lease + project_development)
+
+
+
+
+feed_annual <- (optimal_feed*feed_price)
+
+    
+ 
+
+    # Fingerling costs
+juv_cost_annual <- (initial_stocking_density*farm_volume*fingerling_price) #yearly cost
+ 
+    
+cage_cost_once <- ((farm_size*cage_cost)+farm_size*cage_installation) # one time #find out how to apply annuity
+
+one_time_total <- (cage_cost_once + one_time_fixed_costs_depreciated + one_time_fixed_costs_ndepreciated)
+    
+# Total capital costs year 1
+cap_cost_intial <- one_time_total + juv_cost_annual + annual_fixed_costs + feed_annual
+cap_cost_intial
+
+costs_fuel_wage <- overlay(annual_labor_cost_rast, 
+                     annual_labor_cost_rast,
+                     one_time_total,
+                     fun = function(a, b){a+b})
+plot(costs_fuel_wage)
+
+total <- costs_fuel_wage+ one_time_total
+plot(total)
+
+freq(total)
+
+freq(costs_fuel_wage)
+```
+
+
+
+
+
+
+
+
+
+
 
