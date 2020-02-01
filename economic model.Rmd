@@ -31,14 +31,15 @@ Calculate Fuel Costs
 # Determine Fuel Costs and Usage
 fuel_consumption <- 26.96 #L/hour
 vessel_speed <- 15 #average speed in km/hr
-diesel_price <- 0.92 #USD/L
+diesel_price <- 0.92 #USD/L using 2020 exchange rate 1 usd = 4 reais
 distance_to_port <- 25 #depend on cell
 num_of_boats <- 2
 trips_per_day <- 2
 trip_hours <- 6 #maximum roundtrip
+trips_free_annual <- 480 #oneway trips
 
 # Determine Trips per Year
-one_way_trips_per_year <- (num_of_boats*trips_per_day*365)# single trips for both boats combined is 1460
+one_way_trips_per_year <- (num_of_boats*trips_free_annual)# single trips for both boats combined is 1460
 annual_one_per_boat <- (one_way_trips_per_year/num_of_boats) # 730 annual trips for one boat
 roundtrips_per_year <- (one_way_trips_per_year/2) # roundtrips for both boats combined is 730
 annual_roundtrips_per_boat <- (roundtrips_per_year/num_of_boats) #365
@@ -48,7 +49,7 @@ annual_roundtrips_per_boat <- (roundtrips_per_year/num_of_boats) #365
 fuel_rast_econ <- reclassify(eez_econ, rcl = diesel_price)
 
 # Create Raster for All Fuel Costs
-annual_fuel_cost_econ <- ((dist_shore_econ*num_of_boats)/vessel_speed*fuel_consumption*fuel_rast_econ*annual_one_per_boat)
+annual_fuel_cost_econ <- ((dist_shore_econ*num_of_boats)/vessel_speed*fuel_consumption*fuel_rast_econ*annual_one_per_boat*num_of_boats)
 
 plot(annual_fuel_cost_econ)
 
@@ -59,20 +60,23 @@ plot(annual_fuel_cost_econ)
 Calculate Wage Costs
 ```{r}
 # Determine Wage Costs and Labor
-cage_size <- 6500 #m^3
+cage_size <- 6400 #m^3
 farm_size <- 16 #cages
 farm_volume <- 102400 #m^3
 monthly_hours <- 160 #hours/fulltime employee
 annual_hours <- (monthly_hours*12)
+annual_hours
+
 num_of_employees <- 40 ##/farm
 hourly_wage <- 4.50 #USD/hour average
-work_days_per_month <- 30
+work_days_per_month <- 20
 
 # Determine Annual Wage Cost for Workers per Farm
 wages_annual <- (annual_hours*hourly_wage)
 
 # Determine Annual Trip Hours
-transit_hours <- ((dist_shore_econ*num_of_boats)/vessel_speed*annual_one_per_boat)
+transit_hours <- ((dist_shore_econ*num_of_boats)/vessel_speed*annual_one_per_boat*num_of_boats)
+freq(transit_hours)
 
 # Determine Annual Total Cost per Farm
 
@@ -82,4 +86,99 @@ plot(annual_labor_cost_econ)
 # Create a Labor Only Raster
 
 ```
+
+Calculate Variable Costs
+```{r}
+# Define the discount rate
+risk_rho <- 1.17647
+risk_discount <- (1-(1/risk_rho))
+
+
+# Annuity Function
+annuity <- function(c, r = risk_discount, t = 10) {
+  a <- c/ ((1-(1+r)^-t)/r)
+  return(a)
+}
+
+```
+Calculate Capital Costs
+```{r}
+# Farm Design
+cage_cost <- 312000
+weight_at_harvest <- 3 #user inputs (value is 3kg)
+final_stocking_density <- 10 #user inputs (value is 10fish/m^3)
+initial_stocking_density <- 3 #user inputs 3fish/m^3)
+feed_conversion_ratio <- 3 #user inputs
+survival_rate <- .85 #note that this is species-specific 
+fingerling_price <- 1.50 #USD ****
+feed_price <- 2.10 #USD/kg ****
+optimal_feed <- 2350080 #kg er farm/grow out cycle total amount of feed 
+time <- 12 #months, rotation period 
+farm_installation <- 139700
+cage_installation <- (farm_installation/farm_size)
+  
+# One time costs
+farm_lease <- 8668.74 #one-time lease
+signaling_system <- 28021.40 #one-time system installation
+project_development <- 53403.69 #project development
+miscellaneous <- 123685.54 # one time
+boats <- 420376.85 #for 3 boats, one time, 1 * 16m, 2* 7m
+
+
+# ANNUAL FIXED COSTS
+electric_power <- 3661.32
+mooring_maintenance <- 53191.29
+diving_maintenance <- 8427.13
+office_rent <- 36626.43
+environmental_monitoring <- 45781.04
+
+
+
+annual_fixed_costs <- (electric_power + mooring_maintenance + diving_maintenance + office_rent + environmental_monitoring) #yearly costs
+one_time_fixed_costs_depreciated <- (signaling_system + miscellaneous + boats) # find out how to apply annuity 
+one_time_fixed_costs_ndepreciated <- (farm_lease + project_development)
+
+
+
+
+feed_annual <- (optimal_feed*feed_price)
+
+    
+ 
+
+    # Fingerling costs
+juv_cost_annual <- (initial_stocking_density*farm_volume*fingerling_price) #yearly cost
+ 
+    
+cage_cost_once <- ((farm_size*cage_cost)+farm_size*cage_installation) # one time #find out how to apply annuity
+
+one_time_total <- (cage_cost_once + one_time_fixed_costs_depreciated + one_time_fixed_costs_ndepreciated)
+    
+# Total capital costs year 1
+cap_cost_intial <- one_time_total + juv_cost_annual + annual_fixed_costs + feed_annual
+cap_cost_intial
+
+costs_fuel_wage <- overlay(annual_labor_cost_rast, 
+                     annual_labor_cost_rast,
+                     one_time_total,
+                     fun = function(a, b){a+b})
+plot(costs_fuel_wage)
+
+total <- costs_fuel_wage+ one_time_total
+plot(total)
+
+freq(total)
+
+freq(costs_fuel_wage)
+```
+
+
+
+
+
+
+
+
+
+
 
