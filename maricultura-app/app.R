@@ -31,8 +31,10 @@ a2 <- c(-0.066, -0.0042, -0.1667)
 b1 <- c(-0.0396, -0.0308, -1.5714)
 b2 <- c(1.254, 0.1388, 5.3333)
 T0 <- c(14, 25, 29)
+Linf <- c(54.7, 140, 133.3)
+time0 <- c(0, 0, -0.13)
 
-species_df <- data.frame(species, a1, a2, b1, b2, T0)
+species_df <- data.frame(species, a1, a2, b1, b2, T0, Linf, time0 )
 
 # Set logging for history
 set_logging()
@@ -231,7 +233,31 @@ ui <- fluidPage(
                           leafletOutput("economics_map", height = "100vh")
                         )
                       )),
-             # Fifth Tab
+            
+             
+              #temporary tab
+             tabPanel( "Von Bert",
+                       sidebarLayout(
+                         sidebarPanel(
+                           tabsetPanel(type = "tabs",
+                                       tabPanel( "Species",
+                                                 radioButtons(inputId = "selectSpecies",
+                                                              label = "Pick a species",
+                                                              choiceNames = list(
+                                                                HTML('<span>Atlantic salmon (<i>Salmo salar</i>)<br><img src="atlantic_salmon.png" alt=“image of salmon“ height="100px"/></span>'),
+                                                                HTML('<span>gilthead seabream (<i>Sparus aurata</i>)<br><br><img src="seabream.png" alt=“image of salmon“ height="70px"/></span>'),
+                                                                HTML('<span>cobia (<i>Rachycentron canadum</i>)<br><img src="cobia.png" alt=“image of salmon“  height="100px"/></span>')
+                                                              ),
+                                                              choiceValues = unique(species_df$species)) # Radio buttons sourced from scripts/html.R
+                                       )),
+                           actionButton("run_button_von", label = "Run"),
+                           downloadButton("download_button_von", label = "Download")),
+                         mainPanel(
+                           leafletOutput("vonMap", height = "100vh")
+                         )
+                       )),
+              
+              # Fifth Tab
              tabPanel(HTML('<div><i class="fa fa-calculator"></i> Area Calculator</div>'),
                       fluidRow(
                         column(12,
@@ -740,18 +766,20 @@ server <- function(input, output) {
                                   growth_above_optimal() + growth_below_optimal()
   )
   
+  # Von Bertallanfy 
+  von_raster <- reactive(fish_selection()$Linf*(1 - exp((-1*growth_raster())*(12-fish_selection()$time0))))
   
   # Render growth plot
   output$growthMap <- renderLeaflet({
     # Palette
-    pal_growth <- colorNumeric(c("#DAF7A6", "#C70039", "#581845"), values(growth_raster()),
+    pal_growth <- colorNumeric(c("#DAF7A6", "#C70039", "#581845"), values(von_raster()),
                                na.color = "transparent")
     
     # Leaflet map
     leaflet(options = leafletOptions( zoomSnap = 0.2)) %>%
       addTiles(group = "Open Street Map") %>%
       addProviderTiles("Esri.WorldGrayCanvas", group = "Esri Gray Canvas (default)") %>%
-      addRasterImage(growth_raster(),
+      addRasterImage(von_raster(),
                      colors = pal_growth,
                      group = "Growth Model") %>%
       fitBounds(lng1 = -54.6903404, # sets initial view of map to fit coordinates
@@ -770,12 +798,15 @@ server <- function(input, output) {
         position = "topleft") %>% 
       addLegend("topright",
                 pal = pal_growth,
-                values = values(growth_raster()),
-                title = "Somatic growth (kg/month)") %>% 
+                values = values(von_raster()),
+                title = "Estimated Fish Length (cm)") %>% 
       addMouseCoordinates()
     
     }
       )
+  
+
+  
   
   ### Download suitability map
   output$download_button_growth <- downloadHandler(
@@ -808,6 +839,7 @@ server <- function(input, output) {
   })
   
   navPage <- function(direction) {
+    
     rv$page <- rv$page + direction
   }
   
