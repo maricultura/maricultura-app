@@ -33,8 +33,10 @@ b2 <- c(1.254, 0.1388, 5.3333)
 T0 <- c(14, 25, 29)
 Linf <- c(54.7, 140, 133.3)
 time0 <- c(0, 0, -0.13)
+a <- c(0, 0, 0.00479)
+b <- c(0, 0, 3.11)
 
-species_df <- data.frame(species, a1, a2, b1, b2, T0, Linf, time0 )
+species_df <- data.frame(species, a1, a2, b1, b2, T0, Linf, time0, a, b)
 
 # Set logging for history
 set_logging()
@@ -166,7 +168,7 @@ ui <- fluidPage(
                       )
              ),
              # Third Tab
-             tabPanel( HTML('<div><i class="fa fa-chart-line"></i>Growth</div>'),
+             tabPanel( HTML('<div><i class="fa fa-chart-line"></i>Biomass</div>'),
                        sidebarLayout(
                          sidebarPanel(
                            tabsetPanel(type = "tabs",
@@ -234,28 +236,7 @@ ui <- fluidPage(
                         )
                       )),
             
-             
-              #temporary tab
-             tabPanel( "Von Bert",
-                       sidebarLayout(
-                         sidebarPanel(
-                           tabsetPanel(type = "tabs",
-                                       tabPanel( "Species",
-                                                 radioButtons(inputId = "selectSpecies",
-                                                              label = "Pick a species",
-                                                              choiceNames = list(
-                                                                HTML('<span>Atlantic salmon (<i>Salmo salar</i>)<br><img src="atlantic_salmon.png" alt=“image of salmon“ height="100px"/></span>'),
-                                                                HTML('<span>gilthead seabream (<i>Sparus aurata</i>)<br><br><img src="seabream.png" alt=“image of salmon“ height="70px"/></span>'),
-                                                                HTML('<span>cobia (<i>Rachycentron canadum</i>)<br><img src="cobia.png" alt=“image of salmon“  height="100px"/></span>')
-                                                              ),
-                                                              choiceValues = unique(species_df$species)) # Radio buttons sourced from scripts/html.R
-                                       )),
-                           actionButton("run_button_von", label = "Run"),
-                           downloadButton("download_button_von", label = "Download")),
-                         mainPanel(
-                           leafletOutput("vonMap", height = "100vh")
-                         )
-                       )),
+            
               
               # Fifth Tab
              tabPanel(HTML('<div><i class="fa fa-calculator"></i> Area Calculator</div>'),
@@ -322,7 +303,7 @@ server <- function(input, output) {
   
   ### Show/Hide tabs ###
   # Hide growth, economic, and area tabs when server starts
-  hideTab(inputId = "navbar", target = HTML('<div><i class="fa fa-chart-line"></i>Growth</div>'))
+  hideTab(inputId = "navbar", target = HTML('<div><i class="fa fa-chart-line"></i>Biomass</div>'))
   hideTab(inputId = "navbar", target = HTML('<div><i class="fa fa-hand-holding-usd"></i>Economics</div>'))
   hideTab(inputId = "navbar", target = HTML('<div><i class="fa fa-calculator"></i> Area Calculator</div>'))
   
@@ -769,17 +750,20 @@ server <- function(input, output) {
   # Von Bertallanfy 
   von_raster <- reactive(fish_selection()$Linf*(1 - exp((-1*growth_raster())*(12-fish_selection()$time0))))
   
+  #Allometric Ratio 
+  weight_raster <- reactive(fish_selection()$a*von_raster()^fish_selection()$b)
+  
   # Render growth plot
   output$growthMap <- renderLeaflet({
     # Palette
-    pal_growth <- colorNumeric(c("#DAF7A6", "#C70039", "#581845"), values(von_raster()),
+    pal_growth <- colorNumeric(c("#DAF7A6", "#C70039", "#581845"), values(weight_raster()),
                                na.color = "transparent")
     
     # Leaflet map
     leaflet(options = leafletOptions( zoomSnap = 0.2)) %>%
       addTiles(group = "Open Street Map") %>%
       addProviderTiles("Esri.WorldGrayCanvas", group = "Esri Gray Canvas (default)") %>%
-      addRasterImage(von_raster(),
+      addRasterImage(weight_raster(),
                      colors = pal_growth,
                      group = "Growth Model") %>%
       fitBounds(lng1 = -54.6903404, # sets initial view of map to fit coordinates
@@ -798,8 +782,8 @@ server <- function(input, output) {
         position = "topleft") %>% 
       addLegend("topright",
                 pal = pal_growth,
-                values = values(von_raster()),
-                title = "Estimated Fish Length (cm)") %>% 
+                values = values(weight_raster()),
+                title = "Fish Biomass (kg...?)") %>% 
       addMouseCoordinates()
     
     }
