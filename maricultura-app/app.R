@@ -748,10 +748,10 @@ server <- function(input, output) {
   )
   
   # Von Bertallanfy 
-  von_raster <- reactive(fish_selection()$Linf*(1 - exp((-1*growth_raster())*(12-fish_selection()$time0))))
+  von_raster <- reactive(fish_selection()$Linf*(1 - exp((-1*12*(growth_raster()))*(1-fish_selection()$time0))))
   
   #Allometric Ratio 
-  weight_raster <- reactive(fish_selection()$a*von_raster()^fish_selection()$b)
+  weight_raster <- reactive((fish_selection()$a*von_raster()^fish_selection()$b)*0.001)
   
   # Render growth plot
   output$growthMap <- renderLeaflet({
@@ -783,7 +783,7 @@ server <- function(input, output) {
       addLegend("topright",
                 pal = pal_growth,
                 values = values(weight_raster()),
-                title = "Fish Biomass (kg...?)") %>% 
+                title = "Fish Biomass (kg)") %>% 
       addMouseCoordinates()
     
     }
