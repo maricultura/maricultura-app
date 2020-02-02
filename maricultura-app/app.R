@@ -132,7 +132,7 @@ ui <- fluidPage(
                                                              min = 0,   
                                                              max = 400,
                                                              step = 0.5,
-                                                             value = 200),
+                                                             value = 70.5),
                                                 numericInput("max_cv_slider", label = h5("Maximum Current Velocity (m/s)"),
                                                              min = 0,
                                                              max = 3,
@@ -470,7 +470,7 @@ server <- function(input, output) {
   
   #### Shipping Lanes 
   # Read in File
-  shipping_lanes_binary <- reactive(raster(ifelse(6 %in% input$checkGroup, "data/shipping_mask.tif", "data/raster_ones.tif")))
+  shipping_lanes_binary <- reactive(raster(ifelse(6 %in% input$checkGroup, "data/shipping_binary.tif", "data/raster_ones.tif")))
   
   ### Suitable areas (overlay of layers)
   suitable <- eventReactive( input$run_button, {
