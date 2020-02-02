@@ -309,7 +309,7 @@ server <- function(input, output) {
   
   # Show tabs after clicking the run button/ growth run button
   observeEvent(input$run_button, {
-    showTab(inputId = "navbar", target = HTML('<div><i class="fa fa-chart-line"></i>Growth</div>'))
+    showTab(inputId = "navbar", target = HTML('<div><i class="fa fa-chart-line"></i>Biomass</div>'))
   })
   observeEvent(input$run_button_growth, {
     showTab(inputId = "navbar", target = HTML('<div><i class="fa fa-hand-holding-usd"></i>Economics</div>'))
