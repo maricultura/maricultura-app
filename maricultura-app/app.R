@@ -474,7 +474,18 @@ server <- function(input, output) {
   
   ### Suitable areas (overlay of layers)
   suitable <- eventReactive( input$run_button, {
-    overlay(sst_binary_min(), sst_binary_max(), depth_binary(), current_binary(), dist_shore_binary(), mpas_binary(), reefs_binary(), reefs_artificial_binary(), og_pipeline_binary(), og_production_binary(), shipping_lanes_binary(), fun = function(a, b, c, d, e, f, g, h, i, j, k){a*b*c*d*e*f*g*h*i*j*k})
+    overlay(sst_binary_min(),
+            sst_binary_max(),
+            depth_binary(),
+            current_binary(),
+            dist_shore_binary(),
+            mpas_binary(),
+            reefs_binary(),
+            reefs_artificial_binary(),
+            og_pipeline_binary(),
+            og_production_binary(),
+            shipping_lanes_binary(),
+            fun = function(a, b, c, d, e, f, g, h, i, j, k){a*b*c*d*e*f*g*h*i*j*k})
   })
   
   ### Waiter
@@ -498,7 +509,7 @@ server <- function(input, output) {
   
   # Calculate value for total area
   area <- reactive(
-    round(freq(suitable(), value = 1)*184.64, digits = 0)
+    round(freq(suitable(), value = 1)*123.424, digits = 0)
   )
   
   text_depth <- reactive(paste0(HTML("<b>Depth: </b>"), input$depth_slider[1], " - ", input$depth_slider[2], " m"))
