@@ -503,6 +503,50 @@ server <- function(input, output) {
     )
   })
   
+  ### Render leaflet map
+  output$suitableMap <- renderLeaflet({
+    
+    # Color palettes
+    pal <- colorNumeric(c("#FFFFFF40", "#1D63A3"), values(suitable()), na.color = "transparent", alpha = TRUE)
+    
+    on.exit(waiter_hide())
+    
+    # Leaflet map
+    leaflet(options = leafletOptions( zoomSnap = 0.2)) %>%
+      addTiles(group = "Open Street Map") %>%
+      addProviderTiles("Esri.WorldGrayCanvas", group = "Esri Gray Canvas (default)") %>%
+      addRasterImage(suitable(),
+                     method = "ngb",
+                     colors = pal,
+                     group = "Suitable Areas") %>% 
+      addScaleBar(position = "bottomright") %>%  # adds scale bar
+      # fitBounds(lng1 = 4937645, # sets initial view of map to fit coordinates
+      # lng2 = 8111405,
+      # lat1 = 6030062,
+      # lat2 = 10778162) %>% 
+      fitBounds(lng1 = -54.6903404, # sets initial view of map to fit coordinates
+                lng2 = -25.835314,
+                lat1 = 6.3071255,
+                lat2 = -35.8573806) %>% 
+      addEasyButton(easyButton(
+        icon="fa-globe", title="Reset View", # button to reset to initial view
+        onClick=JS("function(btn, map){
+                   map.setView([-14.0182737, -39.8789667]);
+                   map.setZoom(4.6);}"))) %>% 
+      addFullscreenControl() %>% 
+      addLayersControl(
+        baseGroups = c("Esri Gray Canvas (default)", "Open Street Map"),
+        overlayGroups = "Suitable Areas",
+        options = layersControlOptions(collapsed = TRUE),
+        position = "topleft") %>% 
+      addLegend(colors = c("#1D63A3", "#FFFFFF40"), # adds legend
+                labels = c("Suitable Areas", "Exclusive Economic Zone"),
+                title = "Legend") %>% 
+      addMouseCoordinates() 
+  })  
+  
+  
+  
   ### Area Calculator ###
   
   ### First Bar Graph ###
@@ -567,6 +611,7 @@ server <- function(input, output) {
         x = values$x,
         y = values$y,
         text = values$text,
+        marker = list(color = "#1D63A3"),
         type = "bar")%>%
         layout(title = "Total Suitable Area by Run Number",
                yaxis = list(title = HTML("Area (km<sup>2</sup>)")))
@@ -647,51 +692,8 @@ server <- function(input, output) {
         hjust = 1
       )
   )
-  
-  ### Render leaflet map
-  output$suitableMap <- renderLeaflet({
-    
-    # Color palettes
-    pal <- colorNumeric(c("#FFFFFF40", "#1D63A3"), values(suitable()), na.color = "transparent", alpha = TRUE)
-    
-    on.exit(waiter_hide())
-    
-    # Leaflet map
-    leaflet(options = leafletOptions( zoomSnap = 0.2)) %>%
-      addTiles(group = "Open Street Map") %>%
-      addProviderTiles("Esri.WorldGrayCanvas", group = "Esri Gray Canvas (default)") %>%
-      addRasterImage(suitable(),
-                     method = "ngb",
-                     colors = pal,
-                     group = "Suitable Areas") %>% 
-      addScaleBar(position = "bottomright") %>%  # adds scale bar
-      # fitBounds(lng1 = 4937645, # sets initial view of map to fit coordinates
-      # lng2 = 8111405,
-      # lat1 = 6030062,
-      # lat2 = 10778162) %>% 
-      fitBounds(lng1 = -54.6903404, # sets initial view of map to fit coordinates
-                lng2 = -25.835314,
-                lat1 = 6.3071255,
-                lat2 = -35.8573806) %>% 
-      addEasyButton(easyButton(
-        icon="fa-globe", title="Reset View", # button to reset to initial view
-        onClick=JS("function(btn, map){
-                   map.setView([-14.0182737, -39.8789667]);
-                   map.setZoom(4.6);}"))) %>% 
-      addFullscreenControl() %>% 
-      addLayersControl(
-        baseGroups = c("Esri Gray Canvas (default)", "Open Street Map"),
-        overlayGroups = "Suitable Areas",
-        options = layersControlOptions(collapsed = TRUE),
-        position = "topleft") %>% 
-      addLegend(colors = c("#1D63A3", "#FFFFFF40"), # adds legend
-                labels = c("Suitable Areas", "Exclusive Economic Zone"),
-                title = "Legend") %>% 
-      addMouseCoordinates() 
-})  
-  
-  ###
-  ### Download suitability map
+ 
+  ### Download suitability map  ###
   output$download_button <- downloadHandler(
     
     filename = function() {
@@ -803,14 +805,14 @@ server <- function(input, output) {
 
   
   
-  ### Download suitability map
+  ### Download growth map
   output$download_button_growth <- downloadHandler(
     
     filename = function() {
       "growth_map.tif"
     },
     content = function(file) {
-      writeRaster(growth_raster(), file)
+      writeRaster(weight_raster(), file)
       
       
     })
