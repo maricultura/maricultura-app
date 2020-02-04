@@ -101,6 +101,8 @@ annuity <- function(c, r = risk_discount, t = 10) {
 }
 
 ```
+
+
 Calculate Capital Costs
 ```{r}
 # Farm Design
@@ -173,6 +175,12 @@ freq(costs_fuel_wage)
 ```
 
 
+```{r}
+# testing economic model
+
+suitable_tif <- raster("data/suitability_map-2.tif")
+
+```
 
 
 
@@ -181,4 +189,8 @@ freq(costs_fuel_wage)
 
 
 
+
+```{r}
+
+```
 
