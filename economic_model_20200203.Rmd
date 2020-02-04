@@ -49,11 +49,11 @@ diesel_price <- 0.92 #USD/L using 2020 exchange rate 1 usd = 4 reais
 distance_to_port <- 25 #depend on cell
 num_of_boats <- 2
 
-trips_annual <- 416 # roundtrips per farm per year (1 boat @ 5 trips/week, 1 @ 8 trips per week, and 52 weeks a year)
-
+trips_annual <- 416 # roundtrips per farm per year, for 2 boats (1 boat @ 5 trips/week, 1 @ 8 trips per week, and 52 weeks a year)
+one_way_trips_annual <- 2*trips_annual # (we have to double the roundtrips because we need to take into account that distance traveled happens TWICE for every round trip)
 
 # Create raster for all fuel costs:
-annual_fuel_cost_econ <- (dist_shore_econ/vessel_speed)*fuel_consumption*diesel_price*trips_annual*num_of_boats
+annual_fuel_cost_econ <- (dist_shore_econ/vessel_speed)*fuel_consumption*diesel_price*one_way_trips_annual
 plot(annual_fuel_cost_econ)
 
 
