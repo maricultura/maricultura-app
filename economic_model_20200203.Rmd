@@ -48,18 +48,12 @@ vessel_speed <- 15 #average speed in km/hr
 diesel_price <- 0.92 #USD/L using 2020 exchange rate 1 usd = 4 reais
 distance_to_port <- 25 #depend on cell
 num_of_boats <- 2
-trips_per_day <- 2
-trip_hours <- 6 #maximum roundtrip
-trips_annual <- 416 #Roundtrips trips 8 trips per week and 52 weeks a year
 
-# Determine Trips per Year
-one_way_trips_per_year <- (num_of_boats*trips_free_annual)# single trips for both boats combined is 1460
-annual_one_per_boat <- (one_way_trips_per_year/num_of_boats) # 730 annual trips for one boat
-roundtrips_per_year <- (one_way_trips_per_year/2) # roundtrips for both boats combined is 730
-annual_roundtrips_per_boat <- (roundtrips_per_year/num_of_boats) #365
+trips_annual <- 416 # roundtrips per farm per year (1 boat @ 5 trips/week, 1 @ 8 trips per week, and 52 weeks a year)
+
 
 # Create raster for all fuel costs:
-annual_fuel_cost_econ <- (dist_shore_econ/vessel_speed)*fuel_consumption*diesel_price*trips_free_annual*num_of_boats
+annual_fuel_cost_econ <- (dist_shore_econ/vessel_speed)*fuel_consumption*diesel_price*trips_annual*num_of_boats
 plot(annual_fuel_cost_econ)
 
 
