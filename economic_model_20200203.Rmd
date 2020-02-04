@@ -48,18 +48,12 @@ vessel_speed <- 15 #average speed in km/hr
 diesel_price <- 0.92 #USD/L using 2020 exchange rate 1 usd = 4 reais
 distance_to_port <- 25 #depend on cell
 num_of_boats <- 2
-trips_per_day <- 2
-trip_hours <- 6 #maximum roundtrip
-trips_annual <- 416 #Roundtrips trips 8 trips per week and 52 weeks a year
 
-# Determine Trips per Year
-one_way_trips_per_year <- (num_of_boats*trips_free_annual)# single trips for both boats combined is 1460
-annual_one_per_boat <- (one_way_trips_per_year/num_of_boats) # 730 annual trips for one boat
-roundtrips_per_year <- (one_way_trips_per_year/2) # roundtrips for both boats combined is 730
-annual_roundtrips_per_boat <- (roundtrips_per_year/num_of_boats) #365
+trips_annual <- 416 # roundtrips per farm per year, for 2 boats (1 boat @ 5 trips/week, 1 @ 8 trips per week, and 52 weeks a year)
+one_way_trips_annual <- 2*trips_annual # (we have to double the roundtrips because we need to take into account that distance traveled happens TWICE for every round trip)
 
 # Create raster for all fuel costs:
-annual_fuel_cost_econ <- (dist_shore_econ/vessel_speed)*fuel_consumption*diesel_price*trips_free_annual*num_of_boats
+annual_fuel_cost_econ <- (dist_shore_econ/vessel_speed)*fuel_consumption*diesel_price*one_way_trips_annual
 plot(annual_fuel_cost_econ)
 
 
@@ -74,29 +68,33 @@ cage_size <- 6400 #m^3
 farm_size <- 16 #cages
 farm_volume <- 102400 #m^3
 
+full_time_workers <- 40
 monthly_hours <- 160 #hours/month per fulltime employee
 annual_hours <- (monthly_hours*12)
 num_of_employees <-  ##/farm
 hourly_wage <- 4.50 #USD/hour average
 work_days_per_month <- 20
-fixed_labor <- 374400
 workers_offshore <- 35
+workers_onshore <- 5
 
-# Determine Annual Wage Cost for Workers per Farm
-wages_annual <- (annual_hours*hourly_wage)
+# Determine Annual Fixed Wage Cost per Farm
+fixed_labor_cost <- full_time_workers*hourly_wage*annual_hours
 
-# Determine Annual Trip Hours
-transit_hours <- ((dist_shore_econ*num_of_boats)/vessel_speed*annual_one_per_boat*num_of_boats)
-freq(transit_hours)
 
-##### 2/2 Later Attempt: Labor Costs in A Year
-oneyear_labor_costs <- fixed_labor + ((dist_shore_econ*workers_offshore *hourly_wage*(trips_annual*2))/vessel_speed)
-plot(oneyear_labor_costs)
+# Determine # of Annual Transit Hours
+annual_transit_hours <- (dist_shore_econ/vessel_speed)*one_way_trips_annual
 
-# Create a Labor Only Raster
+# Determine Annual Wage Cost for Transit Hours Per Farm
+transit_cost <- workers_offshore*annual_transit_hours*hourly_wage
+
+# Create raster for all wage costs
+total_annual_wage_costs <- transit_cost+fixed_labor_cost
+
+plot(total_annual_wage_costs)
+
 ```
 
-Calculate Variable Costs
+Calculate Annuity Function
 ```{r}
 
 # Define the discount rate
@@ -112,6 +110,9 @@ annuity <- function(c, r = risk_discount, t = 10) {
 
 Calculate Capital Costs
 ```{r}
+
+##### Discount rate comes into play for NPV equation, later.
+
 
 # Farm Design
 cage_cost <- 312000
