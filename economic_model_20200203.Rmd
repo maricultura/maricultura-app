@@ -165,3 +165,32 @@ plot(total)
 freq(total)
 freq(costs_fuel_wage)
 ```
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+# Test with Suitability Raster
+
+# Read in suitable.tif
+suitable_tif <- raster("maricultura-app/data/suitability_map-2.tif")
+
+# Mask the wage and fuel cost raster to suitable sites
+# Get rid of 0 values
+
+suitable_costs_overlay <- reclassify(suitable_tif, cbind(0, NA))
+
+profitablity_suit <- mask(costs_fuel_wage, suitable_costs_overlay)
+
+plot(profitablity_suit)
+
+freq(profitablity_suit)
+```
+
