@@ -202,7 +202,19 @@ plot(cost_of_suitable)
 
 
 # Create Revenue Raster
-biomass_rast <- raster("maricultura-app/data/suitability_map-2.tif")
+biomass_rast <- raster("maricultura-app/data/cobia_biomass.tif")
+plot(biomass_rast)
+
+revenue_rast <- biomass_rast*12
+plot(revenue_rast)
+
+
+
+# Create Profit Raster
+profit_raster <- cost_of_suitable-revenue_rast
+
+plot(profit_raster)
+
 ```
 
 
