@@ -29,6 +29,8 @@ eez_econ <- raster("eez_all_1.tif")
 
 # Read in Distance to Shore Raster
 dist_shore_econ <- raster("dist_shore.tif")
+plot(dist_shore_econ)
+
 ```
 
 Setting Number of Farms per Cell
@@ -44,7 +46,7 @@ Calculate Fuel Costs
 
 # Determine Fuel Costs and Usage
 fuel_consumption <- 26.96 #L/hour
-vessel_speed <- 15 #average speed in km/hr
+vessel_speed <- 15000 #average speed in m/hr
 diesel_price <- 0.92 #USD/L using 2020 exchange rate 1 usd = 4 reais
 distance_to_port <- 25 #depend on cell
 num_of_boats <- 2
@@ -193,7 +195,8 @@ plot(cost_total)
 ```{r}
 
 # Create Costs of Suitable Raster
-suitable_raster <- raster("maricultura-app/data/suitability_map-2.tif")
+suitable_raster <- raster("maricultura-app/data/cobia_suit.tif")
+plot(suitable_raster)
 suitable_raster_overlay <- reclassify(suitable_raster, cbind(0,NA))
 
 cost_of_suitable <- mask(cost_total, suitable_raster_overlay)
@@ -211,9 +214,15 @@ plot(revenue_rast)
 
 
 # Create Profit Raster
-profit_raster <- cost_of_suitable-revenue_rast
+profit_raster <- revenue_rast-cost_of_suitable
 
 plot(profit_raster)
+
+
+# Create NPV raster
+npv <- ((profit_raster/((1-risk_discount)^1))) + ((profit_raster/((1-risk_discount)^2))) + ((profit_raster/((1-risk_discount)^3))) + ((profit_raster/((1-risk_discount)^4))) + ((profit_raster/((1-risk_discount)^5))) + ((profit_raster/((1-risk_discount)^6))) + ((profit_raster/((1-risk_discount)^7))) + ((profit_raster/((1-risk_discount)^8))) + ((profit_raster/((1-risk_discount)^9))) + ((profit_raster/((1-risk_discount)^10)))
+
+plot(npv)
 
 ```
 
