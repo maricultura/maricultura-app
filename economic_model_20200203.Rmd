@@ -115,7 +115,6 @@ fingerling_price <- 1.50 #USD ****
 feed_price <- 2.10 #USD/kg ****
 optimal_feed <- 2350080 #kg per farm/grow out cycle total amount of feed
 time <- 12 #months, rotation period
-cage_installation <- (farm_installation/farm_size)
 feed_annual <- (optimal_feed*feed_price)
  
 # One-time costs
@@ -142,29 +141,25 @@ juv_cost_annual <- (initial_stocking_density*farm_volume*fingerling_price) # yea
 # Non-Amortized Annual Fixed Costs
 total_annual_fixed_costs <- (electric_power + mooring_maintenance + diving_maintenance + office_rent + environmental_monitoring + boat_maintenance + dockage + insurance + feed_annual + juv_cost_annual)
 
-# Non-Amoratized One-time Costs
-one_time_fixed_costs_notdepreciated <- (farm_lease + project_development)
 
 # Amortized One-time Costs
-one_time_fixed_costs_depreciated <- (signaling_system + miscellaneous + boats + total_cage_cost + farm_installation) #### ONLY PART TO AMORTIZE - find out how to apply annuity
+one_time_fixed_costs_depreciated <- (signaling_system + miscellaneous + boats + total_cage_cost + farm_installation + farm_lease + project_development) #### ONLY PART TO AMORTIZE
 
 
- 
 
 #### REVISE? COME BACK TO!### Total capital costs year 1
-cap_cost_intial <- one_time_total + juv_cost_annual + annual_fixed_costs + feed_annual
-cap_cost_intial
-costs_fuel_wage <- overlay(annual_labor_cost_rast,
-                     annual_labor_cost_rast,
-                     one_time_total,
-                     fun = function(a, b){a+b})
-plot(costs_fuel_wage)
-total <- costs_fuel_wage+ one_time_total
-plot(total)
-freq(total)
-freq(costs_fuel_wage)
+# cap_cost_intial <- one_time_total + juv_cost_annual + annual_fixed_costs + feed_annual
+# cap_cost_intial
+# costs_fuel_wage <- overlay(annual_labor_cost_rast,
+#                     annual_labor_cost_rast,
+ #                    one_time_total,
+  #                   fun = function(a, b){a+b})
+# plot(costs_fuel_wage)
+#total <- costs_fuel_wage+ one_time_total
+#plot(total)
+#freq(total)
+#freq(costs_fuel_wage)
 ```
-
 
 
 Calculate Annuity Function
@@ -180,15 +175,19 @@ annuity <- function(c, r = risk_discount, t = 10) {
   a <- c/ ((1-(1+r)^-t)/r)
   return(a)
 }
-
-a <- annuity(one_time_fixed_costs_depreciated)
-a(one_time_fixed_costs_depreciated)
-total_annuity <- a(one_time_fixed_costs_depreciated)
-total_annuity
-
-caio <- 100
+  
+amortized_costs <- annuity(one_time_fixed_costs_depreciated)
 
 ```
 
+Calculating TOTAL COSTS
+```{r}
+
+#Adding all costs to create final cost raster
+cost_total <- amortized_costs + total_annual_fixed_costs + annual_fuel_cost_econ + total_annual_wage_costs
+
+plot(cost_total)
+
+```
 
 
