@@ -178,7 +178,9 @@ freq(costs_fuel_wage)
 ```{r}
 # testing economic model
 
-suitable_tif <- raster("data/suitability_map-2.tif")
+suitable_tif <- raster("maricultura-app/data/suitability_map-2.tif")
+
+cost_of_suitable <- mask()
 
 ```
 
