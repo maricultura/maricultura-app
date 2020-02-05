@@ -190,5 +190,19 @@ cost_total <- amortized_costs + total_annual_fixed_costs + annual_fuel_cost_econ
 plot(cost_total)
 
 ```
+```{r}
+
+# Create Costs of Suitable Raster
+suitable_raster <- raster("maricultura-app/data/suitability_map-2.tif")
+suitable_raster_overlay <- reclassify(suitable_raster, cbind(0,NA))
+
+cost_of_suitable <- mask(cost_total, suitable_raster_overlay)
+plot(cost_of_suitable)
+
+
+
+# Create Revenue Raster
+biomass_rast <- raster("maricultura-app/data/suitability_map-2.tif")
+```
 
 
