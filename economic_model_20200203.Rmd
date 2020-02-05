@@ -156,7 +156,7 @@ one_time_total <- (cage_cost_once + one_time_fixed_costs_depreciated + one_time_
 # Total capital costs year 1
 cap_cost_intial <- one_time_total + juv_cost_annual + annual_fixed_costs + feed_annual
 cap_cost_intial
-costs_fuel_wage <- overlay(annual_labor_cost_rast,
+costs_fuel_wage <- overlay(annual_labor_cost_rast, #where is the annual_labor_cost_rast
                      annual_labor_cost_rast,
                      one_time_total,
                      fun = function(a, b){a+b})
