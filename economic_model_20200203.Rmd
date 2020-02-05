@@ -87,73 +87,71 @@ annual_transit_hours <- (dist_shore_econ/vessel_speed)*one_way_trips_annual
 # Determine Annual Wage Cost for Transit Hours Per Farm
 transit_cost <- workers_offshore*annual_transit_hours*hourly_wage
 
-# Create raster for all wage costs
+# Create raster for total annual wage costs
 total_annual_wage_costs <- transit_cost+fixed_labor_cost
 
 plot(total_annual_wage_costs)
 
 ```
 
-Calculate Annuity Function
-```{r}
-
-# Define the discount rate
-risk_rho <- 1.17647
-risk_discount <- (1-(1/risk_rho))
-
-# Annuity Function
-annuity <- function(c, r = risk_discount, t = 10) {
-  a <- c/ ((1-(1+r)^-t)/r)
-  return(a)
-}
-```
 
 Calculate Capital Costs
 ```{r}
 
-##### Discount rate comes into play for NPV equation, later.
+##### Discount rate comes into play directly for the NPV equation, later.
+##### Annuity gets applied now, to certain capital costs, for first profit calculation.
 
 
 # Farm Design
+cage_number_per_farm <- 16
 cage_cost <- 312000
-weight_at_harvest <- 3 #user inputs (value is 3kg)
+total_cage_cost <- cage_cost*cage_number_per_farm
+weight_at_harvest <- 5 #user inputs (value is 5kg)
 final_stocking_density <- 10 #user inputs (value is 10fish/m^3)
 initial_stocking_density <- 3 #user inputs 3fish/m^3)
 feed_conversion_ratio <- 3 #user inputs
 survival_rate <- .85 #note that this is species-specific
 fingerling_price <- 1.50 #USD ****
 feed_price <- 2.10 #USD/kg ****
-optimal_feed <- 2350080 #kg er farm/grow out cycle total amount of feed
+optimal_feed <- 2350080 #kg per farm/grow out cycle total amount of feed
 time <- 12 #months, rotation period
-farm_installation <- 139700
 cage_installation <- (farm_installation/farm_size)
- 
-# One time costs
-farm_lease <- 8668.74 #one-time lease
-signaling_system <- 28021.40 #one-time system installation
-project_development <- 53403.69 #project development
-miscellaneous <- 123685.54 # one time
-boats <- 420376.85 #for 3 boats, one time, 1 * 16m, 2* 7m
-
-# Annual fixed costs
-electric_power <- 3661.32
-mooring_maintenance <- 53191.29
-diving_maintenance <- 8427.13
-office_rent <- 36626.43
-environmental_monitoring <- 45781.04
-annual_fixed_costs <- (electric_power + mooring_maintenance + diving_maintenance + office_rent + environmental_monitoring) #yearly costs
-one_time_fixed_costs_depreciated <- (signaling_system + miscellaneous + boats) # find out how to apply annuity
-one_time_fixed_costs_ndepreciated <- (farm_lease + project_development)
 feed_annual <- (optimal_feed*feed_price)
  
-# Fingerling costs
-juv_cost_annual <- (initial_stocking_density*farm_volume*fingerling_price) #yearly cost
+# One-time costs
+farm_installation <- 139555 # (Bezerra)
+farm_lease <- 8668.74 # one-time lease (Bezerra)
+signaling_system <- 28021.40 # one-time system installation (Bezerra)
+project_development <- 53403.69 #project development (Bezerra)
+miscellaneous <- 123685.54 # one time (Bezerra)
+boats <- 420376.85 #for 3 boats, one time, 1 * 16m, 2* 7m (Bezerra)
+
+
+# Annual fixed costs
+electric_power <- 3661.32 # (Bezerra)
+mooring_maintenance <- 53191.29 # (Bezerra)
+diving_maintenance <- 8427.13 # (Bezerra)
+office_rent <- 36626.43 # (Bezerra)
+environmental_monitoring <- 45781.04 # (Bezerra)
+boat_maintenance <- 30000 # for two boats (Costello)
+dockage <- 20000 # for two boats (Costello)
+insurance <- 50000 # (Costello)
+juv_cost_annual <- (initial_stocking_density*farm_volume*fingerling_price) # yearly cost
  
 
-cage_cost_once <- ((farm_size*cage_cost)+farm_size*cage_installation) # one time #find out how to apply annuity
-one_time_total <- (cage_cost_once + one_time_fixed_costs_depreciated + one_time_fixed_costs_ndepreciated)
-   
-# Total capital costs year 1
+# Non-Amortized Annual Fixed Costs
+total_annual_fixed_costs <- (electric_power + mooring_maintenance + diving_maintenance + office_rent + environmental_monitoring + boat_maintenance + dockage + insurance + feed_annual + juv_cost_annual)
+
+# Non-Amoratized One-time Costs
+one_time_fixed_costs_notdepreciated <- (farm_lease + project_development)
+
+# Amortized One-time Costs
+one_time_fixed_costs_depreciated <- (signaling_system + miscellaneous + boats + total_cage_cost + farm_installation) #### ONLY PART TO AMORTIZE - find out how to apply annuity
+
+
+ 
+
+#### REVISE? COME BACK TO!### Total capital costs year 1
 cap_cost_intial <- one_time_total + juv_cost_annual + annual_fixed_costs + feed_annual
 cap_cost_intial
 costs_fuel_wage <- overlay(annual_labor_cost_rast,
@@ -166,3 +164,31 @@ plot(total)
 freq(total)
 freq(costs_fuel_wage)
 ```
+
+
+
+Calculate Annuity Function
+```{r}
+
+# Define the discount rate
+risk_rho <- 1.17647 # Discount rate = 15%
+risk_discount <- (1-(1/risk_rho))
+risk_discount
+
+# Annuity Function
+annuity <- function(c, r = risk_discount, t = 10) {
+  a <- c/ ((1-(1+r)^-t)/r)
+  return(a)
+}
+
+a <- annuity(one_time_fixed_costs_depreciated)
+a(one_time_fixed_costs_depreciated)
+total_annuity <- a(one_time_fixed_costs_depreciated)
+total_annuity
+
+caio <- 100
+
+```
+
+
+
