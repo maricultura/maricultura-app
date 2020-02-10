@@ -769,7 +769,7 @@ server <- function(input, output) {
   # Render growth plot
   output$growthMap <- renderLeaflet({
     # Palette
-    pal_growth <- colorNumeric(c("#DAF7A6", "#C70039", "#581845"), values(weight_raster()),
+    pal_growth <- colorNumeric(c("#ffccff", "#330080"), values(weight_raster()),
                                na.color = "transparent")
     
     # Leaflet map
@@ -788,9 +788,10 @@ server <- function(input, output) {
         onClick=JS("function(btn, map){
                    map.setView([-14.0182737, -39.8789667]);
                    map.setZoom(4.6);}"))) %>%
+      addFullscreenControl() %>% 
       addLayersControl(
         baseGroups = c("Esri Gray Canvas (default)", "Open Street Map"),
-        overlayGroups = "Suitable Areas",
+        overlayGroups = "Growth Model",
         options = layersControlOptions(collapsed = TRUE),
         position = "topleft") %>% 
       addLegend("topright",
