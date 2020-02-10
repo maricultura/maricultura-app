@@ -224,6 +224,7 @@ npv <- ((profit_raster/((1-risk_discount)^1))) + ((profit_raster/((1-risk_discou
 
 plot(npv)
 
+writeRaster(npv,'npv.tif')
 ```
 
 

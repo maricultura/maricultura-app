@@ -761,7 +761,7 @@ server <- function(input, output) {
   )
   
   # Von Bertallanfy 
-  von_raster <- reactive(fish_selection()$Linf*(1 - exp((-1*12*(growth_raster()))*(1-fish_selection()$time0))))
+  von_raster <- reactive(fish_selection()$Linf*(1 - exp((-1*1*((growth_raster())))*(1-fish_selection()$time0))))
   
   #Allometric Ratio 
   weight_raster <- reactive((fish_selection()$a*von_raster()^fish_selection()$b)*0.001*261120)
