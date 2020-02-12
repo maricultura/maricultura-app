@@ -765,7 +765,7 @@ server <- function(input, output) {
   )
   
   # Von Bertallanfy 
-  von_raster <- reactive(fish_selection()$Linf*(1 - exp((-1*12*(growth_raster()))*(1-fish_selection()$time0))))
+  von_raster <- reactive(fish_selection()$Linf*(1 - exp((-1*1*((growth_raster())))*(1-fish_selection()$time0))))
   
   #Allometric Ratio 
   weight_raster <- reactive((fish_selection()$a*von_raster()^fish_selection()$b)*0.001*261120)
@@ -773,7 +773,7 @@ server <- function(input, output) {
   # Render growth plot
   output$growthMap <- renderLeaflet({
     # Palette
-    pal_growth <- colorNumeric(c("#DAF7A6", "#C70039", "#581845"), values(weight_raster()),
+    pal_growth <- colorNumeric(c("#ffccff", "#330080"), values(weight_raster()),
                                na.color = "transparent")
     
     # Leaflet map
@@ -792,9 +792,10 @@ server <- function(input, output) {
         onClick=JS("function(btn, map){
                    map.setView([-14.0182737, -39.8789667]);
                    map.setZoom(4.6);}"))) %>%
+      addFullscreenControl() %>% 
       addLayersControl(
         baseGroups = c("Esri Gray Canvas (default)", "Open Street Map"),
-        overlayGroups = "Suitable Areas",
+        overlayGroups = "Growth Model",
         options = layersControlOptions(collapsed = TRUE),
         position = "topleft") %>% 
       addLegend("topright",
