@@ -195,9 +195,15 @@ plot(cost_total)
 ```{r}
 
 # Create Costs of Suitable Raster
-suitable_raster <- raster("maricultura-app/data/cobia_suit.tif")
-plot(suitable_raster)
-suitable_raster_overlay <- reclassify(suitable_raster, cbind(0,NA))
+# Test
+#suitable_raster <- raster("maricultura-app/data/cobia_suit.tif")
+
+
+#plot(suitable_raster)
+
+
+# Make it reactive
+suitable_raster_overlay <- reclassify(suitable(), cbind(0,NA))
 
 cost_of_suitable <- mask(cost_total, suitable_raster_overlay)
 plot(cost_of_suitable)
