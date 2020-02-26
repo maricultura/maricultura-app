@@ -1,4 +1,4 @@
----
+--
 title: "econ"
 author: "Kirby Bartlett"
 date: "February 3, 2020"
@@ -82,7 +82,6 @@ workers_onshore <- 5
 # Determine Annual Fixed Wage Cost per Farm
 fixed_labor_cost <- full_time_workers*hourly_wage*annual_hours
 
-
 # Determine # of Annual Transit Hours
 annual_transit_hours <- (dist_shore_econ/vessel_speed)*one_way_trips_annual
 
@@ -139,9 +138,15 @@ dockage <- 20000 # for two boats (Costello)
 insurance <- 50000 # (Costello)
 juv_cost_annual <- (initial_stocking_density*farm_volume*fingerling_price) # yearly cost
  
+# Read in Biomass Raster
+biomass_rast <- raster("maricultura-app/data/cobia_biomass.tif")
+
+# Create Feed Raster
+feed_annual_rast <- (biomass_rast*feed_conversion_ratio*feed_price)
+plot(feed_annual_rast)
 
 # Non-Amortized Annual Fixed Costs
-total_annual_fixed_costs <- (electric_power + mooring_maintenance + diving_maintenance + office_rent + environmental_monitoring + boat_maintenance + dockage + insurance + feed_annual + juv_cost_annual)
+total_annual_fixed_costs <- (electric_power + mooring_maintenance + diving_maintenance + office_rent + environmental_monitoring + boat_maintenance + dockage + insurance + feed_annual_rast + juv_cost_annual)
 
 
 # Amortized One-time Costs
@@ -196,22 +201,22 @@ plot(cost_total)
 
 # Create Costs of Suitable Raster
 # Test
-#suitable_raster <- raster("maricultura-app/data/cobia_suit.tif")
+suitable_raster <- raster("maricultura-app/data/cobia_suit.tif")
 
 
 #plot(suitable_raster)
 
 
 # Make it reactive
-suitable_raster_overlay <- reclassify(suitable(), cbind(0,NA))
+#suitable_raster_overlay <- reclassify(suitable(), cbind(0,NA))
 
-cost_of_suitable <- mask(cost_total, suitable_raster_overlay)
+cost_of_suitable <- mask(cost_total, suitable_raster)
 plot(cost_of_suitable)
 
 
 
 # Create Revenue Raster
-biomass_rast <- raster("maricultura-app/data/cobia_biomass.tif")
+#biomass_rast <- raster("maricultura-app/data/cobia_biomass.tif") -> already read in above
 plot(biomass_rast)
 
 revenue_rast <- biomass_rast*12
@@ -230,7 +235,9 @@ npv <- ((profit_raster/((1-risk_discount)^1))) + ((profit_raster/((1-risk_discou
 
 plot(npv)
 
-writeRaster(npv,'npv.tif')
+writeRaster(npv,'npv.tif', overwrite = TRUE)
 ```
+
+
 
 

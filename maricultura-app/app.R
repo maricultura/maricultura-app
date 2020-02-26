@@ -212,7 +212,7 @@ ui <- fluidPage(
                                                             max = 10,
                                                             step = 1,
                                                             value = 3),
-                                               numericInput("numberofcages", label = h3("Number of Cages (6400m^3 each)"),
+                                              numericInput("numberofcages", label = h3("Number of Cages (6400m^3 each)"),
                                                             min = 1,
                                                             max = 32,
                                                             step = 1,
@@ -221,8 +221,8 @@ ui <- fluidPage(
                                                          title = "Desired farm size (max 32 SeaStation cages)",
                                                          placement = "right",
                                                          trigger = "hover",
-                                                         options = NULL),
-                                      )),
+                                                         options = NULL)
+                                  )),
                           actionButton("run_button_economics", label = "Run"),
                           downloadButton("download_button_economics", label = "Download")),
                         mainPanel(
@@ -778,9 +778,6 @@ server <- function(input, output) {
   
   
   cage_size <- 6400 #m^3
-  farm_size <- 16 #cages
-  farm_volume <- 102400 #m^3
-  
   full_time_workers <- 40
   monthly_hours <- 160 #hours/month per fulltime employee
   annual_hours <- (monthly_hours*12)
@@ -802,17 +799,8 @@ server <- function(input, output) {
   # Create raster for total annual wage costs
   total_annual_wage_costs <- transit_cost+fixed_labor_cost
   
-  
   # Farm Design
-  cage_number_per_farm <- 16
   cage_cost <- 312000
-  total_cage_cost <- cage_cost*cage_number_per_farm
-  weight_at_harvest <- 5 #user inputs (value is 5kg)
-  final_stocking_density <- 10 #user inputs (value is 10fish/m^3)
-  initial_stocking_density <- 3 #user inputs 3fish/m^3)
-  survival_rate <- .85 #note that this is species-specific
-  fingerling_price <- 1.50 #USD ****
-  optimal_feed <- 2350080 #kg per farm/grow out cycle total amount of feed
   time <- 12 #months, rotation period
   
   # One-time costs
@@ -846,8 +834,11 @@ server <- function(input, output) {
   # Create Feed Raster
   feed_annual_rast <- reactive(weight_raster()*feedconversionratio()*feedprice())
 
-  # Create Juvenile Cost Raster
+  # Create Juvenile Cost 
   juv_cost_annual <- reactive(stockingdensity()*(numberofcages()*cage_size)*fingerling_price())
+  
+  # Find Total Cage Cost
+  total_cage_cost <- reactive(cage_cost*numberofcages())
 
   
   # Non-Amortized Annual Fixed Costs
@@ -855,7 +846,7 @@ server <- function(input, output) {
   
   
   # Amortized One-time Costs
-  one_time_fixed_costs_depreciated <- (signaling_system + miscellaneous + boats + total_cage_cost + farm_installation + farm_lease + project_development)
+  one_time_fixed_costs_depreciated <- reactive(signaling_system + miscellaneous + boats + total_cage_cost() + farm_installation + farm_lease + project_development)
   
   risk_rho <- 1.17647 # Discount rate = 15%
   risk_discount <- (1-(1/risk_rho))
@@ -868,25 +859,81 @@ server <- function(input, output) {
   }
   
   # Find Amoritized Costs
-  amortized_costs <- annuity(one_time_fixed_costs_depreciated)
+  amortized_costs <- reactive(annuity(one_time_fixed_costs_depreciated()))
   
   # Find Total Costs
-  cost_total <- amortized_costs + total_annual_fixed_costs + annual_fuel_cost_econ + total_annual_wage_costs
+  cost_total <- reactive(amortized_costs() + total_annual_fixed_costs() + annual_fuel_cost_econ + total_annual_wage_costs)
   
   # Find Iost of Suitability Cells
-  cost_of_suitable <- mask(cost_total, suitable_raster)
+  cost_of_suitable <- reactive(mask(cost_total, suitable()))
   
   # Find Total Revenue
-  revenue_rast <- biomass_rast*12
+  revenue_rast <- reactive(weight_at_harvest()*12)
   
   # Find Profits
-  profit_raster <- revenue_rast-cost_of_suitable
+  profit_raster <- reactive(revenue_rast()-cost_of_suitable())
   
   # Find Net Present Value
-  npv <- ((profit_raster/((1-risk_discount)^1))) + ((profit_raster/((1-risk_discount)^2))) + ((profit_raster/((1-risk_discount)^3))) + ((profit_raster/((1 -risk_discount)^4))) + ((profit_raster/((1-risk_discount)^5))) + ((profit_raster/((1-risk_discount)^6))) + ((profit_raster/((1-risk_discount)^7))) + ((profit_raster/((1-risk_discount)^8))) + ((profit_raster/((1-risk_discount)^9))) + ((profit_raster/((1-risk_discount)^10)))
+  npv <- reactive((profit_raster()/((1-risk_discount)^1))) + ((profit_raster()/((1-risk_discount)^2))) + ((profit_raster()/((1-risk_discount)^3))) + ((profit_raster()/((1 -risk_discount)^4))) + ((profit_raster()/((1-risk_discount)^5))) + ((profit_raster()/((1-risk_discount)^6))) + ((profit_raster()/((1-risk_discount)^7))) + ((profit_raster()/((1-risk_discount)^8))) + ((profit_raster()/((1-risk_discount)^9))) + ((profit_raster()/((1-risk_discount)^10)))
   
   
-
+# Create an Ouput Map
+  
+  # Render economics plot
+  output$economics_map <- renderLeaflet({
+    # Palette
+    pal_econ <- colorNumeric(c("#DAF7A6", "#C70039", "#581845"), values(npv()),
+                               na.color = "transparent")
+    
+    # Leaflet map
+    leaflet(options = leafletOptions( zoomSnap = 0.2)) %>%
+      addTiles(group = "Open Street Map") %>%
+      addProviderTiles("Esri.WorldGrayCanvas", group = "Esri Gray Canvas (default)") %>%
+      addRasterImage(npv(),
+                     colors = pal_growth,
+                     group = "Economic Model") %>%
+      fitBounds(lng1 = -54.6903404, # sets initial view of map to fit coordinates
+                lng2 = -25.835314,
+                lat1 = 6.3071255,
+                lat2 = -35.8573806) %>% 
+      addEasyButton(easyButton(
+        icon="fa-globe", title="Reset View", # button to reset to initial view
+        onClick=JS("function(btn, map){
+                   map.setView([-14.0182737, -39.8789667]);
+                   map.setZoom(4.6);}"))) %>%
+      addLayersControl(
+        baseGroups = c("Esri Gray Canvas (default)", "Open Street Map"),
+        overlayGroups = "Suitable Areas",
+        options = layersControlOptions(collapsed = TRUE),
+        position = "topleft") %>% 
+      addLegend("topright",
+                pal = pal_growth,
+                values = values(npv()),
+                title = "Net Present Value ($USD/10 Years)") %>% 
+      addMouseCoordinates()
+    
+  }
+  )
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
 }
 # Run the application 
