@@ -775,7 +775,7 @@ server <- function(input, output) {
   # Create raster for all fuel costs:
   annual_fuel_cost_econ <- (dist_shore/vessel_speed)*fuel_consumption*diesel_price*one_way_trips_annual
   
-  
+
   cage_size <- 6400 #m^3
   full_time_workers <- 40
   monthly_hours <- 160 #hours/month per fulltime employee
@@ -834,7 +834,7 @@ server <- function(input, output) {
   feed_annual_rast <- reactive(weight_raster()*feedconversionratio()*feedprice())
 
   # Create Juvenile Cost 
-  juv_cost_annual <- reactive(stockingdensity()*(numberofcages()*cage_size)*fingerling_price())
+  juv_cost_annual <- reactive(stockingdensity()*(numberofcages()*cage_size)*fingerlingprice())
   
   # Find Total Cage Cost
   total_cage_cost <- reactive(cage_cost*numberofcages())
@@ -852,13 +852,13 @@ server <- function(input, output) {
   risk_discount
   
   # Annuity Function
-  annuity <- reactive(function(c, r = risk_discount, t = 10) {
+  annuity <- (function(c, r = risk_discount, t = 10) {
     a <- c/ ((1-(1+r)^-t)/r)
     return(a)
   })
   
   # Find Amoritized Costs
-  amortized_costs <- reactive(annuity()(one_time_fixed_costs_depreciated()))
+  amortized_costs <- reactive(annuity(one_time_fixed_costs_depreciated()))
   
   # Find Total Costs
   cost_total <- reactive(amortized_costs() + total_annual_fixed_costs() + annual_fuel_cost_econ + total_annual_wage_costs)
@@ -906,7 +906,7 @@ server <- function(input, output) {
         options = layersControlOptions(collapsed = TRUE),
         position = "topleft") %>% 
       addLegend("topright",
-                pal = pal_growth,
+                pal = pal_econ,
                 values = values(npv()),
                 title = "Net Present Value ($USD/10 Years)") %>% 
       addMouseCoordinates()
