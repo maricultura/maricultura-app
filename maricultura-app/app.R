@@ -763,7 +763,6 @@ server <- function(input, output) {
   
   # ECONOMICS
   num_farms <- 1 # number of farms per 9.2x9.2 km cell, most conservative estimate of 16 cages per/farm (per cell)
-  
   fuel_consumption <- 26.96 #L/hour
   vessel_speed <- 15000 #average speed in m/hr
   diesel_price <- 0.92 #USD/L using 2020 exchange rate 1 usd = 4 reais
@@ -865,7 +864,7 @@ server <- function(input, output) {
   cost_total <- reactive(amortized_costs() + total_annual_fixed_costs() + annual_fuel_cost_econ + total_annual_wage_costs)
   
   # Find Iost of Suitability Cells
-  cost_of_suitable <- reactive(mask(cost_total, suitable()))
+  cost_of_suitable <- reactive(mask(cost_total(), suitable()))
   
   # Find Total Revenue
   revenue_rast <- reactive(weight_at_harvest()*12)
