@@ -852,25 +852,25 @@ server <- function(input, output) {
   risk_discount
   
   # Annuity Function
-  annuity <- function(c, r = risk_discount, t = 10) {
+  annuity <- reactive(function(c, r = risk_discount, t = 10) {
     a <- c/ ((1-(1+r)^-t)/r)
     return(a)
-  }
+  })
   
   # Find Amoritized Costs
-  amortized_costs <- reactive(annuity(one_time_fixed_costs_depreciated()))
+  amortized_costs <- reactive(annuity()(one_time_fixed_costs_depreciated()))
   
   # Find Total Costs
   cost_total <- reactive(amortized_costs() + total_annual_fixed_costs() + annual_fuel_cost_econ + total_annual_wage_costs)
   
   # Find Iost of Suitability Cells
-  cost_of_suitable <- reactive(mask(cost_total(), suitable()))
+#  cost_of_suitable <- reactive(mask(cost_total(), suitable()))
   
   # Find Total Revenue
   revenue_rast <- reactive(weight_at_harvest()*12)
   
   # Find Profits
-  profit_raster <- reactive(revenue_rast()-cost_of_suitable())
+  profit_raster <- reactive(revenue_rast()-cost_total())
   
   # Find Net Present Value
   npv <- reactive((profit_raster()/((1-risk_discount)^1))) + ((profit_raster()/((1-risk_discount)^2))) + ((profit_raster()/((1-risk_discount)^3))) + ((profit_raster()/((1 -risk_discount)^4))) + ((profit_raster()/((1-risk_discount)^5))) + ((profit_raster()/((1-risk_discount)^6))) + ((profit_raster()/((1-risk_discount)^7))) + ((profit_raster()/((1-risk_discount)^8))) + ((profit_raster()/((1-risk_discount)^9))) + ((profit_raster()/((1-risk_discount)^10)))
@@ -889,7 +889,7 @@ server <- function(input, output) {
       addTiles(group = "Open Street Map") %>%
       addProviderTiles("Esri.WorldGrayCanvas", group = "Esri Gray Canvas (default)") %>%
       addRasterImage(npv(),
-                     colors = pal_growth,
+                     colors = pal_econ,
                      group = "Economic Model") %>%
       fitBounds(lng1 = -54.6903404, # sets initial view of map to fit coordinates
                 lng2 = -25.835314,
