@@ -774,7 +774,7 @@ server <- function(input, output) {
   one_way_trips_annual <- 2*trips_annual # (we have to double the roundtrips because we need to take into account that distance traveled happens TWICE for every round trip)
   
   # Create raster for all fuel costs:
-  annual_fuel_cost_econ <- (dist_shore_econ/vessel_speed)*fuel_consumption*diesel_price*one_way_trips_annual
+  annual_fuel_cost_econ <- (dist_shore/vessel_speed)*fuel_consumption*diesel_price*one_way_trips_annual
   
   
   cage_size <- 6400 #m^3
