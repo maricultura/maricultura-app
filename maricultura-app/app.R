@@ -878,44 +878,7 @@ server <- function(input, output) {
   
 # Create an Ouput Map
   
-  # Render economics plot
-  output$economics_map <- renderLeaflet({
-    # Palette
-    pal_econ <- colorNumeric(c("#DAF7A6", "#C70039", "#581845"), values(npv()),
-                               na.color = "transparent")
-    
-    # Leaflet map
-    leaflet(options = leafletOptions( zoomSnap = 0.2)) %>%
-      addTiles(group = "Open Street Map") %>%
-      addProviderTiles("Esri.WorldGrayCanvas", group = "Esri Gray Canvas (default)") %>%
-      addRasterImage(npv(),
-                     colors = pal_econ,
-                     group = "Economic Model") %>%
-      fitBounds(lng1 = -54.6903404, # sets initial view of map to fit coordinates
-                lng2 = -25.835314,
-                lat1 = 6.3071255,
-                lat2 = -35.8573806) %>% 
-      addEasyButton(easyButton(
-        icon="fa-globe", title="Reset View", # button to reset to initial view
-        onClick=JS("function(btn, map){
-                   map.setView([-14.0182737, -39.8789667]);
-                   map.setZoom(4.6);}"))) %>%
-      addLayersControl(
-        baseGroups = c("Esri Gray Canvas (default)", "Open Street Map"),
-        overlayGroups = "Suitable Areas",
-        options = layersControlOptions(collapsed = TRUE),
-        position = "topleft") %>% 
-      addLegend("topright",
-                pal = pal_econ,
-                values = values(npv()),
-                title = "Net Present Value ($USD/10 Years)") %>% 
-      addMouseCoordinates()
-    
-  }
-  )
-  
-  
-  
+ 
   
   
   
