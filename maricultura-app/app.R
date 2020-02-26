@@ -1,5 +1,4 @@
 # Load required libraries
-
 library(shiny)
 library(shinythemes)
 library(tidyverse)
@@ -17,12 +16,9 @@ library(plotly)
 library(shinyEventLogger) # Are we using this package?
 library(leaflet.extras)
 library(shinyjs)
-
 # Source scripts
 source("scripts/html.R")
-
 #Species Dataframe 
-
 # Data frame with coefficients for different species
 species <- c("Atlantic salmon", "Gilthead seabream", "Rachycentron
 canadum")
@@ -35,16 +31,9 @@ Linf <- c(54.7, 140, 133.3)
 time0 <- c(0, 0, -0.13)
 a <- c(0, 0, 0.00479)
 b <- c(0, 0, 3.11)
-
 species_df <- data.frame(species, a1, a2, b1, b2, T0, Linf, time0, a, b)
-
-
-
-
-
 # Set logging for history
 set_logging()
-
 # Define UI for application
 ui <- fluidPage(
   
@@ -183,7 +172,7 @@ ui <- fluidPage(
                                                                 HTML('<span>Atlantic salmon (<i>Salmo salar</i>)<br><img src="atlantic_salmon.png" alt=“image of salmon“ height="100px"/></span>'),
                                                                 HTML('<span>gilthead seabream (<i>Sparus aurata</i>)<br><br><img src="seabream.png" alt=“image of salmon“ height="70px"/></span>'),
                                                                 HTML('<span>cobia (<i>Rachycentron canadum</i>)<br><img src="cobia.png" alt=“image of salmon“  height="100px"/></span>')
-                                                                ),
+                                                              ),
                                                               choiceValues = unique(species_df$species)) # Radio buttons sourced from scripts/html.R
                                        )),
                            actionButton("run_button_growth", label = "Run"),
@@ -202,7 +191,7 @@ ui <- fluidPage(
                                                            choices = list("1" = 1, "2" = 2, "3" = 3, "4" = 4, "5" = 5),
                                                            selected = 1
                                                ),
-                                               numericInput("stockingdensity", label = h3("<h5>Stocking Density (fish/m<sup>3</sup>)</h5>"),
+                                               numericInput("stockingdensity", label = h3("Stocking Density (fish/m^3"),
                                                             min = 1,
                                                             max = 50,
                                                             step = 1,
@@ -222,7 +211,7 @@ ui <- fluidPage(
                                                            max = 5000.00,
                                                            step = 100.00,
                                                            value = 500.00),
-                                               numericInput("numberofcages", label = h3("<h5>Number of Cages (6400m<sup>3</sup>)</h5>"),
+                                               numericInput("numberofcages", label = h3("Number of Cages (6400m^3 each)"),
                                                             min = 1,
                                                             max = 32,
                                                             step = 1,
@@ -239,10 +228,10 @@ ui <- fluidPage(
                           leafletOutput("economics_map", height = "100vh")
                         )
                       )),
-            
-            
-              
-              # Fifth Tab
+             
+             
+             
+             # Fifth Tab
              tabPanel(HTML('<div><i class="fa fa-calculator"></i> Area Calculator</div>'),
                       fluidRow(
                         column(12,
@@ -296,8 +285,7 @@ ui <- fluidPage(
                    br(),
                    "R version 3.6.1 (2019-07-05). Code on  ", tags$a(href ="https://github.com/annagaby/tree-monitoring", target="_blank", icon("github"),"GitHub."))
   )
-  )
-
+)
 ##########################################################################################
 # Define server logic 
 ##########################################################################################
@@ -356,9 +344,9 @@ server <- function(input, output) {
   
   # Reclassification matrix for depth layer that makes unsuitable cells 1, suitable 2, and NAs 0
   rcl_mat_depth <- reactive(c(-Inf, max_depth(), 1,
-                     max_depth(), min_depth(), 2,
-                     min_depth(), 0, 1,
-                     0, Inf, 0))
+                              max_depth(), min_depth(), 2,
+                              min_depth(), 0, 1,
+                              0, Inf, 0))
   
   # Reclassify the depth layer
   depth_binary_1 <- reactive(reclassify(depth_mask,rcl= rcl_mat_depth()))
@@ -696,7 +684,7 @@ server <- function(input, output) {
         hjust = 1
       )
   )
- 
+  
   ### Download suitability map  ###
   output$download_button <- downloadHandler(
     
@@ -740,7 +728,6 @@ server <- function(input, output) {
     species_df %>% 
       filter(species == input$selectSpecies)
   })  
-
   
   # Separete cells into cells above and below optimal SST
   cells_below_optimal <- reactive(
@@ -765,6 +752,7 @@ server <- function(input, output) {
   )
   
   # Von Bertallanfy 
+  von_raster <- reactive(fish_selection()$Linf*(1 - exp((-1*12*(growth_raster()))*(1-fish_selection()$time0))))
   von_raster <- reactive(fish_selection()$Linf*(1 - exp((-1*1*((growth_raster())))*(1-fish_selection()$time0))))
   
   #Allometric Ratio 
@@ -773,7 +761,7 @@ server <- function(input, output) {
   # Render growth plot
   output$growthMap <- renderLeaflet({
     # Palette
-    pal_growth <- colorNumeric(c("#ffccff", "#330080"), values(weight_raster()),
+    pal_growth <- colorNumeric(c("#DAF7A6", "#C70039", "#581845"), values(weight_raster()),
                                na.color = "transparent")
     
     # Leaflet map
@@ -792,10 +780,9 @@ server <- function(input, output) {
         onClick=JS("function(btn, map){
                    map.setView([-14.0182737, -39.8789667]);
                    map.setZoom(4.6);}"))) %>%
-      addFullscreenControl() %>% 
       addLayersControl(
         baseGroups = c("Esri Gray Canvas (default)", "Open Street Map"),
-        overlayGroups = "Growth Model",
+        overlayGroups = "Suitable Areas",
         options = layersControlOptions(collapsed = TRUE),
         position = "topleft") %>% 
       addLegend("topright",
@@ -804,10 +791,9 @@ server <- function(input, output) {
                 title = "Fish Biomass (kg/cell)") %>% 
       addMouseCoordinates()
     
-    }
-      )
+  }
+  )
   
-
   
   
   ### Download growth map
@@ -821,91 +807,6 @@ server <- function(input, output) {
       
       
     })
-  
-  ########
-  #Economics
-  
-  ################
-  #ECONOMICS
-  suitable_raster_overlay <- reclassify(suitable(), cbind(0,NA))
-  
-  cost_of_suitable <- mask(cost_total, suitable_raster_overlay())
-  #plot(cost_of_suitable)
-  
-
-  revenue_rast <- growthMap()*12
-  #plot(revenue_rast)
-  
-  
-  
-  # Create Profit Raster
-  profit_raster <- revenue_rast()-cost_of_suitable()
-  
-  #plot(profit_raster)
-  
-  
-  # Create NPV raster
-  npv <- ((profit_raster()/((1-risk_discount)^1))) + ((profit_raster()/((1-risk_discount)^2))) + ((profit_raster()/((1-risk_discount)^3))) + ((profit_raster()/((1-risk_discount)^4))) + ((profit_raster()/((1-risk_discount)^5))) + ((profit_raster()/((1-risk_discount)^6))) + ((profit_raster()/((1-risk_discount)^7))) + ((profit_raster()/((1-risk_discount)^8))) + ((profit_raster()/((1-risk_discount)^9))) + ((profit_raster()/((1-risk_discount)^10)))
-  
-  #plot(npv)
-  
-  
-  
-  
-  
-  # Render economic plot
-  output$economics_map <- renderLeaflet({
-    # Palette
-    pal_econ <- colorNumeric(c("#DAF7A6", "#C70039", "#581845"), values(npv()),
-                               na.color = "transparent")
-    
-    # Leaflet map
-    leaflet(options = leafletOptions( zoomSnap = 0.2)) %>%
-      addTiles(group = "Open Street Map") %>%
-      addProviderTiles("Esri.WorldGrayCanvas", group = "Esri Gray Canvas (default)") %>%
-      addRasterImage(npv(),
-                     colors = pal_growth,
-                     group = "Economics Model") %>%
-      fitBounds(lng1 = -54.6903404, # sets initial view of map to fit coordinates
-                lng2 = -25.835314,
-                lat1 = 6.3071255,
-                lat2 = -35.8573806) %>% 
-      addEasyButton(easyButton(
-        icon="fa-globe", title="Reset View", # button to reset to initial view
-        onClick=JS("function(btn, map){
-                   map.setView([-14.0182737, -39.8789667]);
-                   map.setZoom(4.6);}"))) %>%
-      addLayersControl(
-        baseGroups = c("Esri Gray Canvas (default)", "Open Street Map"),
-        overlayGroups = "Economics Model",
-        options = layersControlOptions(collapsed = TRUE),
-        position = "topleft") %>% 
-      addLegend("topright",
-                pal = pal_econ,
-                values = values(npv()),
-                title = "Net Present Value ($USD)") %>% 
-      addMouseCoordinates()
-    
-  }
-  )
-  
-  
-  
-  
-  ### Download growth map
-  output$download_button_economics <- downloadHandler(
-    
-    filename = function() {
-      "economics_map.tif"
-    },
-    content = function(file) {
-      writeRaster(npv(), file)
-      
-      
-    })
-  
-  
-  
   
   header <- c("Input", "Value", "Unit")
   sst_table <- reactive(c("SST", paste0(input$sst_slider[1], "-" , input$sst_slider[2]), "°C"))
@@ -935,12 +836,5 @@ server <- function(input, output) {
   
   
 }
-
-
-
-
-
-
-
 # Run the application 
 shinyApp(ui = ui, server = server)
