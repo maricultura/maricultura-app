@@ -207,7 +207,7 @@ ui <- fluidPage(
                                                            max = 5000.00,
                                                            step = 100.00,
                                                            value = 500.00),
-                                               numericInput("feedconversionratio"), label = h3("Feed Conversion Ratio"),
+                                               numericInput("feedconversionratio", label = h3("Feed Conversion Ratio"),
                                                             min = 1,
                                                             max = 10,
                                                             step = 1,
