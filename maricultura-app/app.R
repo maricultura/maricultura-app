@@ -752,6 +752,18 @@ server <- function(input, output) {
   observeEvent(input$nextBtn, navPage(1))
   
   
+  
+  
+  
+  
+  
+  
+  
+  
+  # ECONOMICS
+  
+  npv_app_raster
+  
 }
 # Run the application 
 shinyApp(ui = ui, server = server)
