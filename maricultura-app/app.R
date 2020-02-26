@@ -847,9 +847,10 @@ server <- function(input, output) {
   # Amortized One-time Costs
   one_time_fixed_costs_depreciated <- reactive(signaling_system + miscellaneous + boats + total_cage_cost() + farm_installation + farm_lease + project_development)
   
+  
   risk_rho <- 1.17647 # Discount rate = 15%
   risk_discount <- (1-(1/risk_rho))
-  risk_discount
+  
   
   # Annuity Function
   annuity <- (function(c, r = risk_discount, t = 10) {
@@ -864,30 +865,56 @@ server <- function(input, output) {
   cost_total <- reactive(amortized_costs() + total_annual_fixed_costs() + annual_fuel_cost_econ + total_annual_wage_costs)
   
   # Find Iost of Suitability Cells
-#  cost_of_suitable <- reactive(mask(cost_total(), suitable()))
+  #  cost_of_suitable <- reactive(mask(cost_total(), suitable()))
   
   # Find Total Revenue
-  revenue_rast <- reactive(weight_at_harvest()*12)
+  revenue_rast <- reactive(weight_raster()*12)
+ 
   
   # Find Profits
   profit_raster <- reactive(revenue_rast()-cost_total())
   
   # Find Net Present Value
-  npv <- reactive((profit_raster()/((1-risk_discount)^1))) + ((profit_raster()/((1-risk_discount)^2))) + ((profit_raster()/((1-risk_discount)^3))) + ((profit_raster()/((1 -risk_discount)^4))) + ((profit_raster()/((1-risk_discount)^5))) + ((profit_raster()/((1-risk_discount)^6))) + ((profit_raster()/((1-risk_discount)^7))) + ((profit_raster()/((1-risk_discount)^8))) + ((profit_raster()/((1-risk_discount)^9))) + ((profit_raster()/((1-risk_discount)^10)))
+  npv <- reactive(((profit_raster()/((1-risk_discount)^1))) + ((profit_raster()/((1-risk_discount)^2))) + ((profit_raster()/((1-risk_discount)^3))) + ((profit_raster()/((1-risk_discount)^4))) + ((profit_raster()/((1-risk_discount)^5))) + ((profit_raster()/((1-risk_discount)^6))) + ((profit_raster()/((1-risk_discount)^7))) + ((profit_raster()/((1-risk_discount)^8))) + ((profit_raster()/((1-risk_discount)^9))) + ((profit_raster()/((1-risk_discount)^10))))
   
   
-# Create an Ouput Map
+  # Create an Ouput Map
   
- 
-  
-  
-  
-  
-  
-  
-  
-  
-  
+  # Render economics plot
+  output$economics_map <- renderLeaflet({
+    # Palette
+    pal_econ <- colorNumeric(c("#DAF7A6", "#C70039", "#581845"), values(npv()),
+                             na.color = "transparent")
+    
+    # Leaflet map
+    leaflet(options = leafletOptions( zoomSnap = 0.2)) %>%
+      addTiles(group = "Open Street Map") %>%
+      addProviderTiles("Esri.WorldGrayCanvas", group = "Esri Gray Canvas (default)") %>%
+      addRasterImage(npv(),
+                     colors = pal_econ,
+                     group = "Economic Model") %>%
+      fitBounds(lng1 = -54.6903404, # sets initial view of map to fit coordinates
+                lng2 = -25.835314,
+                lat1 = 6.3071255,
+                lat2 = -35.8573806) %>% 
+      addEasyButton(easyButton(
+        icon="fa-globe", title="Reset View", # button to reset to initial view
+        onClick=JS("function(btn, map){
+                   map.setView([-14.0182737, -39.8789667]);
+                   map.setZoom(4.6);}"))) %>%
+      addLayersControl(
+        baseGroups = c("Esri Gray Canvas (default)", "Open Street Map"),
+        overlayGroups = "Suitable Areas",
+        options = layersControlOptions(collapsed = TRUE),
+        position = "topleft") %>% 
+      addLegend("topright",
+                pal = pal_econ,
+                values = values(npv()),
+                title = "Net Present Value ($USD/10 Years)") %>% 
+      addMouseCoordinates()
+    
+  }
+  )
   
   
   
