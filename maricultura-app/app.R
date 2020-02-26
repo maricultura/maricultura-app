@@ -187,11 +187,7 @@ ui <- fluidPage(
                         sidebarPanel(
                           tabsetPanel(type = "tabs",
                                       tabPanel("Economic Factors",
-                                               selectInput("sizetoharvest", label = h3("Size at Harvest (kg)"),
-                                                           choices = list("1" = 1, "2" = 2, "3" = 3, "4" = 4, "5" = 5),
-                                                           selected = 1
-                                               ),
-                                               numericInput("stockingdensity", label = HTML("<h3>Stocking Density (fish/m<sup>3</sup>)<h3>"),
+                                               numericInput("stockingdensity", label = h3("Stocking Density (fish/m^3"),
                                                             min = 1,
                                                             max = 50,
                                                             step = 1,
@@ -201,17 +197,22 @@ ui <- fluidPage(
                                                          placement = "right",
                                                          trigger = "hover",
                                                          options = NULL),
-                                               sliderInput("fingerlingprice", label = h3("Fingerling Price ($USD/fish)"),
+                                               numericInput("fingerlingprice", label = h3("Fingerling Price ($USD/fish)"),
                                                            min = .10,
                                                            max = 10.00,
                                                            step = .10,
                                                            value = 1.50),
-                                               sliderInput("feedprice", label = h3("Feed Price ($USD/kg)"),
+                                               numericInput("feedprice", label = h3("Feed Price ($USD/kg)"),
                                                            min = 100.00,
                                                            max = 5000.00,
                                                            step = 100.00,
                                                            value = 500.00),
-                                               numericInput("numberofcages", label = HTML("<h3>Number of Cages (6400m<sup>3</sup> each)</h3>"),
+                                               numericInput("feedconversionratio"), label = h3("Feed Conversion Ratio"),
+                                                            min = 1,
+                                                            max = 10,
+                                                            step = 1,
+                                                            value = 3),
+                                               numericInput("numberofcages", label = h3("Number of Cages (6400m^3 each)"),
                                                             min = 1,
                                                             max = 32,
                                                             step = 1,
@@ -761,8 +762,131 @@ server <- function(input, output) {
   
   
   # ECONOMICS
+  num_farms <- 1 # number of farms per 9.2x9.2 km cell, most conservative estimate of 16 cages per/farm (per cell)
   
-  npv_app_raster
+  fuel_consumption <- 26.96 #L/hour
+  vessel_speed <- 15000 #average speed in m/hr
+  diesel_price <- 0.92 #USD/L using 2020 exchange rate 1 usd = 4 reais
+  distance_to_port <- 25 #depend on cell
+  num_of_boats <- 2
+  
+  trips_annual <- 416 # roundtrips per farm per year, for 2 boats (1 boat @ 5 trips/week, 1 @ 8 trips per week, and 52 weeks a year)
+  one_way_trips_annual <- 2*trips_annual # (we have to double the roundtrips because we need to take into account that distance traveled happens TWICE for every round trip)
+  
+  # Create raster for all fuel costs:
+  annual_fuel_cost_econ <- (dist_shore_econ/vessel_speed)*fuel_consumption*diesel_price*one_way_trips_annual
+  
+  
+  cage_size <- 6400 #m^3
+  farm_size <- 16 #cages
+  farm_volume <- 102400 #m^3
+  
+  full_time_workers <- 40
+  monthly_hours <- 160 #hours/month per fulltime employee
+  annual_hours <- (monthly_hours*12)
+  num_of_employees <-  ##/farm
+    hourly_wage <- 4.50 #USD/hour average
+  work_days_per_month <- 20
+  workers_offshore <- 35
+  workers_onshore <- 5
+  
+  # Determine Annual Fixed Wage Cost per Farm
+  fixed_labor_cost <- full_time_workers*hourly_wage*annual_hours
+  
+  # Determine # of Annual Transit Hours
+  annual_transit_hours <- (dist_shore/vessel_speed)*one_way_trips_annual
+  
+  # Determine Annual Wage Cost for Transit Hours Per Farm
+  transit_cost <- workers_offshore*annual_transit_hours*hourly_wage
+  
+  # Create raster for total annual wage costs
+  total_annual_wage_costs <- transit_cost+fixed_labor_cost
+  
+  
+  # Farm Design
+  cage_number_per_farm <- 16
+  cage_cost <- 312000
+  total_cage_cost <- cage_cost*cage_number_per_farm
+  weight_at_harvest <- 5 #user inputs (value is 5kg)
+  final_stocking_density <- 10 #user inputs (value is 10fish/m^3)
+  initial_stocking_density <- 3 #user inputs 3fish/m^3)
+  survival_rate <- .85 #note that this is species-specific
+  fingerling_price <- 1.50 #USD ****
+  optimal_feed <- 2350080 #kg per farm/grow out cycle total amount of feed
+  time <- 12 #months, rotation period
+  
+  # One-time costs
+  farm_installation <- 139555 # (Bezerra)
+  farm_lease <- 8668.74 # one-time lease (Bezerra)
+  signaling_system <- 28021.40 # one-time system installation (Bezerra)
+  project_development <- 53403.69 #project development (Bezerra)
+  miscellaneous <- 123685.54 # one time (Bezerra)
+  boats <- 420376.85 #for 3 boats, one time, 1 * 16m, 2* 7m (Bezerra)
+  
+  # Annual fixed costs
+  electric_power <- 3661.32 # (Bezerra)
+  mooring_maintenance <- 53191.29 # (Bezerra)
+  diving_maintenance <- 8427.13 # (Bezerra)
+  office_rent <- 36626.43 # (Bezerra)
+  environmental_monitoring <- 45781.04 # (Bezerra)
+  boat_maintenance <- 30000 # for two boats (Costello)
+  dockage <- 20000 # for two boats (Costello)
+  insurance <- 50000 # (Costello)
+
+  
+ 
+  feedprice <- reactive(input$feedprice)
+  feedconversionratio <- reactive(input$feedconversionratio)
+  stockingdensity <- reactive(input$stockingdensity)
+  numberofcages <- reactive(input$numberofcages)
+  fingerlingprice <- reactive(input$fingerlingprice)
+
+  
+   
+  # Create Feed Raster
+  feed_annual_rast <- reactive(weight_raster()*feedconversionratio()*feedprice())
+
+  # Create Juvenile Cost Raster
+  juv_cost_annual <- reactive(stockingdensity()*(numberofcages()*cage_size)*fingerling_price())
+
+  
+  # Non-Amortized Annual Fixed Costs
+  total_annual_fixed_costs <- reactive(electric_power + mooring_maintenance + diving_maintenance + office_rent + environmental_monitoring + boat_maintenance + dockage + insurance + feed_annual_rast() + juv_cost_annual())
+  
+  
+  # Amortized One-time Costs
+  one_time_fixed_costs_depreciated <- (signaling_system + miscellaneous + boats + total_cage_cost + farm_installation + farm_lease + project_development)
+  
+  risk_rho <- 1.17647 # Discount rate = 15%
+  risk_discount <- (1-(1/risk_rho))
+  risk_discount
+  
+  # Annuity Function
+  annuity <- function(c, r = risk_discount, t = 10) {
+    a <- c/ ((1-(1+r)^-t)/r)
+    return(a)
+  }
+  
+  # Find Amoritized Costs
+  amortized_costs <- annuity(one_time_fixed_costs_depreciated)
+  
+  # Find Total Costs
+  cost_total <- amortized_costs + total_annual_fixed_costs + annual_fuel_cost_econ + total_annual_wage_costs
+  
+  # Find Iost of Suitability Cells
+  cost_of_suitable <- mask(cost_total, suitable_raster)
+  
+  # Find Total Revenue
+  revenue_rast <- biomass_rast*12
+  
+  # Find Profits
+  profit_raster <- revenue_rast-cost_of_suitable
+  
+  # Find Net Present Value
+  npv <- ((profit_raster/((1-risk_discount)^1))) + ((profit_raster/((1-risk_discount)^2))) + ((profit_raster/((1-risk_discount)^3))) + ((profit_raster/((1 -risk_discount)^4))) + ((profit_raster/((1-risk_discount)^5))) + ((profit_raster/((1-risk_discount)^6))) + ((profit_raster/((1-risk_discount)^7))) + ((profit_raster/((1-risk_discount)^8))) + ((profit_raster/((1-risk_discount)^9))) + ((profit_raster/((1-risk_discount)^10)))
+  
+  
+
   
 }
 # Run the application 
