@@ -236,15 +236,6 @@ ui <- fluidPage(
                       fluidRow(
                         column(12,
                                plotlyOutput("barPlot"))
-                      ),
-                      fluidRow(
-                        column(12,
-                               tags$h3("Percentage of EEZ excluded"),
-                               tabsetPanel(type = "tabs",
-                                           id = "area_tabs",
-                                           selected = "Run 1"
-                                           
-                               ))
                       )),
              
              # Sixth Tab
@@ -610,80 +601,6 @@ server <- function(input, output) {
     )
   )
   
-  ### Second Bar Graph ### 
-  
-  # Create bar graph after clicking run button
-  observeEvent(input$run_button, {
-    if ( input$run_button == 1) {
-      prependTab(
-        inputId = "area_tabs",
-        tabPanel( "Run 1", 
-                  plotOutput("excludedPlot"))
-      )
-    } else {
-      insertTab(inputId = "area_tabs",
-                tabPanel(run_number(),
-                         plotOutput("excludedPlot"),
-                         target = paste0("Run ", input$run_button-1)
-                ))
-    }
-  })
-  
-  # Create vector with input names
-  input_names <- c("Min SST",
-                   "Max SST",
-                   "Depth",
-                   "Current Velocity",
-                   "Distance to Shore",
-                   "Dissolved Oxygen",
-                   "MPAs",
-                   "Reefs",
-                   "Artificial Reefs",
-                   "Oil Pipelines",
-                   "Oil Production",
-                   "Shipping Lanes")
-  
-  
-  # Create vector with number of 0 cells in each binary raster
-  freq_0 <- reactive(c(
-    freq(sst_binary_min(), value = 0),
-    freq(sst_binary_max(), value = 0),
-    freq(depth_binary(), value = 0),
-    freq(current_binary(), value = 0),
-    freq(dist_shore_binary(), value = 0),
-    freq(DO_min_binary(), value = 0),
-    freq(mpas_binary(), value = 0),
-    freq(reefs_binary(), value = 0),
-    freq(reefs_artificial_binary(), value = 0),
-    freq(og_pipeline_binary(), value = 0),
-    freq(og_production_binary(), value = 0),
-    freq(shipping_lanes_binary(), value = 0)
-  ))
-  
-  # Create df with layer names, frequency of 0 cells, and percentage of excluded area
-  area_df <- reactive(
-    data.frame(input_names, freq_0()) %>% 
-      mutate(percent_excluded = round(freq_0()*100/30959, digits = 2)) %>% 
-      arrange(percent_excluded) %>% 
-      mutate( input_names = factor(input_names, levels = input_names))
-  )
-  
-  # Render excluded areas plot
-  output$excludedPlot <- renderPlot(
-    ggplot(area_df(), aes(x = input_names, y = percent_excluded)) +
-      geom_col(fill = "darkturquoise") +
-      coord_flip() +
-      ylab("Percentage of EEZ Excluded") +
-      xlab("") +
-      scale_y_continuous( expand = c(0,0)) +
-      theme_classic(14) +
-      geom_text(
-        aes(label = paste0(percent_excluded,"%"), y = percent_excluded + 15), 
-        color = "black", 
-        size = 5,
-        hjust = 1
-      )
-  )
   
   ### Download suitability map  ###
   output$download_button <- downloadHandler(
