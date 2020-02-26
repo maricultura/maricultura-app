@@ -191,7 +191,7 @@ ui <- fluidPage(
                                                            choices = list("1" = 1, "2" = 2, "3" = 3, "4" = 4, "5" = 5),
                                                            selected = 1
                                                ),
-                                               numericInput("stockingdensity", label = h3("Stocking Density (fish/m^3"),
+                                               numericInput("stockingdensity", label = HTML("<h3>Stocking Density (fish/m<sup>3</sup>)<h3>"),
                                                             min = 1,
                                                             max = 50,
                                                             step = 1,
@@ -211,7 +211,7 @@ ui <- fluidPage(
                                                            max = 5000.00,
                                                            step = 100.00,
                                                            value = 500.00),
-                                               numericInput("numberofcages", label = h3("Number of Cages (6400m^3 each)"),
+                                               numericInput("numberofcages", label = HTML("<h3>Number of Cages (6400m<sup>3</sup> each)</h3>"),
                                                             min = 1,
                                                             max = 32,
                                                             step = 1,
