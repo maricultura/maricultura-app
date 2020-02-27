@@ -187,13 +187,13 @@ ui <- fluidPage(
                         sidebarPanel(
                           tabsetPanel(type = "tabs",
                                       tabPanel("Economic Factors",
-                                               numericInput("stockingdensity", label = h3("Stocking Density (fish/m^3"),
+                                               numericInput("stockingdensity", label = h3("Initial Stocking Density (fish/m^3"),
                                                             min = 1,
                                                             max = 50,
                                                             step = 1,
-                                                            value = 10), 
+                                                            value = 3), 
                                                bsTooltip(id = "stockingdensity",
-                                                         title = "Desired density of adult fish at time of harvest (max 50)",
+                                                         title = "Desired density of fingerlings to stock farm",
                                                          placement = "right",
                                                          trigger = "hover",
                                                          options = NULL),
@@ -203,10 +203,10 @@ ui <- fluidPage(
                                                            step = .10,
                                                            value = 1.50),
                                                numericInput("feedprice", label = h3("Feed Price ($USD/kg)"),
-                                                           min = 100.00,
-                                                           max = 5000.00,
-                                                           step = 100.00,
-                                                           value = 500.00),
+                                                           min = 1.00,
+                                                           max = 20.00,
+                                                           step = .10,
+                                                           value = 2.10),
                                                numericInput("feedconversionratio", label = h3("Feed Conversion Ratio"),
                                                             min = 1,
                                                             max = 10,
@@ -221,7 +221,12 @@ ui <- fluidPage(
                                                          title = "Desired farm size (max 32 SeaStation cages)",
                                                          placement = "right",
                                                          trigger = "hover",
-                                                         options = NULL)
+                                                         options = NULL),
+                                              numericInput("priceoffish", label = h3("Price of Fish at Market ($USD"),
+                                                           min = 1,
+                                                           max = 20,
+                                                           step = .10,
+                                                           value = 7)
                                   )),
                           actionButton("run_button_economics", label = "Run"),
                           downloadButton("download_button_economics", label = "Download")),
@@ -827,6 +832,7 @@ server <- function(input, output) {
   stockingdensity <- reactive(input$stockingdensity)
   numberofcages <- reactive(input$numberofcages)
   fingerlingprice <- reactive(input$fingerlingprice)
+  priceoffish <- reactive(input$priceoffish)
 
   
    
@@ -868,7 +874,7 @@ server <- function(input, output) {
   #  cost_of_suitable <- reactive(mask(cost_total(), suitable()))
   
   # Find Total Revenue
-  revenue_rast <- reactive(weight_raster()*12)
+  revenue_rast <- reactive(weight_raster()*priceoffish())
  
   
   # Find Profits
