@@ -72,12 +72,8 @@ ui <- fluidPage(
                          class = "font-weight-light text-white",
                          class = "bg-primary text-center py-5 mb-4"),
                       p(
-                        wellPanel( style = "padding = 15",
-                                   img(src = "bartlett-kirby_orig.jpg", height = 300, width = 225), 
-                                   img(src = "bartlett-kirby_orig.jpg", height = 300, width   = 225),
-                                   img(src = "bartlett-kirby_orig.jpg", height = 300, width = 225), 
-                                   img(src = "bartlett-kirby_orig.jpg", height = 300, width   = 225),
-                                   img(src = "bartlett-kirby_orig.jpg", height = 300, width = 225)
+                        wellPanel(style = "padding = 15",
+                                   img(src = "maricultura-team.jpg", height = 400, width = 400)
                                    
                         ),
                         
@@ -924,6 +920,20 @@ server <- function(input, output) {
   
   
   
+  ### Download Economics map
+  output$download_button_economics <- downloadHandler(
+    
+    filename = function() {
+      "profitability_map.tif"
+    },
+    content = function(file) {
+      writeRaster(npv(), file)
+      
+      
+    })
+  
+  # Run Button
+
   
   
   
