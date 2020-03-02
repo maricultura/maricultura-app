@@ -1,5 +1,4 @@
 # Load required libraries
-
 library(shiny)
 library(shinythemes)
 library(tidyverse)
@@ -17,12 +16,9 @@ library(plotly)
 library(shinyEventLogger) # Are we using this package?
 library(leaflet.extras)
 library(shinyjs)
-
 # Source scripts
 source("scripts/html.R")
-
 #Species Dataframe 
-
 # Data frame with coefficients for different species
 species <- c("Atlantic salmon", "Gilthead seabream", "Rachycentron
 canadum")
@@ -35,12 +31,9 @@ Linf <- c(54.7, 140, 133.3)
 time0 <- c(0, 0, -0.13)
 a <- c(0, 0, 0.00479)
 b <- c(0, 0, 3.11)
-
 species_df <- data.frame(species, a1, a2, b1, b2, T0, Linf, time0, a, b)
-
 # Set logging for history
 set_logging()
-
 # Define UI for application
 ui <- fluidPage(
   
@@ -79,12 +72,8 @@ ui <- fluidPage(
                          class = "font-weight-light text-white",
                          class = "bg-primary text-center py-5 mb-4"),
                       p(
-                        wellPanel( style = "padding = 15",
-                                   img(src = "bartlett-kirby_orig.jpg", height = 300, width = 225), 
-                                   img(src = "bartlett-kirby_orig.jpg", height = 300, width   = 225),
-                                   img(src = "bartlett-kirby_orig.jpg", height = 300, width = 225), 
-                                   img(src = "bartlett-kirby_orig.jpg", height = 300, width   = 225),
-                                   img(src = "bartlett-kirby_orig.jpg", height = 300, width = 225)
+                        wellPanel(style = "padding = 15",
+                                   img(src = "maricultura-team.jpg", height = 400, width = 400)
                                    
                         ),
                         
@@ -179,7 +168,7 @@ ui <- fluidPage(
                                                                 HTML('<span>Atlantic salmon (<i>Salmo salar</i>)<br><img src="atlantic_salmon.png" alt=“image of salmon“ height="100px"/></span>'),
                                                                 HTML('<span>gilthead seabream (<i>Sparus aurata</i>)<br><br><img src="seabream.png" alt=“image of salmon“ height="70px"/></span>'),
                                                                 HTML('<span>cobia (<i>Rachycentron canadum</i>)<br><img src="cobia.png" alt=“image of salmon“  height="100px"/></span>')
-                                                                ),
+                                                              ),
                                                               choiceValues = unique(species_df$species)) # Radio buttons sourced from scripts/html.R
                                        )),
                            actionButton("run_button_growth", label = "Run"),
@@ -194,31 +183,32 @@ ui <- fluidPage(
                         sidebarPanel(
                           tabsetPanel(type = "tabs",
                                       tabPanel("Economic Factors",
-                                               selectInput("sizetoharvest", label = h3("Size at Harvest (kg)"),
-                                                           choices = list("1" = 1, "2" = 2, "3" = 3, "4" = 4, "5" = 5),
-                                                           selected = 1
-                                               ),
-                                               numericInput("stockingdensity", label = h3("Stocking Density (fish/m^3"),
+                                               numericInput("stockingdensity", label = h3("Initial Stocking Density (fish/m^3"),
                                                             min = 1,
                                                             max = 50,
                                                             step = 1,
-                                                            value = 10), 
+                                                            value = 3), 
                                                bsTooltip(id = "stockingdensity",
-                                                         title = "Desired density of adult fish at time of harvest (max 50)",
+                                                         title = "Desired density of fingerlings to stock farm",
                                                          placement = "right",
                                                          trigger = "hover",
                                                          options = NULL),
-                                               sliderInput("fingerlingprice", label = h3("Fingerling Price ($USD/fish)"),
+                                               numericInput("fingerlingprice", label = h3("Fingerling Price ($USD/fish)"),
                                                            min = .10,
                                                            max = 10.00,
                                                            step = .10,
                                                            value = 1.50),
-                                               sliderInput("feedprice", label = h3("Feed Price ($USD/kg)"),
-                                                           min = 100.00,
-                                                           max = 5000.00,
-                                                           step = 100.00,
-                                                           value = 500.00),
-                                               numericInput("numberofcages", label = h3("Number of Cages (6400m^3 each)"),
+                                               numericInput("feedprice", label = h3("Feed Price ($USD/kg)"),
+                                                           min = 1.00,
+                                                           max = 20.00,
+                                                           step = .10,
+                                                           value = 2.10),
+                                               numericInput("feedconversionratio", label = h3("Feed Conversion Ratio"),
+                                                            min = 1,
+                                                            max = 10,
+                                                            step = 1,
+                                                            value = 3),
+                                              numericInput("numberofcages", label = h3("Number of Cages (6400m^3 each)"),
                                                             min = 1,
                                                             max = 32,
                                                             step = 1,
@@ -228,30 +218,26 @@ ui <- fluidPage(
                                                          placement = "right",
                                                          trigger = "hover",
                                                          options = NULL),
-                                      )),
+                                              numericInput("priceoffish", label = h3("Price of Fish at Market ($USD"),
+                                                           min = 1,
+                                                           max = 20,
+                                                           step = .10,
+                                                           value = 7)
+                                  )),
                           actionButton("run_button_economics", label = "Run"),
                           downloadButton("download_button_economics", label = "Download")),
                         mainPanel(
                           leafletOutput("economics_map", height = "100vh")
                         )
                       )),
-            
-            
-              
-              # Fifth Tab
+             
+             
+             
+             # Fifth Tab
              tabPanel(HTML('<div><i class="fa fa-calculator"></i> Area Calculator</div>'),
                       fluidRow(
                         column(12,
                                plotlyOutput("barPlot"))
-                      ),
-                      fluidRow(
-                        column(12,
-                               tags$h3("Percentage of EEZ excluded"),
-                               tabsetPanel(type = "tabs",
-                                           id = "area_tabs",
-                                           selected = "Run 1"
-                                           
-                               ))
                       )),
              
              # Sixth Tab
@@ -292,8 +278,7 @@ ui <- fluidPage(
                    br(),
                    "R version 3.6.1 (2019-07-05). Code on  ", tags$a(href ="https://github.com/annagaby/tree-monitoring", target="_blank", icon("github"),"GitHub."))
   )
-  )
-
+)
 ##########################################################################################
 # Define server logic 
 ##########################################################################################
@@ -352,9 +337,9 @@ server <- function(input, output) {
   
   # Reclassification matrix for depth layer that makes unsuitable cells 1, suitable 2, and NAs 0
   rcl_mat_depth <- reactive(c(-Inf, max_depth(), 1,
-                     max_depth(), min_depth(), 2,
-                     min_depth(), 0, 1,
-                     0, Inf, 0))
+                              max_depth(), min_depth(), 2,
+                              min_depth(), 0, 1,
+                              0, Inf, 0))
   
   # Reclassify the depth layer
   depth_binary_1 <- reactive(reclassify(depth_mask,rcl= rcl_mat_depth()))
@@ -618,81 +603,7 @@ server <- function(input, output) {
     )
   )
   
-  ### Second Bar Graph ### 
   
-  # Create bar graph after clicking run button
-  observeEvent(input$run_button, {
-    if ( input$run_button == 1) {
-      prependTab(
-        inputId = "area_tabs",
-        tabPanel( "Run 1", 
-                  plotOutput("excludedPlot"))
-      )
-    } else {
-      insertTab(inputId = "area_tabs",
-                tabPanel(run_number(),
-                         plotOutput("excludedPlot"),
-                         target = paste0("Run ", input$run_button-1)
-                ))
-    }
-  })
-  
-  # Create vector with input names
-  input_names <- c("Min SST",
-                   "Max SST",
-                   "Depth",
-                   "Current Velocity",
-                   "Distance to Shore",
-                   "Dissolved Oxygen",
-                   "MPAs",
-                   "Reefs",
-                   "Artificial Reefs",
-                   "Oil Pipelines",
-                   "Oil Production",
-                   "Shipping Lanes")
-  
-  
-  # Create vector with number of 0 cells in each binary raster
-  freq_0 <- reactive(c(
-    freq(sst_binary_min(), value = 0),
-    freq(sst_binary_max(), value = 0),
-    freq(depth_binary(), value = 0),
-    freq(current_binary(), value = 0),
-    freq(dist_shore_binary(), value = 0),
-    freq(DO_min_binary(), value = 0),
-    freq(mpas_binary(), value = 0),
-    freq(reefs_binary(), value = 0),
-    freq(reefs_artificial_binary(), value = 0),
-    freq(og_pipeline_binary(), value = 0),
-    freq(og_production_binary(), value = 0),
-    freq(shipping_lanes_binary(), value = 0)
-  ))
-  
-  # Create df with layer names, frequency of 0 cells, and percentage of excluded area
-  area_df <- reactive(
-    data.frame(input_names, freq_0()) %>% 
-      mutate(percent_excluded = round(freq_0()*100/30959, digits = 2)) %>% 
-      arrange(percent_excluded) %>% 
-      mutate( input_names = factor(input_names, levels = input_names))
-  )
-  
-  # Render excluded areas plot
-  output$excludedPlot <- renderPlot(
-    ggplot(area_df(), aes(x = input_names, y = percent_excluded)) +
-      geom_col(fill = "darkturquoise") +
-      coord_flip() +
-      ylab("Percentage of EEZ Excluded") +
-      xlab("") +
-      scale_y_continuous( expand = c(0,0)) +
-      theme_classic(14) +
-      geom_text(
-        aes(label = paste0(percent_excluded,"%"), y = percent_excluded + 15), 
-        color = "black", 
-        size = 5,
-        hjust = 1
-      )
-  )
- 
   ### Download suitability map  ###
   output$download_button <- downloadHandler(
     
@@ -736,7 +647,6 @@ server <- function(input, output) {
     species_df %>% 
       filter(species == input$selectSpecies)
   })  
-
   
   # Separete cells into cells above and below optimal SST
   cells_below_optimal <- reactive(
@@ -761,6 +671,7 @@ server <- function(input, output) {
   )
   
   # Von Bertallanfy 
+  von_raster <- reactive(fish_selection()$Linf*(1 - exp((-1*12*(growth_raster()))*(1-fish_selection()$time0))))
   von_raster <- reactive(fish_selection()$Linf*(1 - exp((-1*1*((growth_raster())))*(1-fish_selection()$time0))))
   
   #Allometric Ratio 
@@ -769,7 +680,7 @@ server <- function(input, output) {
   # Render growth plot
   output$growthMap <- renderLeaflet({
     # Palette
-    pal_growth <- colorNumeric(c("#ffccff", "#330080"), values(weight_raster()),
+    pal_growth <- colorNumeric(c("#DAF7A6", "#C70039", "#581845"), values(weight_raster()),
                                na.color = "transparent")
     
     # Leaflet map
@@ -788,10 +699,9 @@ server <- function(input, output) {
         onClick=JS("function(btn, map){
                    map.setView([-14.0182737, -39.8789667]);
                    map.setZoom(4.6);}"))) %>%
-      addFullscreenControl() %>% 
       addLayersControl(
         baseGroups = c("Esri Gray Canvas (default)", "Open Street Map"),
-        overlayGroups = "Growth Model",
+        overlayGroups = "Suitable Areas",
         options = layersControlOptions(collapsed = TRUE),
         position = "topleft") %>% 
       addLegend("topright",
@@ -800,10 +710,9 @@ server <- function(input, output) {
                 title = "Fish Biomass (kg/cell)") %>% 
       addMouseCoordinates()
     
-    }
-      )
+  }
+  )
   
-
   
   
   ### Download growth map
@@ -845,13 +754,192 @@ server <- function(input, output) {
   observeEvent(input$nextBtn, navPage(1))
   
   
+  
+  
+  
+  
+  
+  
+  
+  
+  # ECONOMICS
+  num_farms <- 1 # number of farms per 9.2x9.2 km cell, most conservative estimate of 16 cages per/farm (per cell)
+  fuel_consumption <- 26.96 #L/hour
+  vessel_speed <- 15000 #average speed in m/hr
+  diesel_price <- 0.92 #USD/L using 2020 exchange rate 1 usd = 4 reais
+  distance_to_port <- 25 #depend on cell
+  num_of_boats <- 2
+  
+  trips_annual <- 416 # roundtrips per farm per year, for 2 boats (1 boat @ 5 trips/week, 1 @ 8 trips per week, and 52 weeks a year)
+  one_way_trips_annual <- 2*trips_annual # (we have to double the roundtrips because we need to take into account that distance traveled happens TWICE for every round trip)
+  
+  # Create raster for all fuel costs:
+  annual_fuel_cost_econ <- (dist_shore/vessel_speed)*fuel_consumption*diesel_price*one_way_trips_annual
+  
+
+  cage_size <- 6400 #m^3
+  full_time_workers <- 40
+  monthly_hours <- 160 #hours/month per fulltime employee
+  annual_hours <- (monthly_hours*12)
+  num_of_employees <-  ##/farm
+    hourly_wage <- 4.50 #USD/hour average
+  work_days_per_month <- 20
+  workers_offshore <- 35
+  workers_onshore <- 5
+  
+  # Determine Annual Fixed Wage Cost per Farm
+  fixed_labor_cost <- full_time_workers*hourly_wage*annual_hours
+  
+  # Determine # of Annual Transit Hours
+  annual_transit_hours <- (dist_shore/vessel_speed)*one_way_trips_annual
+  
+  # Determine Annual Wage Cost for Transit Hours Per Farm
+  transit_cost <- workers_offshore*annual_transit_hours*hourly_wage
+  
+  # Create raster for total annual wage costs
+  total_annual_wage_costs <- transit_cost+fixed_labor_cost
+  
+  # Farm Design
+  cage_cost <- 312000
+  time <- 12 #months, rotation period
+  
+  # One-time costs
+  farm_installation <- 139555 # (Bezerra)
+  farm_lease <- 8668.74 # one-time lease (Bezerra)
+  signaling_system <- 28021.40 # one-time system installation (Bezerra)
+  project_development <- 53403.69 #project development (Bezerra)
+  miscellaneous <- 123685.54 # one time (Bezerra)
+  boats <- 420376.85 #for 3 boats, one time, 1 * 16m, 2* 7m (Bezerra)
+  
+  # Annual fixed costs
+  electric_power <- 3661.32 # (Bezerra)
+  mooring_maintenance <- 53191.29 # (Bezerra)
+  diving_maintenance <- 8427.13 # (Bezerra)
+  office_rent <- 36626.43 # (Bezerra)
+  environmental_monitoring <- 45781.04 # (Bezerra)
+  boat_maintenance <- 30000 # for two boats (Costello)
+  dockage <- 20000 # for two boats (Costello)
+  insurance <- 50000 # (Costello)
+
+  
+ 
+  feedprice <- reactive(input$feedprice)
+  feedconversionratio <- reactive(input$feedconversionratio)
+  stockingdensity <- reactive(input$stockingdensity)
+  numberofcages <- reactive(input$numberofcages)
+  fingerlingprice <- reactive(input$fingerlingprice)
+  priceoffish <- reactive(input$priceoffish)
+
+  
+   
+  # Create Feed Raster
+  feed_annual_rast <- reactive(weight_raster()*feedconversionratio()*feedprice())
+
+  # Create Juvenile Cost 
+  juv_cost_annual <- reactive(stockingdensity()*(numberofcages()*cage_size)*fingerlingprice())
+  
+  # Find Total Cage Cost
+  total_cage_cost <- reactive(cage_cost*numberofcages())
+
+  
+  # Non-Amortized Annual Fixed Costs
+  total_annual_fixed_costs <- reactive(electric_power + mooring_maintenance + diving_maintenance + office_rent + environmental_monitoring + boat_maintenance + dockage + insurance + feed_annual_rast() + juv_cost_annual())
+  
+  
+  # Amortized One-time Costs
+  one_time_fixed_costs_depreciated <- reactive(signaling_system + miscellaneous + boats + total_cage_cost() + farm_installation + farm_lease + project_development)
+  
+  
+  risk_rho <- 1.17647 # Discount rate = 15%
+  risk_discount <- (1-(1/risk_rho))
+  
+  
+  # Annuity Function
+  annuity <- (function(c, r = risk_discount, t = 10) {
+    a <- c/ ((1-(1+r)^-t)/r)
+    return(a)
+  })
+  
+  # Find Amoritized Costs
+  amortized_costs <- reactive(annuity(one_time_fixed_costs_depreciated()))
+  
+  # Find Total Costs
+  cost_total <- reactive(amortized_costs() + total_annual_fixed_costs() + annual_fuel_cost_econ + total_annual_wage_costs)
+  
+  # Find Iost of Suitability Cells
+  #  cost_of_suitable <- reactive(mask(cost_total(), suitable()))
+  
+  # Find Total Revenue
+  revenue_rast <- reactive(weight_raster()*priceoffish())
+ 
+  
+  # Find Profits
+  profit_raster <- reactive(revenue_rast()-cost_total())
+  
+  # Find Net Present Value
+  npv <- reactive(((profit_raster()/((1-risk_discount)^1))) + ((profit_raster()/((1-risk_discount)^2))) + ((profit_raster()/((1-risk_discount)^3))) + ((profit_raster()/((1-risk_discount)^4))) + ((profit_raster()/((1-risk_discount)^5))) + ((profit_raster()/((1-risk_discount)^6))) + ((profit_raster()/((1-risk_discount)^7))) + ((profit_raster()/((1-risk_discount)^8))) + ((profit_raster()/((1-risk_discount)^9))) + ((profit_raster()/((1-risk_discount)^10))))
+  
+  
+  # Create an Ouput Map
+  
+  # Render economics plot
+  output$economics_map <- renderLeaflet({
+    # Palette
+    pal_econ <- colorNumeric(c("#DAF7A6", "#C70039", "#581845"), values(npv()),
+                             na.color = "transparent")
+    
+    # Leaflet map
+    leaflet(options = leafletOptions( zoomSnap = 0.2)) %>%
+      addTiles(group = "Open Street Map") %>%
+      addProviderTiles("Esri.WorldGrayCanvas", group = "Esri Gray Canvas (default)") %>%
+      addRasterImage(npv(),
+                     colors = pal_econ,
+                     group = "Economic Model") %>%
+      fitBounds(lng1 = -54.6903404, # sets initial view of map to fit coordinates
+                lng2 = -25.835314,
+                lat1 = 6.3071255,
+                lat2 = -35.8573806) %>% 
+      addEasyButton(easyButton(
+        icon="fa-globe", title="Reset View", # button to reset to initial view
+        onClick=JS("function(btn, map){
+                   map.setView([-14.0182737, -39.8789667]);
+                   map.setZoom(4.6);}"))) %>%
+      addLayersControl(
+        baseGroups = c("Esri Gray Canvas (default)", "Open Street Map"),
+        overlayGroups = "Suitable Areas",
+        options = layersControlOptions(collapsed = TRUE),
+        position = "topleft") %>% 
+      addLegend("topright",
+                pal = pal_econ,
+                values = values(npv()),
+                title = "Net Present Value ($USD/10 Years)") %>% 
+      addMouseCoordinates()
+    
+  }
+  )
+  
+  
+  
+  ### Download Economics map
+  output$download_button_economics <- downloadHandler(
+    
+    filename = function() {
+      "profitability_map.tif"
+    },
+    content = function(file) {
+      writeRaster(npv(), file)
+      
+      
+    })
+  
+  # Run Button
+
+  
+  
+  
+  
+  
+  
 }
-
-
-
-
-
-
-
 # Run the application 
 shinyApp(ui = ui, server = server)
