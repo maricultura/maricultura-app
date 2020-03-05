@@ -17,7 +17,7 @@ library(shinyEventLogger) # Are we using this package?
 library(leaflet.extras)
 library(shinyjs)
 # Source scripts
-source("scripts/html.R")
+#source("scripts/html.R")
 #Species Dataframe 
 # Data frame with coefficients for different species
 species <- c("Atlantic salmon", "Gilthead seabream", "Rachycentron
