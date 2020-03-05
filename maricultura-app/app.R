@@ -21,7 +21,7 @@ source("scripts/html.R")
 #Species Dataframe 
 # Data frame with coefficients for different species
 species <- c("Atlantic salmon", "Gilthead seabream", "Rachycentron
-canadum")
+             canadum")
 a1 <- c(0.0264, 0.026, 0.0714) #0.093 may be new slope
 a2 <- c(-0.066, -0.0042, -0.1667)
 b1 <- c(-0.0396, -0.0308, -1.5714)
@@ -75,8 +75,8 @@ ui <- fluidPage(
                          class = "bg-primary text-center py-5 mb-4"),
                       p(
                         wellPanel(style = "padding = 15",
-                                   img(src = "maricultura-team.jpg", height = 400, width = 400)
-                                   
+                                  img(src = "maricultura-team.jpg", height = 400, width = 400)
+                                  
                         ),
                         
                         
@@ -206,26 +206,26 @@ ui <- fluidPage(
                           tabsetPanel(type = "tabs",
                                       tabPanel("Economic Factors",
                                                numericInput("fingerlingprice", label = h3("Fingerling Price ($USD/fish)"),
-                                                           min = .10,
-                                                           max = 10.00,
-                                                           step = .10,
-                                                           value = 1.50),
+                                                            min = .10,
+                                                            max = 10.00,
+                                                            step = .10,
+                                                            value = 1.50),
                                                numericInput("feedprice", label = h3("Feed Price ($USD/kg)"),
-                                                           min = 1.00,
-                                                           max = 20.00,
-                                                           step = .10,
-                                                           value = 2.10),
+                                                            min = 1.00,
+                                                            max = 20.00,
+                                                            step = .10,
+                                                            value = 2.10),
                                                numericInput("feedconversionratio", label = h3("Feed Conversion Ratio"),
                                                             min = 1,
                                                             max = 10,
                                                             step = 1,
                                                             value = 3),
-                                              numericInput("priceoffish", label = h3("Price of Fish at Market ($USD"),
-                                                           min = 1,
-                                                           max = 20,
-                                                           step = .10,
-                                                           value = 7)
-                                  )),
+                                               numericInput("priceoffish", label = h3("Price of Fish at Market ($USD"),
+                                                            min = 1,
+                                                            max = 20,
+                                                            step = .10,
+                                                            value = 7)
+                                      )),
                           actionButton("run_button_economics", label = "Run"),
                           downloadButton("download_button_economics", label = "Download")),
                         mainPanel(
@@ -280,7 +280,7 @@ ui <- fluidPage(
                    br(),
                    "R version 3.6.1 (2019-07-05). Code on  ", tags$a(href ="https://github.com/annagaby/tree-monitoring", target="_blank", icon("github"),"GitHub."))
   )
-)
+  )
 ##########################################################################################
 # Define server logic 
 ##########################################################################################
@@ -530,7 +530,7 @@ server <- function(input, output) {
                 labels = c("Suitable Areas", "Exclusive Economic Zone"),
                 title = "Legend") %>% 
       addMouseCoordinates() 
-  })  
+})  
   
   
   
@@ -652,20 +652,20 @@ server <- function(input, output) {
   
   # Separete cells into cells above and below optimal SST
   #cells_below_optimal <- reactive(
-    #suitable_sst() < fish_selection()$T0
+  #suitable_sst() < fish_selection()$T0
   #)
   
   #cells_above_optimal <-  reactive(
-    #suitable_sst() >= fish_selection()$T0
- # )
+  #suitable_sst() >= fish_selection()$T0
+  # )
   
   # Apply growth equations
- # growth_below_optimal <- reactive(
-    #fish_selection()$a1*cells_below_optimal()*suitable_sst() + fish_selection()$b1*cells_below_optimal()
+  # growth_below_optimal <- reactive(
+  #fish_selection()$a1*cells_below_optimal()*suitable_sst() + fish_selection()$b1*cells_below_optimal()
   #)
- # growth_above_optimal <- reactive(
- #   fish_selection()$a2*cells_above_optimal()*suitable_sst() + fish_selection()$b2*cells_above_optimal()
- # )
+  # growth_above_optimal <- reactive(
+  #   fish_selection()$a2*cells_above_optimal()*suitable_sst() + fish_selection()$b2*cells_above_optimal()
+  # )
   
   growth_rate <- reactive(
     fish_selection()$A_omega*suitable_sst() + fish_selection()$B_omega
@@ -673,7 +673,7 @@ server <- function(input, output) {
   
   # Add both rasters
   #growth_raster <- eventReactive( input$run_button_growth,
-   #                               growth_above_optimal() + growth_below_optimal()
+  #                               growth_above_optimal() + growth_below_optimal()
   #)
   
   #Stocking density and number of cages for biomass 
@@ -684,15 +684,14 @@ server <- function(input, output) {
   
   # Growth raster 
   growth_raster <- eventReactive(input$run_button_growth, (growth_rate()/6.066)*6.066*(stockingdensity()*numberofcages()*cage_size)*survival_rate)
-
+  
   
   # Render growth plot (now with the new growth raster)
   output$growthMap <- renderLeaflet({
     # Palette
     pal_growth <- colorNumeric(c("#DAF7A6", "#C70039", "#581845"), values(growth_raster()),
                                na.color = "transparent")
-
-
+    
     
     # Leaflet map
     leaflet(options = leafletOptions( zoomSnap = 0.2)) %>%
@@ -721,8 +720,8 @@ server <- function(input, output) {
                 title = "Fish Biomass (kg/cell)") %>% 
       addMouseCoordinates()
     
-  }
-  )
+    }
+      )
   
   
   
@@ -787,7 +786,7 @@ server <- function(input, output) {
   # Create raster for all fuel costs:
   annual_fuel_cost_econ <- (dist_shore/vessel_speed)*fuel_consumption*diesel_price*one_way_trips_annual
   
-
+  
   full_time_workers <- 40
   monthly_hours <- 160 #hours/month per fulltime employee
   annual_hours <- (monthly_hours*12)
@@ -830,25 +829,25 @@ server <- function(input, output) {
   boat_maintenance <- 30000 # for two boats (Costello)
   dockage <- 20000 # for two boats (Costello)
   insurance <- 50000 # (Costello)
-
   
- 
+  
+  
   feedprice <- reactive(input$feedprice)
   feedconversionratio <- reactive(input$feedconversionratio)
   fingerlingprice <- reactive(input$fingerlingprice)
   priceoffish <- reactive(input$priceoffish)
-
   
-   
+  
+  
   # Create Feed Raster
   feed_annual_rast <- reactive(growth_raster()*feedconversionratio()*feedprice())
-
+  
   # Create Juvenile Cost 
   juv_cost_annual <- reactive(stockingdensity()*(numberofcages()*cage_size)*fingerlingprice())
   
   # Find Total Cage Cost
   total_cage_cost <- reactive(cage_cost*numberofcages())
-
+  
   
   # Non-Amortized Annual Fixed Costs
   total_annual_fixed_costs <- reactive(electric_power + mooring_maintenance + diving_maintenance + office_rent + environmental_monitoring + boat_maintenance + dockage + insurance + feed_annual_rast() + juv_cost_annual())
@@ -879,7 +878,7 @@ server <- function(input, output) {
   
   # Find Total Revenue
   revenue_rast <- reactive(growth_raster()*priceoffish())
- 
+  
   
   # Find Profits
   profit_raster <- reactive(revenue_rast()-cost_total())
@@ -923,8 +922,8 @@ server <- function(input, output) {
                 title = "Net Present Value ($USD/10 Years)") %>% 
       addMouseCoordinates()
     
-  }
-  )
+}
+      )
   
   
   
@@ -941,7 +940,7 @@ server <- function(input, output) {
     })
   
   # Run Button
-
+  
   
   
   
