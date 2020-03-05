@@ -16,8 +16,7 @@ library(plotly)
 library(shinyEventLogger) # Are we using this package?
 library(leaflet.extras)
 library(shinyjs)
-# Source scripts
-source("scripts/html.R")
+
 #Species Dataframe 
 # Data frame with coefficients for different species
 species <- c("Atlantic salmon", "Gilthead seabream", "Rachycentron
@@ -67,13 +66,15 @@ ui <- fluidPage(
                       h1("The Project",
                          class = "font-weight-light text-white",
                          class = "bg-primary text-center py-5 mb-4"),
-                      test,
                       h1("Meet the Creators",
                          class = "font-weight-light text-white",
                          class = "bg-primary text-center py-5 mb-4"),
                       p(
                         wellPanel(style = "padding = 15",
-                                   img(src = "maricultura-team.jpg", height = 400, width = 400)
+                                   img(src = "maricultura-team.jpg",
+                                       height = 400,
+                                       width = 400,
+                                       align = "middle")
                                    
                         ),
                         
