@@ -21,7 +21,7 @@ library(shinyjs)
 # Data frame with coefficients for different species
 species <- c("Atlantic salmon", "Gilthead seabream", "Rachycentron
 canadum")
-a1 <- c(0.0264, 0.026, 0.0714)
+a1 <- c(0.0264, 0.026, 0.0714) #0.093 may be new slope
 a2 <- c(-0.066, -0.0042, -0.1667)
 b1 <- c(-0.0396, -0.0308, -1.5714)
 b2 <- c(1.254, 0.1388, 5.3333)
@@ -30,7 +30,9 @@ Linf <- c(54.7, 140, 133.3)
 time0 <- c(0, 0, -0.13)
 a <- c(0, 0, 0.00479)
 b <- c(0, 0, 3.11)
-species_df <- data.frame(species, a1, a2, b1, b2, T0, Linf, time0, a, b)
+A_omega <- c(0, 0, 0.0714*12)
+B_omega <- c(0, 0, -1.5714*12)
+species_df <- data.frame(species, a1, a2, b1, b2, T0, Linf, time0, a, b, A_omega, B_omega)
 # Set logging for history
 set_logging()
 # Define UI for application
@@ -170,7 +172,27 @@ ui <- fluidPage(
                                                                 HTML('<span>gilthead seabream (<i>Sparus aurata</i>)<br><br><img src="seabream.png" alt=“image of salmon“ height="70px"/></span>'),
                                                                 HTML('<span>cobia (<i>Rachycentron canadum</i>)<br><img src="cobia.png" alt=“image of salmon“  height="100px"/></span>')
                                                               ),
-                                                              choiceValues = unique(species_df$species)) # Radio buttons sourced from scripts/html.R
+                                                              choiceValues = unique(species_df$species)),
+                                                 numericInput("stockingdensity", label = h3("Initial Stocking Density (fish/m^3)"),
+                                                              min = 1,
+                                                              max = 50,
+                                                              step = 1,
+                                                              value = 3), 
+                                                 bsTooltip(id = "stockingdensity",
+                                                           title = "Desired density of fingerlings to stock farm",
+                                                           placement = "right",
+                                                           trigger = "hover",
+                                                           options = NULL), numericInput("numberofcages", label = h3("Number of Cages (6400m^3 each)"),
+                                                                                         min = 1,
+                                                                                         max = 32,
+                                                                                         step = 1,
+                                                                                         value = 16),
+                                                 bsTooltip(id = "numberofcages",
+                                                           title = "Desired farm size (max 32 SeaStation cages)",
+                                                           placement = "right",
+                                                           trigger = "hover",
+                                                           options = NULL)
+                                                 # Radio buttons sourced from scripts/html.R
                                        )),
                            actionButton("run_button_growth", label = "Run"),
                            downloadButton("download_button_growth", label = "Download")),
@@ -184,16 +206,6 @@ ui <- fluidPage(
                         sidebarPanel(
                           tabsetPanel(type = "tabs",
                                       tabPanel("Economic Factors",
-                                               numericInput("stockingdensity", label = h3("Initial Stocking Density (fish/m^3"),
-                                                            min = 1,
-                                                            max = 50,
-                                                            step = 1,
-                                                            value = 3), 
-                                               bsTooltip(id = "stockingdensity",
-                                                         title = "Desired density of fingerlings to stock farm",
-                                                         placement = "right",
-                                                         trigger = "hover",
-                                                         options = NULL),
                                                numericInput("fingerlingprice", label = h3("Fingerling Price ($USD/fish)"),
                                                            min = .10,
                                                            max = 10.00,
@@ -209,16 +221,6 @@ ui <- fluidPage(
                                                             max = 10,
                                                             step = 1,
                                                             value = 3),
-                                              numericInput("numberofcages", label = h3("Number of Cages (6400m^3 each)"),
-                                                            min = 1,
-                                                            max = 32,
-                                                            step = 1,
-                                                            value = 16),
-                                               bsTooltip(id = "numberofcages",
-                                                         title = "Desired farm size (max 32 SeaStation cages)",
-                                                         placement = "right",
-                                                         trigger = "hover",
-                                                         options = NULL),
                                               numericInput("priceoffish", label = h3("Price of Fish at Market ($USD"),
                                                            min = 1,
                                                            max = 20,
@@ -650,45 +652,54 @@ server <- function(input, output) {
   })  
   
   # Separete cells into cells above and below optimal SST
-  cells_below_optimal <- reactive(
-    suitable_sst() < fish_selection()$T0
-  )
+  #cells_below_optimal <- reactive(
+    #suitable_sst() < fish_selection()$T0
+  #)
   
-  cells_above_optimal <-  reactive(
-    suitable_sst() >= fish_selection()$T0
-  )
+  #cells_above_optimal <-  reactive(
+    #suitable_sst() >= fish_selection()$T0
+ # )
   
   # Apply growth equations
-  growth_below_optimal <- reactive(
-    fish_selection()$a1*cells_below_optimal()*suitable_sst() + fish_selection()$b1*cells_below_optimal()
-  )
-  growth_above_optimal <- reactive(
-    fish_selection()$a2*cells_above_optimal()*suitable_sst() + fish_selection()$b2*cells_above_optimal()
+ # growth_below_optimal <- reactive(
+    #fish_selection()$a1*cells_below_optimal()*suitable_sst() + fish_selection()$b1*cells_below_optimal()
+  #)
+ # growth_above_optimal <- reactive(
+ #   fish_selection()$a2*cells_above_optimal()*suitable_sst() + fish_selection()$b2*cells_above_optimal()
+ # )
+  
+  growth_rate <- reactive(
+    fish_selection()$A_omega*suitable_sst() + fish_selection()$B_omega
   )
   
   # Add both rasters
-  growth_raster <- eventReactive( input$run_button_growth,
-                                  growth_above_optimal() + growth_below_optimal()
-  )
+  #growth_raster <- eventReactive( input$run_button_growth,
+   #                               growth_above_optimal() + growth_below_optimal()
+  #)
   
-  # Von Bertallanfy 
-  von_raster <- reactive(fish_selection()$Linf*(1 - exp((-1*12*(growth_raster()))*(1-fish_selection()$time0))))
-  von_raster <- reactive(fish_selection()$Linf*(1 - exp((-1*1*((growth_raster())))*(1-fish_selection()$time0))))
+  #Stocking density and number of cages for biomass 
+  stockingdensity <- reactive(input$stockingdensity)
+  numberofcages <- reactive(input$numberofcages)  
+  cage_size <- 6400 #m^3
+  survival_rate <- 0.85 
   
-  #Allometric Ratio 
-  weight_raster <- reactive((fish_selection()$a*von_raster()^fish_selection()$b)*0.001*261120)
+  # Growth raster 
+  growth_raster <- eventReactive(input$run_button_growth, (growth_rate()/6.066)*6.066*(stockingdensity()*numberofcages()*cage_size)*survival_rate)
+
   
-  # Render growth plot
+  # Render growth plot (now with the new growth raster)
   output$growthMap <- renderLeaflet({
     # Palette
-    pal_growth <- colorNumeric(c("#DAF7A6", "#C70039", "#581845"), values(weight_raster()),
+    pal_growth <- colorNumeric(c("#DAF7A6", "#C70039", "#581845"), values(growth_raster()),
                                na.color = "transparent")
+
+
     
     # Leaflet map
     leaflet(options = leafletOptions( zoomSnap = 0.2)) %>%
       addTiles(group = "Open Street Map") %>%
       addProviderTiles("Esri.WorldGrayCanvas", group = "Esri Gray Canvas (default)") %>%
-      addRasterImage(weight_raster(),
+      addRasterImage(growth_raster(),
                      colors = pal_growth,
                      group = "Growth Model") %>%
       fitBounds(lng1 = -54.6903404, # sets initial view of map to fit coordinates
@@ -707,7 +718,7 @@ server <- function(input, output) {
         position = "topleft") %>% 
       addLegend("topright",
                 pal = pal_growth,
-                values = values(weight_raster()),
+                values = values(growth_raster()),
                 title = "Fish Biomass (kg/cell)") %>% 
       addMouseCoordinates()
     
@@ -723,7 +734,7 @@ server <- function(input, output) {
       "growth_map.tif"
     },
     content = function(file) {
-      writeRaster(weight_raster(), file)
+      writeRaster(growth_raster(), file)
       
       
     })
@@ -778,7 +789,6 @@ server <- function(input, output) {
   annual_fuel_cost_econ <- (dist_shore/vessel_speed)*fuel_consumption*diesel_price*one_way_trips_annual
   
 
-  cage_size <- 6400 #m^3
   full_time_workers <- 40
   monthly_hours <- 160 #hours/month per fulltime employee
   annual_hours <- (monthly_hours*12)
@@ -826,15 +836,13 @@ server <- function(input, output) {
  
   feedprice <- reactive(input$feedprice)
   feedconversionratio <- reactive(input$feedconversionratio)
-  stockingdensity <- reactive(input$stockingdensity)
-  numberofcages <- reactive(input$numberofcages)
   fingerlingprice <- reactive(input$fingerlingprice)
   priceoffish <- reactive(input$priceoffish)
 
   
    
   # Create Feed Raster
-  feed_annual_rast <- reactive(weight_raster()*feedconversionratio()*feedprice())
+  feed_annual_rast <- reactive(growth_raster()*feedconversionratio()*feedprice())
 
   # Create Juvenile Cost 
   juv_cost_annual <- reactive(stockingdensity()*(numberofcages()*cage_size)*fingerlingprice())
@@ -871,7 +879,7 @@ server <- function(input, output) {
   #  cost_of_suitable <- reactive(mask(cost_total(), suitable()))
   
   # Find Total Revenue
-  revenue_rast <- reactive(weight_raster()*priceoffish())
+  revenue_rast <- reactive(growth_raster()*priceoffish())
  
   
   # Find Profits
