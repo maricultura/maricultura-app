@@ -692,6 +692,7 @@ server <- function(input, output) {
     pal_growth <- colorNumeric(c("#DAF7A6", "#C70039", "#581845"), values(growth_raster()),
                                na.color = "transparent")
 
+
     
     # Leaflet map
     leaflet(options = leafletOptions( zoomSnap = 0.2)) %>%
