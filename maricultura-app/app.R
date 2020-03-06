@@ -69,7 +69,6 @@ ui <- fluidPage(
                       h1("The Project",
                          class = "font-weight-light text-white",
                          class = "bg-primary text-center py-5 mb-4"),
-                      test,
                       h1("Meet the Creators",
                          class = "font-weight-light text-white",
                          class = "bg-primary text-center py-5 mb-4"),

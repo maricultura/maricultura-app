@@ -15,6 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(rnaturalearth)
 library(raster)
+library(rgdal)
 
 ```
 
@@ -113,7 +114,7 @@ initial_stocking_density <- 3 #user inputs 3fish/m^3)
 feed_conversion_ratio <- 3 #user inputs
 survival_rate <- .85 #note that this is species-specific
 fingerling_price <- 1.50 #USD ****
-feed_price <- 2.10 #USD/kg ****
+feed_price <- 2.1 #USD/kg ****
 optimal_feed <- 2350080 #kg per farm/grow out cycle total amount of feed
 time <- 12 #months, rotation period
 feed_annual <- (optimal_feed*feed_price)
@@ -219,7 +220,8 @@ plot(cost_of_suitable)
 #biomass_rast <- raster("maricultura-app/data/cobia_biomass.tif") -> already read in above
 plot(biomass_rast)
 
-revenue_rast <- biomass_rast*12
+cobia_price <- 8.6
+revenue_rast <- biomass_rast*cobia_price
 plot(revenue_rast)
 
 
