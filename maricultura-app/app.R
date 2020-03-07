@@ -528,7 +528,7 @@ server <- function(input, output) {
       addLegend(colors = c("#1D63A3", "#FFFFFF40"), # adds legend
                 labels = c("Suitable Areas", "Exclusive Economic Zone"),
                 title = "Legend") %>% 
-      addMouseCoordinates() 
+      leafem::addMouseCoordinates()
 })  
   
   
@@ -717,7 +717,7 @@ server <- function(input, output) {
                 pal = pal_growth,
                 values = values(growth_raster()),
                 title = "Fish Biomass (kg/cell)") %>% 
-      addMouseCoordinates()
+      leafem::addMouseCoordinates()
     
     }
       )
@@ -919,7 +919,7 @@ server <- function(input, output) {
                 pal = pal_econ,
                 values = values(npv()),
                 title = "Net Present Value ($USD/10 Years)") %>% 
-      addMouseCoordinates()
+      leafem::addMouseCoordinates()
     
 }
       )
