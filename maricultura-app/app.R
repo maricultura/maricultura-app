@@ -171,7 +171,7 @@ ui <- fluidPage(
                                                                 HTML('<span>cobia (<i>Rachycentron canadum</i>)<br><img src="cobia.png" alt=“image of salmon“  height="100px"/></span>')
                                                               ),
                                                               choiceValues = unique(species_df$species)),
-                                                 numericInput("stockingdensity", label = h3("Initial Stocking Density (fish/m^3)"),
+                                                 numericInput("stockingdensity", label = HTML("<h3>Initial Stocking Density (fish/m<sup>3</sup>)</h3>"),
                                                               min = 1,
                                                               max = 50,
                                                               step = 1,
@@ -180,7 +180,7 @@ ui <- fluidPage(
                                                            title = "Desired density of fingerlings to stock farm",
                                                            placement = "right",
                                                            trigger = "hover",
-                                                           options = NULL), numericInput("numberofcages", label = h3("Number of Cages (6400m^3 each)"),
+                                                           options = NULL), numericInput("numberofcages", label = HTML("<h3>Number of Cages (6400m<sup>3</sup> each)</h3>"),
                                                                                          min = 1,
                                                                                          max = 32,
                                                                                          step = 1,
