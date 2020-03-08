@@ -44,8 +44,6 @@ ui <- fluidPage(
   # Use previous and next buttons to navigate through the user guide
   useShinyjs(),
   
-  # Set the number of pages for the user guide
-  NUM_PAGES <- 5, 
   
   # Head element (contains metadata for app)
   tags$head(
@@ -252,18 +250,8 @@ ui <- fluidPage(
              
              # Seventh Tab
              tabPanel(div(icon("book-open"),"User Guide"),
-                      hidden(
-                        lapply(seq(NUM_PAGES), function(ui) {
-                          div(
-                            class = "page",
-                            id = paste0("step", ui),
-                            "Step", ui
-                          )
-                        })
-                      ),
-                      br(),
-                      actionButton("prevBtn", "< Previous"),
-                      actionButton("nextBtn", "Next >")
+                      tags$iframe(style="height:400px; width:100%; scrolling=yes", 
+                                  src="User Guide.pdf")
              ),
              
              # Eight Tab
@@ -295,7 +283,7 @@ server <- function(input, output) {
   hideTab(inputId = "navbar", target = HTML('<div><i class="fa fa-hand-holding-usd"></i>Economics</div>'))
   hideTab(inputId = "navbar", target = HTML('<div><i class="fa fa-calculator"></i> Area Calculator</div>'))
   
-  # Show tabs after clicking the run button/ growth run button
+  # Show tabs after clicking the run button/ growth run button/economic
   observeEvent(input$run_button, {
     showTab(inputId = "navbar", target = HTML('<div><i class="fa fa-chart-line"></i>Biomass</div>'))
   })
@@ -305,6 +293,7 @@ server <- function(input, output) {
   observeEvent(input$run_button, {
     showTab(inputId = "navbar", target = HTML('<div><i class="fa fa-calculator"></i> Area Calculator</div>'))
   })
+
   
   ### Modal Dialogue
   # Create modal dialogue
@@ -686,6 +675,8 @@ server <- function(input, output) {
   # Growth raster 
   growth_raster <- eventReactive(input$run_button_growth, (growth_rate()/6.066)*6.066*(stockingdensity()*numberofcages()*cage_size)*survival_rate)
 
+
+  
   
   # Render growth plot (now with the new growth raster)
   output$growthMap <- renderLeaflet({
@@ -739,6 +730,9 @@ server <- function(input, output) {
       
     })
   
+  
+  
+  
   header <- c("Input", "Value", "Unit")
   sst_table <- reactive(c("SST", paste0(input$sst_slider[1], "-" , input$sst_slider[2]), "°C"))
   suitability_df <- data.frame(header)
@@ -747,28 +741,8 @@ server <- function(input, output) {
     suitability_df 
     
   )
-  
-  rv <- reactiveValues(page = 1)
-  
-  observe({
-    toggleState(id = "prevBtn", condition = rv$page > 1)
-    toggleState(id = "nextBtn", condition = rv$page < NUM_PAGES)
-    hide(selector = ".page")
-    show(paste0("step", rv$page))
-  })
-  
-  navPage <- function(direction) {
-    
-    rv$page <- rv$page + direction
-  }
-  
-  observeEvent(input$prevBtn, navPage(-1))
-  observeEvent(input$nextBtn, navPage(1))
-  
-  
-  
-  
-  
+
+
   
   
   
@@ -886,7 +860,7 @@ server <- function(input, output) {
   profit_raster <- reactive(revenue_rast()-cost_total())
   
   # Find Net Present Value
-  npv <- reactive(((profit_raster()/((1-risk_discount)^1))) + ((profit_raster()/((1-risk_discount)^2))) + ((profit_raster()/((1-risk_discount)^3))) + ((profit_raster()/((1-risk_discount)^4))) + ((profit_raster()/((1-risk_discount)^5))) + ((profit_raster()/((1-risk_discount)^6))) + ((profit_raster()/((1-risk_discount)^7))) + ((profit_raster()/((1-risk_discount)^8))) + ((profit_raster()/((1-risk_discount)^9))) + ((profit_raster()/((1-risk_discount)^10))))
+  npv <- eventReactive(input$run_button_economics, ((profit_raster()/((1-risk_discount)^1))) + ((profit_raster()/((1-risk_discount)^2))) + ((profit_raster()/((1-risk_discount)^3))) + ((profit_raster()/((1-risk_discount)^4))) + ((profit_raster()/((1-risk_discount)^5))) + ((profit_raster()/((1-risk_discount)^6))) + ((profit_raster()/((1-risk_discount)^7))) + ((profit_raster()/((1-risk_discount)^8))) + ((profit_raster()/((1-risk_discount)^9))) + ((profit_raster()/((1-risk_discount)^10))))
   
   
   # Create an Ouput Map
