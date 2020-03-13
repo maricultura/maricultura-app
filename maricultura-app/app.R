@@ -199,7 +199,7 @@ ui <- fluidPage(
                          )
                        )),
              #Fourth Tab
-             tabPanel(HTML('<div><i class="fa fa-hand-holding-usd"></i>Economics</div>'),
+             tabPanel(HTML('<div><i class="fas fa-coins"></i>Economics</div>'),
                       sidebarLayout(
                         sidebarPanel(
                           tabsetPanel(type = "tabs",
@@ -219,7 +219,7 @@ ui <- fluidPage(
                                                             max = 10,
                                                             step = 1,
                                                             value = 3),
-                                              numericInput("priceoffish", label = h3("Price of Fish at Market ($USD"),
+                                              numericInput("priceoffish", label = h3("Price of Fish at Market ($USD)"),
                                                            min = 1,
                                                            max = 20,
                                                            step = .10,
@@ -241,15 +241,9 @@ ui <- fluidPage(
                                plotlyOutput("barPlot"))
                       )),
              
-             # Sixth Tab
-             tabPanel(div(icon("history"), "Run History"),
-                      fluidRow(
-                        column(12,
-                               dataTableOutput("suitabilityTable"))
-                      )),
              
              # Seventh Tab
-             tabPanel(div(icon("book-open"),"User Guide"),
+             tabPanel(HTML('<div><i class="fas fa-book"></i> User Guide</div>'),
                       tags$iframe(style="height:400px; width:100%; scrolling=yes", 
                                   src="User Guide.pdf")
              ),
@@ -280,7 +274,7 @@ server <- function(input, output) {
   ### Show/Hide tabs ###
   # Hide growth, economic, and area tabs when server starts
   hideTab(inputId = "navbar", target = HTML('<div><i class="fa fa-chart-line"></i>Biomass</div>'))
-  hideTab(inputId = "navbar", target = HTML('<div><i class="fa fa-hand-holding-usd"></i>Economics</div>'))
+  hideTab(inputId = "navbar", target = HTML('<div><i class="fas fa-coins"></i>Economics</div>'))
   hideTab(inputId = "navbar", target = HTML('<div><i class="fa fa-calculator"></i> Area Calculator</div>'))
   
   # Show tabs after clicking the run button/ growth run button/economic
@@ -288,7 +282,7 @@ server <- function(input, output) {
     showTab(inputId = "navbar", target = HTML('<div><i class="fa fa-chart-line"></i>Biomass</div>'))
   })
   observeEvent(input$run_button_growth, {
-    showTab(inputId = "navbar", target = HTML('<div><i class="fa fa-hand-holding-usd"></i>Economics</div>'))
+    showTab(inputId = "navbar", target = HTML('<div><i class="fas fa-coins"></i>Economics</div>'))
   })
   observeEvent(input$run_button, {
     showTab(inputId = "navbar", target = HTML('<div><i class="fa fa-calculator"></i> Area Calculator</div>'))
@@ -715,6 +709,14 @@ server <- function(input, output) {
     
   }
   )
+  
+  
+  
+  
+  
+  
+  
+  
   
   
   
