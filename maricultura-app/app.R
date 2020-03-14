@@ -705,7 +705,8 @@ server <- function(input, output) {
       addLegend("topright",
                 pal = pal_growth,
                 values = values(growth_raster()),
-                title = "Fish Biomass (MT/cell)") %>% 
+                title = "Fish Biomass (MT/cell)",
+                labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE))) %>% 
       addMouseCoordinates()
     
   }
@@ -909,7 +910,8 @@ server <- function(input, output) {
       addLegend("topright",
                 pal = pal_econ,
                 values = values(npv()),
-                title = "10-Year NPV<br>( Billion $USD/cell)") %>% 
+                title = "10-Year NPV<br>( Billion $USD/cell)",
+                labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE))) %>% 
       addMouseCoordinates()
     
   }
