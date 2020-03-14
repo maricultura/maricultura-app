@@ -864,16 +864,16 @@ server <- function(input, output) {
   
   # Find Net Present Value
   npv <- eventReactive(input$run_button_economics, 
-                       (((profit_raster()/((1-risk_discount)^1))) +
-                         ((profit_raster()/((1-risk_discount)^2))) + 
-                         ((profit_raster()/((1-risk_discount)^3))) + 
-                         ((profit_raster()/((1-risk_discount)^4))) + 
-                         ((profit_raster()/((1-risk_discount)^5))) + 
-                         ((profit_raster()/((1-risk_discount)^6))) + 
-                         ((profit_raster()/((1-risk_discount)^7))) + 
-                         ((profit_raster()/((1-risk_discount)^8))) + 
-                         ((profit_raster()/((1-risk_discount)^9))) + 
-                         ((profit_raster()/((1-risk_discount)^10))))/1000000) # divided by 1000000 to convert from USD to billion USD
+                       ((profit_raster()/(1-risk_discount)^1) +
+                         (profit_raster()/(1-risk_discount)^2) + 
+                         (profit_raster()/(1-risk_discount)^3) + 
+                         (profit_raster()/(1-risk_discount)^4) + 
+                         (profit_raster()/(1-risk_discount)^5) + 
+                         (profit_raster()/(1-risk_discount)^6) + 
+                         (profit_raster()/(1-risk_discount)^7) + 
+                         (profit_raster()/(1-risk_discount)^8) + 
+                         (profit_raster()/(1-risk_discount)^9) + 
+                         (profit_raster()/(1-risk_discount)^10))/1000000) # divided by 1000000 to convert from USD to billion USD
   
   
   # Create an Ouput Map
