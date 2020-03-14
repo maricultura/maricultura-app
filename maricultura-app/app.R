@@ -245,7 +245,7 @@ ui <- fluidPage(
              # Seventh Tab
              tabPanel(HTML('<div><i class="fas fa-book"></i> User Guide</div>'),
                       tags$iframe(style="height:400px; width:100%; scrolling=yes", 
-                                  src="User Guide.pdf")
+                                  src= "User Guide.pdf")
              ),
              
              # Eight Tab
@@ -667,7 +667,8 @@ server <- function(input, output) {
   survival_rate <- 0.85 
   
   # Growth raster 
-  growth_raster <- eventReactive(input$run_button_growth, (growth_rate()/6.066)*6.066*(stockingdensity()*numberofcages()*cage_size)*survival_rate)
+  growth_raster <- eventReactive(input$run_button_growth,
+                                 (growth_rate()/6.066)*6.066*(stockingdensity()*numberofcages()*cage_size)*survival_rate/1000) # dividing by 1000 to convert from kg to MT
 
 
   
@@ -704,7 +705,7 @@ server <- function(input, output) {
       addLegend("topright",
                 pal = pal_growth,
                 values = values(growth_raster()),
-                title = "Fish Biomass (kg/cell)") %>% 
+                title = "Fish Biomass (MT/cell)") %>% 
       addMouseCoordinates()
     
   }
@@ -818,7 +819,7 @@ server <- function(input, output) {
   
    
   # Create Feed Raster
-  feed_annual_rast <- reactive(growth_raster()*feedconversionratio()*feedprice())
+  feed_annual_rast <- reactive(growth_raster()*1000*feedconversionratio()*feedprice()) # multiplied by 1000 to convert biomass from MT to kg
 
   # Create Juvenile Cost 
   juv_cost_annual <- reactive(stockingdensity()*(numberofcages()*cage_size)*fingerlingprice())
@@ -855,14 +856,24 @@ server <- function(input, output) {
   #  cost_of_suitable <- reactive(mask(cost_total(), suitable()))
   
   # Find Total Revenue
-  revenue_rast <- reactive(growth_raster()*priceoffish())
+  revenue_rast <- reactive(growth_raster()*1000* priceoffish()) # multiplied by 1000 to convert biomass from MT to kg
  
   
   # Find Profits
   profit_raster <- reactive(revenue_rast()-cost_total())
   
   # Find Net Present Value
-  npv <- eventReactive(input$run_button_economics, ((profit_raster()/((1-risk_discount)^1))) + ((profit_raster()/((1-risk_discount)^2))) + ((profit_raster()/((1-risk_discount)^3))) + ((profit_raster()/((1-risk_discount)^4))) + ((profit_raster()/((1-risk_discount)^5))) + ((profit_raster()/((1-risk_discount)^6))) + ((profit_raster()/((1-risk_discount)^7))) + ((profit_raster()/((1-risk_discount)^8))) + ((profit_raster()/((1-risk_discount)^9))) + ((profit_raster()/((1-risk_discount)^10))))
+  npv <- eventReactive(input$run_button_economics, 
+                       (((profit_raster()/((1-risk_discount)^1))) +
+                         ((profit_raster()/((1-risk_discount)^2))) + 
+                         ((profit_raster()/((1-risk_discount)^3))) + 
+                         ((profit_raster()/((1-risk_discount)^4))) + 
+                         ((profit_raster()/((1-risk_discount)^5))) + 
+                         ((profit_raster()/((1-risk_discount)^6))) + 
+                         ((profit_raster()/((1-risk_discount)^7))) + 
+                         ((profit_raster()/((1-risk_discount)^8))) + 
+                         ((profit_raster()/((1-risk_discount)^9))) + 
+                         ((profit_raster()/((1-risk_discount)^10))))/1000000) # divided by 1000000 to convert from USD to billion USD
   
   
   # Create an Ouput Map
@@ -870,7 +881,8 @@ server <- function(input, output) {
   # Render economics plot
   output$economics_map <- renderLeaflet({
     # Palette
-    pal_econ <- colorNumeric(c("#DAF7A6", "#C70039", "#581845"), values(npv()),
+    pal_econ <- colorNumeric(c("#DAF7A6", "#C70039", "#581845"),
+                             values(npv()),
                              na.color = "transparent")
     
     # Leaflet map
@@ -897,7 +909,7 @@ server <- function(input, output) {
       addLegend("topright",
                 pal = pal_econ,
                 values = values(npv()),
-                title = "Net Present Value ($USD/10 Years)") %>% 
+                title = "10-Year NPV<br>( Billion $USD/cell)") %>% 
       addMouseCoordinates()
     
   }
