@@ -910,7 +910,7 @@ server <- function(input, output) {
       addLegend("topright",
                 pal = pal_econ,
                 values = values(npv()),
-                title = "10-Year NPV<br>( Billion $USD/cell)",
+                title = "NPV - 10 yrs<br>( Billion $USD/cell)",
                 labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE))) %>% 
       addMouseCoordinates()
     
