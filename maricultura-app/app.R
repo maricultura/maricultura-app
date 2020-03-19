@@ -223,7 +223,7 @@ ui <- fluidPage(
                                                            min = 1,
                                                            max = 20,
                                                            step = .10,
-                                                           value = 7)
+                                                           value = 8.6)
                                   )),
                           actionButton("run_button_economics", label = "Run"),
                           downloadButton("download_button_economics", label = "Download")),
