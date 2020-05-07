@@ -17,24 +17,13 @@ library(shinyEventLogger) # Are we using this package?
 library(leaflet.extras)
 library(shinyjs)
 
-#Species Dataframe 
-# Data frame with coefficients for different species
-species <- c("Atlantic salmon", "Gilthead seabream", "Rachycentron
-canadum")
-a1 <- c(0.0264, 0.026, 0.0714) #0.093 may be new slope
-a2 <- c(-0.066, -0.0042, -0.1667)
-b1 <- c(-0.0396, -0.0308, -1.5714)
-b2 <- c(1.254, 0.1388, 5.3333)
-T0 <- c(14, 25, 29)
-Linf <- c(54.7, 140, 133.3)
-time0 <- c(0, 0, -0.13)
-a <- c(0, 0, 0.00479)
-b <- c(0, 0, 3.11)
-A_omega <- c(0, 0, 0.0714*12)
-B_omega <- c(0, 0, -1.5714*12)
-species_df <- data.frame(species, a1, a2, b1, b2, T0, Linf, time0, a, b, A_omega, B_omega)
-# Set logging for history
-set_logging()
+# Source scripts
+source("about_page.R")
+source("species_df.R")
+source("footer.R")
+
+# Set logging for history ?
+# set_logging() ?
 # Define UI for application
 ui <- fluidPage(
   
@@ -62,34 +51,10 @@ ui <- fluidPage(
              selected = div(icon("map-pin"),"Site Suitability"),
              # Do not need title for Navigation Bar
              # First tab
-             tabPanel(div(icon("info-circle"),"About"), HTML('<div class="jumbotron" style="height: 75vh; display: flex; justify-content: center; align-items: center; background: linear-gradient( rgba(197,219,235, 0.65), rgba(197,219,235, 0.8)),
-	url(https://images.unsplash.com/photo-1518837695005-2083093ee35b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80); background-size: cover; background-position: center top; letter-spacing: 0.7em;">
-                           <h1 class="display-3" style="text-align: center; color: white; font-size: 5em; font-weight: 550;">SHAPING &nbsp;MARICULTURE &nbsp;IN &nbsp;BRAZIL</h1>
-                           </div>' ),
-                      HTML('<div style="height: 75vh; overflow: auto" class="jumbotron">
-                      <h1 class="display-3" >The Project</h1>
-                      <div style="display: table-cell; vertical-align: middle;">
-  <img style="width: 40vh; height: 40vh; object-fit: cover; margin: 0px 0px 1em 1.5em; padding: 0.5em 0px 0px 0px; float: right; vertical-align: middle" src="6.png" alt="Bren Hall Building">
-  <p style="text-align: justify;" class="lead">The Bren School at UC Santa Barbara is a graduate-level environmental science and management program whose students fulfill a 12 month Group Project to solve an environmental problem faced by a real-world client, in our case, the World Wildlife Fund. We explored the spatial feasibility of offshore mariculture in Brazil’s Exclusive Economic Zone, and created a web-based tool to predict yields and profitability for offshore mariculture of various finfish. This app is the interactive component of our overall thesis project.</p>
-  <p class="lead">More information about the Bren School is available on their website.</p>
-  <p style="display: inline-block; vertical-align: bottom" class="lead">
-    <a class="btn btn-primary btn-lg" href=https://www.bren.ucsb.edu target="_blank" role="button">Learn more</a>
-  </p>
-  </div>
-</div>'
-                      ),
-                      HTML('<div style="height: 75vh; overflow: auto" class="jumbotron">
-  <h1 class="display-3"> Meet the Creators</h1>
-  <div>
-  <img style="width: 40vh; height: 40vh; object-fit: cover;  margin: 0px 0px 1em 1.5em; padding: 0.5em 0px 0px 0px; float: right; vertical-align: middle" src="maricultura-team.jpg" alt="Team image">
-  <p style="text-align: justify;" class="lead">Our team consists of 5 master’s students at the Bren School of Environmental Science & Management at the University of California, Santa Barbara: Anna Calle, Caio Vianna, Eva Marrero, Kirby Barttlet and Sandra Fogg. We came together as a group with a common interest in marine conservation and ocean sustainability. Our collaborative thesis is in partnership with the World Wildlife Fund in Brazil.</p>
-  <p class="lead">For more information visit our website.</p>
-  <p style="display: inline-block; vertical-align: bottom" class="lead">
-    <a class="btn btn-primary btn-lg" href=https://maricultura.weebly.com" target="_blank" role="button">Learn more</a>
-  </p>
-  </div>
-</div>')),
-             
+             tabPanel(div(icon("info-circle"),"About"),
+                      header,
+                      project,
+                      creators),
              
              # Second tab
              tabPanel(div(icon("map-pin"),"Site Suitability"),
@@ -244,25 +209,18 @@ ui <- fluidPage(
              
              # Seventh Tab
              tabPanel(HTML('<div><i class="fas fa-book"></i> User Guide</div>'),
-                      tags$iframe(style="height:400px; width:100%; scrolling=yes", 
-                                  src= "User Guide.pdf")
+                      fluidRow(
+                        column(12,
+                      HTML('<iframe height=400px  width=100% src= "user_guide.pdf"></iframe>')))
              ),
              
              # Eight Tab
              tabPanel(div(icon("table"),"Metadata"),
                       tableOutput("metadataTable"))
   ),
-  # Create footer
+  # Display footer
   br(),
-  div( style = "background-color: #c5dbeb; padding: 15px; text-align: center;",
-       tags$footer("Developed with",
-                   tags$span(style = "font-family: 'Source Code Pro', monospace; font-size: 25px;" ,"Shiny"),
-                   "from",
-                   img(src = "https://rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-Flat.png", height = "30px"),
-                   ".",
-                   br(),
-                   "R version 3.6.1 (2019-07-05). Code on  ", tags$a(href ="https://github.com/annagaby/tree-monitoring", target="_blank", icon("github"),"GitHub."))
-  )
+  footer
 )
 ##########################################################################################
 # Define server logic 
