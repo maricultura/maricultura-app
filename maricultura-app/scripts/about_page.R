@@ -27,5 +27,10 @@ creators <- HTML('<div style="height: 75vh; overflow: auto" class="jumbotron">
   </p>
   </div>
 </div>')
+
+aboutPage <- tabPanel(div(icon("info-circle"),"About"),
+                      header,
+                      project,
+                      creators)
                
                
