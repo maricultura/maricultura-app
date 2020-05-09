@@ -3,8 +3,11 @@
 # Module UI function
 ######################################################################################
 econUI <- function(id){
+  
+  # Create a namespace function using the provided id
   ns = NS(id)
 
+  # Create economics tab
   tabPanel(HTML('<div><i class="fas fa-coins"></i>Economics</div>'),
            sidebarLayout(
              sidebarPanel(
@@ -43,7 +46,6 @@ econUI <- function(id){
 ######################################################################################
 # Module server function
 ######################################################################################
-
 econ <- function(input, output, session, site_suitability, biomass_production) {
   
 num_farms <- 1 # number of farms per 9.2x9.2 km cell, most conservative estimate of 16 cages per/farm (per cell)
@@ -210,8 +212,6 @@ output$economics_map <- renderLeaflet({
 }
 )
 
-
-
 ### Download Economics map
 output$download_button_economics <- downloadHandler(
   
@@ -220,7 +220,6 @@ output$download_button_economics <- downloadHandler(
   },
   content = function(file) {
     writeRaster(npv(), file)
-    
     
   })
 

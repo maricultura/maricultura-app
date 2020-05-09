@@ -3,8 +3,11 @@
 # Module UI function
 ######################################################################################
 areaCalculatorUI <- function(id){
+  
+  # Create a namespace function using the provided id
   ns = NS(id)
   
+  # Create area calculator tab
   tabPanel(HTML('<div><i class="fa fa-calculator"></i> Area Calculator</div>'),
            fluidRow(
              column(12,
@@ -17,7 +20,6 @@ areaCalculatorUI <- function(id){
 ######################################################################################
 # Module server function
 ######################################################################################
-
 areaCalculator <- function(input, output, session, site_suitability) {
 
   ### First Bar Graph ###

@@ -97,13 +97,13 @@ server <- function(input, output) {
    r <- reactiveValues()
    
   # Show tabs after clicking the run button/growth run button
-  observeEvent(r$mod1$run_num, {
+  observeEvent(r$run_num_suit, {
     showTab(inputId = "navbar", target = HTML('<div><i class="fa fa-chart-line"></i>Biomass</div>'))
   })
-  observeEvent(r$mod2$run_num, {
+  observeEvent(r$run_num_growth, {
     showTab(inputId = "navbar", target = HTML('<div><i class="fas fa-coins"></i>Economics</div>'))
   })
-  observeEvent(r$mod1$run_num, {
+  observeEvent(r$run_num_suit, {
     showTab(inputId = "navbar", target = HTML('<div><i class="fa fa-calculator"></i> Area Calculator</div>'))
   })
 

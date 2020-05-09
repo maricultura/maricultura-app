@@ -3,8 +3,11 @@
 # Module UI function
 ######################################################################################
 biomassProdUI <- function(id){
+  
+  # Create a namespace function using the provided id
   ns = NS(id)
   
+  # Create biomass tab
   tabPanel( HTML('<div><i class="fa fa-chart-line"></i>Biomass</div>'),
             sidebarLayout(
               sidebarPanel(
@@ -53,15 +56,11 @@ biomassProdUI <- function(id){
 ######################################################################################
 # Module server function
 ######################################################################################
-
 biomassProd <- function(input, output, session, site_suitability, r) {
   
-  
-  r$mod2<- reactiveValues()
-  
+# Keep track of clicks on run button
   observeEvent(input$run_button_growth, {
-    r$mod2$run_num <- input$run_button_growth})
-
+    r$run_num_growth <- input$run_button_growth})
   
 # Read saved raster
 mean_sst_mask <- raster("data/mean_sst_mask.tif")
@@ -129,7 +128,6 @@ output$growthMap <- renderLeaflet({
               title = "Fish Biomass (MT/cell)",
               labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE))) %>% 
     addMouseCoordinates()
-  
 }
 )
 
@@ -151,6 +149,5 @@ return(list(
   stocking_d = reactive(stockingdensity()),
   cage_size = cage_size
 ))
-
 
 }

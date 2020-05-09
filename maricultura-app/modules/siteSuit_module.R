@@ -3,7 +3,11 @@
 # Module UI function
 ######################################################################################
 siteSuitUI <- function(id){
+  
+  # Create a namespace function using the provided id
   ns = NS(id)
+  
+  # Create site suitability panel
   tabPanel(div(icon("map-pin"),"Site Suitability"),
            sidebarLayout(
              sidebarPanel(
@@ -75,13 +79,11 @@ siteSuitUI <- function(id){
 ######################################################################################
 # Module server function
 ######################################################################################
-
   siteSuit <- function(input, output, session, r) {
-    
-    r$mod1 <- reactiveValues()
-    
+ 
+    # Keep track of clicks on run button
     observeEvent(input$run_button, {
-      r$mod1$run_num <- input$run_button})
+      r$run_num_suit <- input$run_button})
     
     ### Depth
     # Defining variables
@@ -92,20 +94,10 @@ siteSuitUI <- function(id){
     depth_mask <- raster("data/depth_mask.tif")
     
     # Reclassification matrix for depth layer that makes unsuitable cells 1, suitable 2, and NAs 0
-    rcl_mat_depth <- reactive(c(
-      -Inf,
-      max_depth(),
-      1,
-      max_depth(),
-      min_depth(),
-      2,
-      min_depth(),
-      0,
-      1,
-      0,
-      Inf,
-      0
-    ))
+    rcl_mat_depth <- reactive(c(-Inf, max_depth(),1,
+                                max_depth(),min_depth(),2,
+                                min_depth(),0,
+                                1,0,Inf,0))
     
     # Reclassify the depth layer
     depth_binary_1 <-
@@ -315,8 +307,7 @@ siteSuitUI <- function(id){
     ### Render leaflet map
     output$suitableMap <- renderLeaflet({
       # Color palettes
-      pal <-
-        colorNumeric(
+      pal <-colorNumeric(
           c("#FFFFFF40", "#1D63A3"),
           values(suitable()),
           na.color = "transparent",
@@ -383,7 +374,7 @@ siteSuitUI <- function(id){
         
       })
     
-    ### Steps needed for the area graph
+    ### Code needed for the area graph later
     # Calculate value for total area
     area <- reactive(
       round(freq(suitable(), value = 1)*123.424, digits = 0)
@@ -448,7 +439,3 @@ siteSuitUI <- function(id){
     
 }
   
-  
- 
-
-
