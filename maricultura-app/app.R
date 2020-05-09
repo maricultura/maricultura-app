@@ -127,6 +127,7 @@ server <- function(input, output) {
   # Economic Model
   profitability <- callModule(econ,
                               "profitability",
+                              site_suitability = site_suitability,
                               biomass_production = biomass_production)
   
   # Area Calculator 

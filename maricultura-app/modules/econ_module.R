@@ -1,5 +1,7 @@
 
+######################################################################################
 # Module UI function
+######################################################################################
 econUI <- function(id){
   ns = NS(id)
 
@@ -42,14 +44,8 @@ econUI <- function(id){
 # Module server function
 ######################################################################################
 
-econ <- function(input, output, session, biomass_production) {
+econ <- function(input, output, session, site_suitability, biomass_production) {
   
-
-  
-  
-  dist_shore <- raster("data/dist_shore.tif")
-
-
 num_farms <- 1 # number of farms per 9.2x9.2 km cell, most conservative estimate of 16 cages per/farm (per cell)
 fuel_consumption <- 26.96 #L/hour
 vessel_speed <- 15000 #average speed in m/hr
@@ -61,7 +57,7 @@ trips_annual <- 416 # roundtrips per farm per year, for 2 boats (1 boat @ 5 trip
 one_way_trips_annual <- 2*trips_annual # (we have to double the roundtrips because we need to take into account that distance traveled happens TWICE for every round trip)
 
 # Create raster for all fuel costs:
-annual_fuel_cost_econ <- (dist_shore/vessel_speed)*fuel_consumption*diesel_price*one_way_trips_annual
+annual_fuel_cost_econ <- reactive((site_suitability$dist_shore()/vessel_speed)*fuel_consumption*diesel_price*one_way_trips_annual)
 
 
 full_time_workers <- 40
@@ -77,13 +73,13 @@ workers_onshore <- 5
 fixed_labor_cost <- full_time_workers*hourly_wage*annual_hours
 
 # Determine # of Annual Transit Hours
-annual_transit_hours <- (dist_shore/vessel_speed)*one_way_trips_annual
+annual_transit_hours <- reactive((site_suitability$dist_shore()/vessel_speed)*one_way_trips_annual)
 
 # Determine Annual Wage Cost for Transit Hours Per Farm
-transit_cost <- workers_offshore*annual_transit_hours*hourly_wage
+transit_cost <- reactive(workers_offshore*annual_transit_hours()*hourly_wage)
 
 # Create raster for total annual wage costs
-total_annual_wage_costs <- transit_cost+fixed_labor_cost
+total_annual_wage_costs <- reactive(transit_cost()+fixed_labor_cost)
 
 # Farm Design
 cage_cost <- 312000
@@ -148,7 +144,7 @@ annuity <- (function(c, r = risk_discount, t = 10) {
 amortized_costs <- reactive(annuity(one_time_fixed_costs_depreciated()))
 
 # Find Total Costs
-cost_total <- reactive(amortized_costs() + total_annual_fixed_costs() + annual_fuel_cost_econ + total_annual_wage_costs)
+cost_total <- reactive(amortized_costs() + total_annual_fixed_costs() + annual_fuel_cost_econ() + total_annual_wage_costs())
 
 # Find Iost of Suitability Cells
 #  cost_of_suitable <- reactive(mask(cost_total(), suitable()))

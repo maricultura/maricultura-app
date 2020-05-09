@@ -1,7 +1,7 @@
-library(shiny)
-library(shinyBS)
 
+######################################################################################
 # Module UI function
+######################################################################################
 siteSuitUI <- function(id){
   ns = NS(id)
   tabPanel(div(icon("map-pin"),"Site Suitability"),
@@ -436,13 +436,11 @@ siteSuitUI <- function(id){
       values$text <- append(values$text, inputs_suitability(), input$run_button-1)
     }
     )
-    
-    
-    
-    
-    
+  
+    # Return list with parameters needed by other module functions   
    return(list(
         suit = reactive(suitable()),
+        dist_shore = reactive(dist_shore),
         values_x = reactive(values$x),
         values_y = reactive(values$y),
         values_text = reactive(values$text)

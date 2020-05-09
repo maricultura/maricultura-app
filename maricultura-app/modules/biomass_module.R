@@ -1,5 +1,7 @@
 
+######################################################################################
 # Module UI function
+######################################################################################
 biomassProdUI <- function(id){
   ns = NS(id)
   
@@ -74,38 +76,15 @@ suitable_sst <- reactive(
   reclassify(suitable_sst_0(), cbind(0, NA))
 )
 
-
 # Set reactive values
 fish_selection <-  reactive({
   species_df %>% 
     filter(species == input$selectSpecies)
 })  
 
-# Separete cells into cells above and below optimal SST
-#cells_below_optimal <- reactive(
-#suitable_sst() < fish_selection()$T0
-#)
-
-#cells_above_optimal <-  reactive(
-#suitable_sst() >= fish_selection()$T0
-# )
-
-# Apply growth equations
-# growth_below_optimal <- reactive(
-#fish_selection()$a1*cells_below_optimal()*suitable_sst() + fish_selection()$b1*cells_below_optimal()
-#)
-# growth_above_optimal <- reactive(
-#   fish_selection()$a2*cells_above_optimal()*suitable_sst() + fish_selection()$b2*cells_above_optimal()
-# )
-
 growth_rate <- reactive(
   fish_selection()$A_omega*suitable_sst() + fish_selection()$B_omega
 )
-
-# Add both rasters
-#growth_raster <- eventReactive( input$run_button_growth,
-#                               growth_above_optimal() + growth_below_optimal()
-#)
 
 #Stocking density and number of cages for biomass 
 stockingdensity <- reactive(input$stockingdensity)
@@ -117,16 +96,11 @@ survival_rate <- 0.85
 growth_raster <- eventReactive(input$run_button_growth,
                                (growth_rate()/6.066)*6.066*(stockingdensity()*numberofcages()*cage_size)*survival_rate/1000) # dividing by 1000 to convert from kg to MT
 
-
-
-
 # Render growth plot (now with the new growth raster)
 output$growthMap <- renderLeaflet({
   # Palette
   pal_growth <- colorNumeric(c("#DAF7A6", "#C70039", "#581845"), values(growth_raster()),
                              na.color = "transparent")
-  
-  
   
   # Leaflet map
   leaflet(options = leafletOptions( zoomSnap = 0.2)) %>%
@@ -170,7 +144,7 @@ output$download_button_growth <- downloadHandler(
     
   })
 
-
+# Return list with parameters needed by other module functions
 return(list(
   growth_r = reactive(growth_raster()),
   cage_num = reactive(numberofcages()),
