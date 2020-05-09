@@ -13,22 +13,23 @@ econUI <- function(id){
              sidebarPanel(
                tabsetPanel(type = "tabs",
                            tabPanel("Economic Factors",
-                                    numericInput(ns("fingerlingprice"), label = h3("Fingerling Price ($USD/fish)"),
+                                    h4("Select value(s):"),
+                                    numericInput(ns("fingerlingprice"), label = h5("Fingerling Price ($USD/fish)"),
                                                  min = .10,
                                                  max = 10.00,
                                                  step = .10,
                                                  value = 1.50),
-                                    numericInput(ns("feedprice"), label = h3("Feed Price ($USD/kg)"),
+                                    numericInput(ns("feedprice"), label = h5("Feed Price ($USD/kg)"),
                                                  min = 1.00,
                                                  max = 20.00,
                                                  step = .10,
                                                  value = 2.10),
-                                    numericInput(ns("feedconversionratio"), label = h3("Feed Conversion Ratio"),
+                                    numericInput(ns("feedconversionratio"), label = h5("Feed Conversion Ratio"),
                                                  min = 1,
                                                  max = 10,
                                                  step = 1,
                                                  value = 3),
-                                    numericInput(ns("priceoffish"), label = h3("Price of Fish at Market ($USD)"),
+                                    numericInput(ns("priceoffish"), label = h5("Price of Fish at Market ($USD)"),
                                                  min = 1,
                                                  max = 20,
                                                  step = .10,
@@ -172,21 +173,39 @@ npv <- eventReactive(input$run_button_economics,
                         (profit_raster()/(1-risk_discount)^10))/1000000) # divided by 1000000 to convert from USD to billion USD
 
 
-# Create an Ouput Map
+### Waiter
+# Create waiter spinner
+waiting_screen <- tagList(spin_flower(),
+                          h4("Loading map..."))
+
+# Show waiter after clicking run button
+observeEvent(input$run_button_economics, {
+  waiter_show(html = waiting_screen,
+              color = "#222222")
+})
 
 # Render economics plot
 output$economics_map <- renderLeaflet({
   # Palette
-  pal_econ <- colorNumeric(c("#DAF7A6", "#C70039", "#581845"),
+  pal_econ <- colorNumeric(c("#185858", "#00c76a", "#f4f7a6"),
                            values(npv()),
                            na.color = "transparent")
+  
+  # Reverse palette
+  rev_pal_econ <- colorNumeric(c("#185858", "#00c76a", "#f4f7a6"),
+                                 values(npv()),
+                                 na.color = "transparent",
+                                 reverse = TRUE)
+  
+  # Hide waiter after map is rendered
+  on.exit(waiter_hide())
   
   # Leaflet map
   leaflet(options = leafletOptions( zoomSnap = 0.2)) %>%
     addTiles(group = "Open Street Map") %>%
     addProviderTiles("Esri.WorldGrayCanvas", group = "Esri Gray Canvas (default)") %>%
     addRasterImage(npv(),
-                   colors = pal_econ,
+                   colors = rev_pal_econ,
                    group = "Economic Model") %>%
     fitBounds(lng1 = -54.6903404, # sets initial view of map to fit coordinates
               lng2 = -25.835314,

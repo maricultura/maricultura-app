@@ -14,15 +14,16 @@ biomassProdUI <- function(id){
                 tabsetPanel(type = "tabs",
                             tabPanel( "Species",
                                       radioButtons(inputId = ns("selectSpecies"),
-                                                   label = "Pick a species",
+                                                   label = h4("Select a species:"),
                                                    choiceNames = list(
-                                                     HTML('<span>Atlantic salmon (<i>Salmo salar</i>)<br><img src="atlantic_salmon.png" alt=“image of salmon“ height="100px"/></span>'),
-                                                     HTML('<span>gilthead seabream (<i>Sparus aurata</i>)<br><br><img src="seabream.png" alt=“image of salmon“ height="70px"/></span>'),
-                                                     HTML('<span>cobia (<i>Rachycentron canadum</i>)<br><img src="cobia.png" alt=“image of salmon“  height="100px"/></span>')
+                                                     HTML('<span><h5>Atlantic salmon (<i>Salmo salar</i>)</h5><img src="atlantic_salmon.png" alt=“image of salmon“ height="100px"/></span>'),
+                                                     HTML('<span><h5>gilthead seabream (<i>Sparus aurata</i>)</h5><img src="seabream.png" alt=“image of seabream“ height="70px"/></span>'),
+                                                     HTML('<span><h5>cobia (<i>Rachycentron canadum</i>)</h5><img src="cobia.png" alt=“image of cobia“  height="100px"/></span>')
                                                    ),
                                                    choiceValues = unique(species_df$species),
                                                    selected =  HTML('<span>cobia (<i>Rachycentron canadum</i>)<br><img src="cobia.png" alt=“image of salmon“  height="100px"/></span>')),
-                                      numericInput(ns("stockingdensity"), label = HTML("<h3>Initial Stocking Density (fish/m<sup>3</sup>)</h3>"),
+                                      h4("Select value(s):"),
+                                      numericInput(ns("stockingdensity"), label = HTML("<h5>Initial Stocking Density (fish/m<sup>3</sup>)</h5>"),
                                                    min = 1,
                                                    max = 50,
                                                    step = 1,
@@ -33,7 +34,7 @@ biomassProdUI <- function(id){
                                                 trigger = "hover",
                                                 options = NULL),
                                       numericInput(ns("numberofcages"),
-                                                   label = HTML("<h3>Number of Cages (6400m<sup>3</sup> each)</h3>"),
+                                                   label = HTML("<h5>Number of Cages (6400m<sup>3</sup> each)</h5>"),
                                                                               min = 1,
                                                                               max = 32,
                                                                               step = 1,
@@ -96,18 +97,38 @@ survival_rate <- 0.85
 growth_raster <- eventReactive(input$run_button_growth,
                                (growth_rate()/6.066)*6.066*(stockingdensity()*numberofcages()*cage_size)*survival_rate/1000) # dividing by 1000 to convert from kg to MT
 
-# Render growth plot (now with the new growth raster)
+### Waiter
+# Create waiter spinner
+waiting_screen <- tagList(spin_flower(),
+                          h4("Loading map..."))
+
+# Show waiter after clicking run button
+observeEvent(input$run_button_growth, {
+  waiter_show(html = waiting_screen,
+              color = "#222222")
+})
+
+# Render growth plot
 output$growthMap <- renderLeaflet({
   # Palette
-  pal_growth <- colorNumeric(c("#DAF7A6", "#C70039", "#581845"), values(growth_raster()),
+  pal_growth <- colorNumeric(c("#3a1858", "#c700c4", "#f4f7a6"),
+                             values(growth_raster()),
                              na.color = "transparent")
+  # Reverse palette
+  rev_pal_growth <- colorNumeric(c("#3a1858", "#c700c4", "#f4f7a6"),
+                                               values(growth_raster()),
+                                               na.color = "transparent",
+                                 reverse = TRUE)
+  
+  # Hide waiter after map is rendered
+  on.exit(waiter_hide())
   
   # Leaflet map
   leaflet(options = leafletOptions( zoomSnap = 0.2)) %>%
     addTiles(group = "Open Street Map") %>%
     addProviderTiles("Esri.WorldGrayCanvas", group = "Esri Gray Canvas (default)") %>%
     addRasterImage(growth_raster(),
-                   colors = pal_growth,
+                   colors = rev_pal_growth,
                    group = "Growth Model") %>%
     fitBounds(lng1 = -54.6903404, # sets initial view of map to fit coordinates
               lng2 = -25.835314,

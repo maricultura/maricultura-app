@@ -12,7 +12,8 @@ siteSuitUI <- function(id){
            sidebarLayout(
              sidebarPanel(
                tabsetPanel(type = "tabs",
-                           tabPanel( "Variable",
+                           tabPanel( "Oceanographic Conditions",
+                                     h4("Select Value(s):"),
                                      sliderInput(ns("sst_slider"),
                                                  label = h5("Sea Surface Temperature (°C)"),
                                                  min = 0, 
@@ -54,14 +55,15 @@ siteSuitUI <- function(id){
                                                   max = 200,
                                                   step = 0.5,
                                                   value = 25)),
-                           tabPanel( "Fixed",
-                                     checkboxGroupInput(ns("checkGroup"), label = h3("Select Barrier(s)"), 
-                                                        choices = list("MPAs" = 1,
-                                                                       "Reefs" = 2,
-                                                                       "Artificial Reefs" = 3,
-                                                                       "Oil Pipelines" = 4,
-                                                                       "Oil Production" = 5,
-                                                                       "Shipping lanes" = 6),
+                           tabPanel( "Spatial Constraints",
+                                     checkboxGroupInput(ns("checkGroup"), label = h4("Select Constraint(s):"), 
+                                                        choiceNames = list( HTML("<h5>MPAs</h5>"),
+                                                                            HTML("<h5>Reefs</h5>"),
+                                                                            HTML("<h5>Artificial Reefs</h5>"),
+                                                                            HTML("<h5>Oil Pipelines</h5>"),
+                                                                            HTML("<h5>Oil Production</h5>"),
+                                                                            HTML("<h5>Shipping lanes</h5>")),
+                                                        choiceValues = c(1, 2, 3, 4, 5, 6),
                                                         selected = c(1, 2, 3, 4, 5, 6))
                            )),
                actionButton(ns("run_button"), label = "Run"),
@@ -314,6 +316,7 @@ siteSuitUI <- function(id){
           alpha = TRUE
         )
       
+      # Hide waiter after map is rendered
       on.exit(waiter_hide())
       
       # Leaflet map
