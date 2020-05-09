@@ -20,7 +20,8 @@ biomassProdUI <- function(id){
                                                      HTML('<span>gilthead seabream (<i>Sparus aurata</i>)<br><br><img src="seabream.png" alt=“image of salmon“ height="70px"/></span>'),
                                                      HTML('<span>cobia (<i>Rachycentron canadum</i>)<br><img src="cobia.png" alt=“image of salmon“  height="100px"/></span>')
                                                    ),
-                                                   choiceValues = unique(species_df$species)),
+                                                   choiceValues = unique(species_df$species),
+                                                   selected =  HTML('<span>cobia (<i>Rachycentron canadum</i>)<br><img src="cobia.png" alt=“image of salmon“  height="100px"/></span>')),
                                       numericInput(ns("stockingdensity"), label = HTML("<h3>Initial Stocking Density (fish/m<sup>3</sup>)</h3>"),
                                                    min = 1,
                                                    max = 50,
