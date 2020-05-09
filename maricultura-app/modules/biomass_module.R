@@ -21,7 +21,8 @@ biomassProdUI <- function(id){
                                                      HTML('<span><h5>cobia (<i>Rachycentron canadum</i>)</h5><img src="cobia.png" alt=“image of cobia“  height="100px"/></span>')
                                                    ),
                                                    choiceValues = unique(species_df$species),
-                                                   selected =  HTML('<span>cobia (<i>Rachycentron canadum</i>)<br><img src="cobia.png" alt=“image of salmon“  height="100px"/></span>')),
+                                                   selected =  HTML('<span>cobia (<i>Rachycentron canadum</i>)<br><img src="cobia.png" alt=“image of salmon“  height="100px"/></span>'))),
+                            tabPanel("Farm",
                                       h4("Select value(s):"),
                                       numericInput(ns("stockingdensity"), label = HTML("<h5>Initial Stocking Density (fish/m<sup>3</sup>)</h5>"),
                                                    min = 1,
@@ -152,6 +153,10 @@ output$growthMap <- renderLeaflet({
     addMouseCoordinates()
 }
 )
+
+### Modal Dialogue ###
+observeEvent(input$run_button_growth, 
+             showModal(modal3()), once = TRUE)
 
 ### Download growth map
 output$download_button_growth <- downloadHandler(

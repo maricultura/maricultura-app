@@ -365,6 +365,11 @@ siteSuitUI <- function(id){
         addMouseCoordinates()
     })
     
+  
+    ### Modal Dialogue ###
+    observeEvent(input$run_button, 
+      showModal(modal2()), once = TRUE)
+    
     ### Download suitability map  ###
     output$download_button <- downloadHandler(
       

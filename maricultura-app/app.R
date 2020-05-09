@@ -20,7 +20,7 @@ library(shinyjs)
 source("scripts/about_page.R")
 source("scripts/species_df.R")
 source("scripts/footer.R")
-source("scripts/modal_dialogue.R")
+source("scripts/modal_dialogues.R")
 
 # Source modules
 source("modules/siteSuit_module.R")
@@ -107,10 +107,9 @@ server <- function(input, output) {
   observeEvent(r$run_num_suit, {
     showTab(inputId = "navbar", target = HTML('<div><i class="fa fa-calculator"></i> Area Calculator</div>'))
   })
-
   
   ### Modal Dialogue ###
-  showModal(dataModal())
+  showModal(startModal())
   
   ### Call Modules for Each Tab ###
 
