@@ -224,7 +224,7 @@ output$economics_map <- renderLeaflet({
     addLegend("topright",
               pal = pal_econ,
               values = values(npv()),
-              title = "NPV - 10 yrs<br>( Billion $USD/cell)",
+              title = "Net Present Value - 10 yrs<br>( Billion $USD/cell)",
               labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE))) %>% 
     addMouseCoordinates()
   

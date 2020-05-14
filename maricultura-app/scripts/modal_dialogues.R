@@ -24,13 +24,13 @@ modal2 <- function(failed = FALSE) {
   modalDialog(
     title = tags$h3(
       style = "text-align: center;",
-      "Success! Your suitable sites map has been generated!"
+      "Success! Your site suitability map has been generated!"
     ),
     tags$div(
       style = "text-align: center;",
       tags$p("Now you can: "),
-      HTML('<p><b>1.</b>Estimate biomass production of suitable sites in the <span style="color:#2680e3;"><b><i class="fa fa-chart-line"></i>Biomass</b></span> tab.</p>'),
-      HTML('<p><b>2.</b>Calculate total area of suitable sites in the <span style="color:#2680e3;"><b><i class="fa fa-calculator"></i> Area Calculator</b></span> tab.</p>')
+      HTML('<p><b>1.</b> Estimate yearly potential biomass production of suitable sites in the <span style="color:#2680e3;"><b><i class="fa fa-chart-line"></i>Biomass</b></span> tab.</p>'),
+      HTML('<p><b>2.</b> Calculate total area of suitable sites in the <span style="color:#2680e3;"><b><i class="fa fa-calculator"></i> Area Calculator</b></span> tab.</p>')
     ),
     footer = tagList(
       modalButton("Continue")
@@ -48,7 +48,7 @@ modal3 <- function(failed = FALSE) {
     tags$div(
       style = "text-align: center;",
       tags$p("Now you can: "),
-      HTML('<p><b>1.</b>Estimate profitability of suitable sites in the <span style="color:#2680e3;"><b><i class="fas fa-coins"></i>Economics</b></span> tab.</p>'),
+      HTML('<p><b>1.</b> Estimate profitability of suitable sites in the <span style="color:#2680e3;"><b><i class="fas fa-coins"></i>Economics</b></span> tab.</p>'),
     ),
     footer = tagList(
       modalButton("Continue")
