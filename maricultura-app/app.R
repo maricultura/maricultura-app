@@ -72,8 +72,8 @@ ui <- fluidPage(
              tabPanel(HTML('<div><i class="fas fa-book"></i> User Guide</div>'),
                       fluidRow(
                         column(12
-                               #,HTML('<iframe height=400px  width=100% src= "user_guide.pdf"></iframe>')
-                               ))
+                               ,HTML('<iframe height=400px  width=100% src= "user_guide.pdf"></iframe>')
+                               )),
              ),
              
              # Eight Tab: Metadata
@@ -138,6 +138,7 @@ server <- function(input, output) {
   # Metadata Table
   metadata_table <- callModule(meta,
                                "metadata_table")
+
   
 }
 # Run the application 
