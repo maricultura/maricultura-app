@@ -14,3 +14,10 @@ b <- c(0, 0, 3.11)
 A_omega <- c(0, 0, 0.0714*12)
 B_omega <- c(0, 0, -1.5714*12)
 species_df <- data.frame(species, a1, a2, b1, b2, T0, Linf, time0, a, b, A_omega, B_omega)
+
+#Names for radio buttons
+salmonName <-  HTML('<span><h5>Atlantic salmon (<i>Salmo salar</i>)</h5><img src="atlantic_salmon.png" alt=“image of salmon“ height="100px"/></span>')
+
+seabreamName <-  HTML('<span><h5>gilthead seabream (<i>Sparus aurata</i>)</h5><img src="seabream.png" alt=“image of seabream“ height="70px"/></span>')
+
+cobiaName <- HTML('<span><h5>cobia (<i>Rachycentron canadum</i>)</h5><img src="cobia.png" alt=“image of cobia“  height="100px"/></span>')

@@ -33,6 +33,8 @@ source("modules/area_module.R")
 # Define UI for application
 ##########################################################################################
 ui <- fluidPage(
+  # Use Shinyjs to disable radio buttons
+  shinyjs::useShinyjs(),
   
   # Add waiter dependencies
   use_waiter(),
@@ -71,8 +73,8 @@ ui <- fluidPage(
              # Seventh Tab: User Guide
              tabPanel(HTML('<div><i class="fas fa-book"></i> User Guide</div>'),
                       fluidRow(
-                        column(12
-                               ,HTML('<iframe height=400px  width=100% src= "user_guide.pdf"></iframe>')
+                        column(12, 
+                                HTML('<iframe height=400px  width=100% src= "user_guide.pdf"></iframe>')
                                )),
              ),
              

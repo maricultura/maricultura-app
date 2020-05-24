@@ -445,5 +445,12 @@ siteSuitUI <- function(id){
         values_text = reactive(values$text)
       ))
     
+    ### Disable other fish buttons
+    observe({
+      if (1==1) {
+        shinyjs::disable(ns("sst_slider"))
+      }
+    })
+    
 }
   

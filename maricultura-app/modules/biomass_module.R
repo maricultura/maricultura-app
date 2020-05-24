@@ -16,12 +16,18 @@ biomassProdUI <- function(id){
                                       radioButtons(inputId = ns("selectSpecies"),
                                                    label = h4("Select a species:"),
                                                    choiceNames = list(
-                                                     HTML('<span><h5>Atlantic salmon (<i>Salmo salar</i>)</h5><img src="atlantic_salmon.png" alt=“image of salmon“ height="100px"/></span>'),
-                                                     HTML('<span><h5>gilthead seabream (<i>Sparus aurata</i>)</h5><img src="seabream.png" alt=“image of seabream“ height="70px"/></span>'),
-                                                     HTML('<span><h5>cobia (<i>Rachycentron canadum</i>)</h5><img src="cobia.png" alt=“image of cobia“  height="100px"/></span>')
+                                                    salmonName,
+                                                    seabreamName,
+                                                    cobiaName
                                                    ),
-                                                   choiceValues = unique(species_df$species),
-                                                   selected =  HTML('<span>cobia (<i>Rachycentron canadum</i>)<br><img src="cobia.png" alt=“image of salmon“  height="100px"/></span>'))),
+                                                   choiceValues = list(
+                                                     "Atlantic salmon",
+                                                     "Gilthead seabream",
+                                                     "Rachycentron
+canadum"
+                                                   ),
+                                                   selected = "Rachycentron
+canadum")) ,
                             tabPanel("Farm",
                                       h4("Select value(s):"),
                                       numericInput(ns("stockingdensity"), label = HTML("<h5>Initial Stocking Density (fish/m<sup>3</sup>)</h5>"),
@@ -53,13 +59,23 @@ biomassProdUI <- function(id){
                 leafletOutput(ns("growthMap"), height = "100vh")
               )
             ))
+
 }
-  
   
 ######################################################################################
 # Module server function
 ######################################################################################
 biomassProd <- function(input, output, session, site_suitability, r) {
+ 
+# Dissable radio buttons for Atlantic salmon and Gilthead seabream
+  observe({
+    if (input$selectSpecies != "A") {
+      shinyjs::disable(selector = '[type=radio][value="Atlantic salmon"]')
+      shinyjs::runjs("$('[type=radio][value='Atlantic salmon']').parent().parent().addClass('disabled').css('opacity', 0.4)")
+      shinyjs::disable(selector = '[type=radio][value="Gilthead seabream"]')
+      shinyjs::runjs("$('[type=radio][value='Gilthead seabream']').parent().parent().addClass('disabled').css('opacity', 0.4)")
+    }
+  })
   
 # Keep track of clicks on run button
   observeEvent(input$run_button_growth, {
@@ -168,6 +184,7 @@ output$download_button_growth <- downloadHandler(
     writeRaster(growth_raster(), file)
     
   })
+
 
 # Return list with parameters needed by other module functions
 return(list(
