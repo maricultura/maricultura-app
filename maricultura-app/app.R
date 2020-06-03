@@ -41,7 +41,11 @@ ui <- fluidPage(
   
   # Head element (contains metadata for app)
   tags$head(
-    tags$style(HTML("@import url('https://fonts.googleapis.com/css?family=Source+Code+Pro&display=swap')"))),
+    tags$style(HTML("@import url('https://fonts.googleapis.com/css?family=Source+Code+Pro&display=swap');
+                   div, body, footer, navbar {
+                    margin: 0px 0px 0px 0px;
+                    padding:  0px 0px 0px 0px;
+                    }"))),
   
   # Theme for the app
   theme = shinytheme("cosmo"),

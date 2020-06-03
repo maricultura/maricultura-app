@@ -23,7 +23,7 @@ creators <- HTML('<div style="height: 75vh; overflow: auto" class="jumbotron">
   <p style="text-align: justify;" class="lead">Our team consists of 5 master’s students at the Bren School of Environmental Science & Management at the University of California, Santa Barbara: Anna Calle, Kirby Bartlett, Sandra Fogg, Eva Marrero, and Caio Vianna.We came together as a group with a common interest in marine conservation and sustainable utilization of oceea resources. Our collaborative thesis is in partnership with the World Wildlife Fund in Brazil.</p>
   <p class="lead">For more information visit our website.</p>
   <p style="display: inline-block; vertical-align: bottom" class="lead">
-    <a class="btn btn-primary btn-lg" href=https://maricultura.weebly.com" target="_blank" role="button">Learn more</a>
+    <a class="btn btn-primary btn-lg" href=https://maricultura.weebly.com target="_blank" role="button">Learn more</a>
   </p>
   </div>
 </div>')
