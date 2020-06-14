@@ -1,13 +1,12 @@
 ﻿Layer,Source,Link ,Geometry type,File format ,Spatial Resolution ,Time period,Spatial Extent,Projection
 EEZ,Marineregions,http://www.marineregions.org,Polygon,shapefile,N/A,2005-2007,Brazil,WGS84
 Depth,GEBCO,https://www.gebco.net,Raster,netCDF,15 arc-sec,2014,Global,WGS84
-Sea Surface Temperature,Bio-ORACLE,http://www.bio-oracle.org,Raster,tif,"9.2 km, or 5 arc-min",2002-2009,Global,WGS84
+Sea Surface Temperature,Bio-ORACLE,http://www.bio-oracle.org,Raster,tif,"9.2 km, or 5 arc-min",2000-2014,Global,WGS84
 MPAs,World Database on Protected Areas,https://www.protectedplanet.net,Polygon,shapefile,N/A,2019,Brazil,GRS80
 Reefs,WWF,Not publicly available,Polygon,shapefile,N/A,2018,Brazil,SIRGAS 2000 / Brazil Polyconic
 Artificial Reefs,WWF,Not publicly available,Polygon,shapefile,N/A,2018,Brazil,SIRGAS 2000 / Brazil Polyconic
-Dissolved Oxygen,Bio-ORACLE,http://www.bio-oracle.org,Raster,tif,"9.2 km, or 5 arc-min",1898 - 2009,Global,WGS84
-Current Velocity,Bio-ORACLE,http://www.bio-oracle.org,Raster,tif,"9.2 km, or 5 arc-min",,Global,WGS84
+Dissolved Oxygen,Bio-ORACLE,http://www.bio-oracle.org,Raster,tif,"9.2 km, or 5 arc-min",2000-2014,Global,WGS84
+Current Velocity,Bio-ORACLE,http://www.bio-oracle.org,Raster,tif,"9.2 km, or 5 arc-min",2000-2014,Global,WGS84
 Oil pipelines,WWF,Not publicly available,Polygon,shapefile,N/A,2018,Brazil,SIRGAS 2000 / Brazil Polyconic
 Oil production,WWF,Not publicly available,Polygon,shapefile,N/A,2018,Brazil,SIRGAS 2000 / Brazil Polyconic
-Significant Wave Height,,,,,,,,
-Shipping lanes,,,,,,,,
+Shipping lanes,NCEAS,https://knb.ecoinformatics.org,Raster,tif,934.5 m,2013,Global,WGS84
