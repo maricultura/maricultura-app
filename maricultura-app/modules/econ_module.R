@@ -216,6 +216,7 @@ output$economics_map <- renderLeaflet({
       onClick=JS("function(btn, map){
                    map.setView([-14.0182737, -39.8789667]);
                    map.setZoom(4.6);}"))) %>%
+    addFullscreenControl() %>%
     addLayersControl(
       baseGroups = c("Esri Gray Canvas (default)", "Open Street Map"),
       overlayGroups = "Suitable Areas",
