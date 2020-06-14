@@ -5,8 +5,8 @@ account: maricultura-gp
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 1676407
-bundleId: 3268952
+bundleId: 3269187
 url: https://maricultura-gp.shinyapps.io/maricultura-app/
-when: 1592163052.44585
+when: 1592167528.17186
 asMultiple: FALSE
 asStatic: FALSE
