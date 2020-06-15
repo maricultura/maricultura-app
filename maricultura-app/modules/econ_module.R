@@ -14,6 +14,16 @@ econUI <- function(id){
                tabsetPanel(type = "tabs",
                            tabPanel("Economic Factors",
                                     h4("Select value(s):"),
+                                    numericInput(ns("dieselprice"), label = h5("Diesel Price ($USD/L)"),
+                                                 min = .10,
+                                                 max = 5.00,
+                                                 step = .01,
+                                                 value = 0.92),
+                                    numericInput(ns("hourlywage"), label = h5("Hourly Wage ($USD/hour)"),
+                                                 min = 1,
+                                                 max = 15,
+                                                 step = 0.5,
+                                                 value = 4.50),
                                     numericInput(ns("fingerlingprice"), label = h5("Fingerling Price ($USD/fish)"),
                                                  min = .10,
                                                  max = 10.00,
@@ -52,7 +62,7 @@ econ <- function(input, output, session, site_suitability, biomass_production) {
 num_farms <- 1 # number of farms per 9.2x9.2 km cell, most conservative estimate of 16 cages per/farm (per cell)
 fuel_consumption <- 26.96 #L/hour
 vessel_speed <- 15000 #average speed in m/hr
-diesel_price <- 0.92 #USD/L using 2020 exchange rate 1 usd = 4 reais
+# diesel_price <- 0.92 USD/L using 2020 exchange rate 1 usd = 4 reais
 distance_to_port <- 25 #depend on cell
 num_of_boats <- 2
 
@@ -60,29 +70,28 @@ trips_annual <- 416 # roundtrips per farm per year, for 2 boats (1 boat @ 5 trip
 one_way_trips_annual <- 2*trips_annual # (we have to double the roundtrips because we need to take into account that distance traveled happens TWICE for every round trip)
 
 # Create raster for all fuel costs:
-annual_fuel_cost_econ <- reactive((site_suitability$dist_shore()/vessel_speed)*fuel_consumption*diesel_price*one_way_trips_annual)
+annual_fuel_cost_econ <- reactive((site_suitability$dist_shore()/vessel_speed)*fuel_consumption*input$dieselprice*one_way_trips_annual)
 
 
 full_time_workers <- 40
 monthly_hours <- 160 #hours/month per fulltime employee
 annual_hours <- (monthly_hours*12)
-num_of_employees <-  ##/farm
-  hourly_wage <- 4.50 #USD/hour average
+# hourly_wage <- 4.50 #USD/hour average
 work_days_per_month <- 20
 workers_offshore <- 35
 workers_onshore <- 5
 
 # Determine Annual Fixed Wage Cost per Farm
-fixed_labor_cost <- full_time_workers*hourly_wage*annual_hours
+fixed_labor_cost <- reactive(full_time_workers*input$hourlywage*annual_hours)
 
 # Determine # of Annual Transit Hours
 annual_transit_hours <- reactive((site_suitability$dist_shore()/vessel_speed)*one_way_trips_annual)
 
 # Determine Annual Wage Cost for Transit Hours Per Farm
-transit_cost <- reactive(workers_offshore*annual_transit_hours()*hourly_wage)
+transit_cost <- reactive(workers_offshore*annual_transit_hours()*input$hourlywage)
 
 # Create raster for total annual wage costs
-total_annual_wage_costs <- reactive(transit_cost()+fixed_labor_cost)
+total_annual_wage_costs <- reactive(transit_cost()+fixed_labor_cost())
 
 # Farm Design
 cage_cost <- 312000
